@@ -32,14 +32,14 @@ const app = new Hono<Env>()
     c.set('extractorConfiguration', extractorConfiguration);
     return next();
   })
-  .get(path.serviceConfigurationPath, async (c) => {
+  .post(path.parPath, async (c) => {
     const endpointConfiguration = new ParEndpointConfigurationImpl(
       c.get('baseHandlerConfiguration'),
       c.get('extractorConfiguration')
     );
     return await endpointConfiguration.processRequest(c.req.raw);
   })
-  .get(path.serviceConfigurationPath, async (c) => {
+  .get(path.authorizationPath, async (c) => {
     const endpointConfiguration = new AuthorizationEndpointConfigurationImpl(
       c.get('baseHandlerConfiguration'),
       c.get('extractorConfiguration')
@@ -53,7 +53,7 @@ const app = new Hono<Env>()
       );
     return await endpointConfiguration.processRequest(c.req.raw);
   })
-  .get(path.serviceConfigurationPath, async (c) => {
+  .get(path.credentialIssuerMetadataPath, async (c) => {
     const endpointConfiguration =
       new CredentialMetadataEndpointConfigurationImpl(
         c.get('baseHandlerConfiguration')
