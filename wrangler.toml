@@ -1,5 +1,6 @@
 name = "au3te-ts-hono"
 compatibility_date = "2024-10-25"
+assets = { directory = "./public/" }
 
 # [vars]
 # MY_VAR = "my-variable"

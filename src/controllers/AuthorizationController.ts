@@ -14,21 +14,16 @@
  * language governing permissions and limitations under the
  * License.
  */
-import { Session, sessionSchemas } from 'au3te-ts-base/session';
-import { ExtractorConfiguration } from 'au3te-ts-base/extractor';
-import { BaseHandlerConfiguration } from 'au3te-ts-base/handler';
+import { Context } from 'hono';
+import { AuthorizationEndpointConfigurationImpl } from 'au3te-ts-base/endpoint.authorization';
+import { Env } from '../env';
 
-export interface Env {
-  Bindings: {
-    API_VERSION: string;
-    API_BASE_URL: string;
-    API_KEY: string;
-    ACCESS_TOKEN: string;
-    SESSION_KV: KVNamespace;
-  };
-  Variables: {
-    session: Session<typeof sessionSchemas>;
-    extractorConfiguration: ExtractorConfiguration;
-    baseHandlerConfiguration: BaseHandlerConfiguration<typeof sessionSchemas>;
-  };
+export class AuthorizationController {
+  static async handle(c: Context<Env>) {
+    const endpointConfiguration = new AuthorizationEndpointConfigurationImpl(
+      c.get('baseHandlerConfiguration'),
+      c.get('extractorConfiguration')
+    );
+    return await endpointConfiguration.processRequest(c.req.raw);
+  }
 }
