@@ -16,7 +16,9 @@
  */
 import { Context } from 'hono';
 import { AuthorizationEndpointConfigurationImpl } from 'au3te-ts-base/endpoint.authorization';
+import { AuthorizationPageModel } from 'au3te-ts-common/page-model.authorization';
 import { Env } from '../env';
+import { AuthorizationPage } from '../view/AuthorizationPage';
 
 export class AuthorizationController {
   static async handle(c: Context<Env>) {
@@ -24,6 +26,11 @@ export class AuthorizationController {
       c.get('baseHandlerConfiguration'),
       c.get('extractorConfiguration')
     );
-    return await endpointConfiguration.processRequest(c.req.raw);
+    const result = await endpointConfiguration.processRequest(c.req.raw);
+    if (result.ok) {
+      const pageModel = (await result.json()) as AuthorizationPageModel;
+      return c.render(<AuthorizationPage {...pageModel} />);
+    }
+    return result;
   }
 }

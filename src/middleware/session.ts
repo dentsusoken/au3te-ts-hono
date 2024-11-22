@@ -144,6 +144,7 @@ export class KVSession<T extends SessionSchemas> implements Session<T> {
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
   async set<K extends keyof T>(key: K, value: z.infer<T[K]>): Promise<void> {
+    await this.loadData();
     this.#data[key] = JSON.stringify(value);
     await this.saveData();
   }
@@ -158,6 +159,7 @@ export class KVSession<T extends SessionSchemas> implements Session<T> {
   async setBatch<K extends keyof T>(
     batch: ParsedSessionData<T, K>
   ): Promise<void> {
+    await this.loadData();
     Object.entries(batch).forEach(([key, value]) => {
       this.#data[key as K] = JSON.stringify(value);
     });
@@ -172,6 +174,7 @@ export class KVSession<T extends SessionSchemas> implements Session<T> {
    * @returns {Promise<z.infer<T[K]> | undefined>} A promise that resolves with the deleted value, or undefined if not found.
    */
   async delete<K extends keyof T>(key: K): Promise<z.infer<T[K]> | undefined> {
+    await this.loadData();
     const result = this.parseValue(key);
     delete this.#data[key];
     await this.saveData();
@@ -189,6 +192,7 @@ export class KVSession<T extends SessionSchemas> implements Session<T> {
   async deleteBatch<K extends keyof T>(
     ...keys: K[]
   ): Promise<ParsedSessionData<T, K>> {
+    await this.loadData();
     const result: ParsedSessionData<T, K> = {};
 
     keys.forEach((key) => {
