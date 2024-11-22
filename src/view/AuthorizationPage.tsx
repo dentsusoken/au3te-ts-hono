@@ -97,7 +97,19 @@ export const AuthorizationPage: FC<AuthorizationPageModel> = (props) => {
             </>
           )}
 
-          {/* Identity Assurance Section */}
+          {props.claimsForUserInfo && (
+            <>
+              <h4 id="claims-for-userinfo">Claims for UserInfo</h4>
+              <div className="indent">
+                <ul>
+                  {props.claimsForUserInfo.map((claim, index) => (
+                    <li key={index}>{claim}</li>
+                  ))}
+                </ul>
+              </div>
+            </>
+          )}
+
           {props.identityAssuranceRequired && (
             <>
               <h4 id="identity-assurance">Identity Assurance</h4>
@@ -111,11 +123,110 @@ export const AuthorizationPage: FC<AuthorizationPageModel> = (props) => {
                   </>
                 )}
 
-                {/* Verified Claims Tables */}
-                {/* ... 他の検証済みクレームセクション ... */}
+                {/* Verified Claims for ID Token */}
+                {(props.allVerifiedClaimsForIdTokenRequested ||
+                  props.verifiedClaimsForIdToken) && (
+                  <>
+                    <h5>Verified claims requested for ID token</h5>
+                    <div className="indent">
+                      {props.allVerifiedClaimsForIdTokenRequested ? (
+                        'All'
+                      ) : (
+                        <table
+                          border={1}
+                          cellPadding={5}
+                          style={{ borderCollapse: 'collapse' }}
+                          className="verified-claims"
+                        >
+                          <thead>
+                            <tr bgcolor="orange">
+                              <th>claim</th>
+                              <th>purpose</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {props.verifiedClaimsForIdToken?.map(
+                              (pair, index) => (
+                                <tr key={index}>
+                                  <td>{pair.key}</td>
+                                  <td>{pair.value}</td>
+                                </tr>
+                              )
+                            )}
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {/* Verified Claims for UserInfo */}
+                {(props.allVerifiedClaimsForUserInfoRequested ||
+                  props.verifiedClaimsForUserInfo) && (
+                  <>
+                    <h5>Verified claims requested for userinfo</h5>
+                    <div className="indent">
+                      {props.allVerifiedClaimsForUserInfoRequested ? (
+                        'All'
+                      ) : (
+                        <table
+                          border={1}
+                          cellPadding={5}
+                          style={{ borderCollapse: 'collapse' }}
+                        >
+                          <thead>
+                            <tr bgcolor="orange">
+                              <th>claim</th>
+                              <th>purpose</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {props.verifiedClaimsForUserInfo?.map(
+                              (pair, index) => (
+                                <tr key={index}>
+                                  <td>{pair.key}</td>
+                                  <td>{pair.value}</td>
+                                </tr>
+                              )
+                            )}
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             </>
           )}
+
+          {props.authorizationDetails && (
+            <>
+              <h4 id="authorization-details">Authorization Details</h4>
+              <div className="indent">
+                <pre>{props.authorizationDetails}</pre>
+              </div>
+            </>
+          )}
+
+          {/* {!props.user && props.federations && (
+            <div id="federations" className="indent">
+              <div id="federations-prompt">
+                ID federation using an external OpenID Provider
+              </div>
+              {props.federationMessage && (
+                <div id="federation-message">{props.federationMessage}</div>
+              )}
+              <ul>
+                {props.federations.map((federation, index) => (
+                  <li key={index}>
+                    <a href={`/api/federation/initiation/${federation.id}`}>
+                      {federation.server.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )} */}
 
           <h4 id="authorization">Authorization</h4>
           <div className="indent">
