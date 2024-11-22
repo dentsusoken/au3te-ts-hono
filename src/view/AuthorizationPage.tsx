@@ -14,8 +14,14 @@
  * language governing permissions and limitations under the
  * License.
  */
-import { FC, Fragment } from 'hono/jsx';
+import { FC } from 'hono/jsx';
 import { AuthorizationPageModel } from 'au3te-ts-common/page-model.authorization';
+import { ClientInfo } from './components/ClientInfo';
+import { Permissions } from './components/Permissions';
+import { Claims } from './components/Claims';
+import { IdentityAssurance } from './components/IdentityAssurance';
+import { AuthorizationForm } from './components/AuthorizationForm';
+// import { Federations } from './components/Federations';
 
 export const AuthorizationPage: FC<AuthorizationPageModel> = (props) => {
   return (
@@ -33,171 +39,21 @@ export const AuthorizationPage: FC<AuthorizationPageModel> = (props) => {
         <div id="page_title">{props.serviceName}</div>
 
         <div id="content">
-          <h3 id="client-name">{props.clientName}</h3>
-          <div className="indent">
-            <img id="logo" src={props.logoUri} alt="[Logo] (150x150)" />
-
-            <div id="client-summary">
-              <p>{props.description}</p>
-              <ul id="client-link-list">
-                {props.clientUri && (
-                  <li>
-                    <a target="_blank" href={props.clientUri} rel="noreferrer">
-                      Homepage
-                    </a>
-                  </li>
-                )}
-                {props.policyUri && (
-                  <li>
-                    <a target="_blank" href={props.policyUri} rel="noreferrer">
-                      Policy
-                    </a>
-                  </li>
-                )}
-                {props.tosUri && (
-                  <li>
-                    <a target="_blank" href={props.tosUri} rel="noreferrer">
-                      Terms of Service
-                    </a>
-                  </li>
-                )}
-              </ul>
-            </div>
-
-            <div style={{ clear: 'both' }}></div>
-          </div>
+          <ClientInfo {...props} />
 
           {props.scopes && props.scopes.length > 0 && (
-            <>
-              <h4 id="permissions">Permissions</h4>
-              <div className="indent">
-                <p>The application is requesting the following permissions.</p>
-                <dl id="scope-list">
-                  {props.scopes.map((scope, index) => (
-                    <Fragment key={index.toString()}>
-                      <dt>{scope.name}</dt>
-                      <dd>{scope.description}</dd>
-                    </Fragment>
-                  ))}
-                </dl>
-              </div>
-            </>
+            <Permissions scopes={props.scopes} />
           )}
 
           {props.claimsForIdToken && (
-            <>
-              <h4 id="claims-for-id_token">Claims for ID Token</h4>
-              <div className="indent">
-                <ul>
-                  {props.claimsForIdToken.map((claim, index) => (
-                    <li key={index}>{claim}</li>
-                  ))}
-                </ul>
-              </div>
-            </>
+            <Claims type="id_token" claims={props.claimsForIdToken} />
           )}
 
           {props.claimsForUserInfo && (
-            <>
-              <h4 id="claims-for-userinfo">Claims for UserInfo</h4>
-              <div className="indent">
-                <ul>
-                  {props.claimsForUserInfo.map((claim, index) => (
-                    <li key={index}>{claim}</li>
-                  ))}
-                </ul>
-              </div>
-            </>
+            <Claims type="userinfo" claims={props.claimsForUserInfo} />
           )}
 
-          {props.identityAssuranceRequired && (
-            <>
-              <h4 id="identity-assurance">Identity Assurance</h4>
-              <div className="indent">
-                {props.purpose && (
-                  <>
-                    <h5>Purpose</h5>
-                    <div className="indent">
-                      <p>{props.purpose}</p>
-                    </div>
-                  </>
-                )}
-
-                {/* Verified Claims for ID Token */}
-                {(props.allVerifiedClaimsForIdTokenRequested ||
-                  props.verifiedClaimsForIdToken) && (
-                  <>
-                    <h5>Verified claims requested for ID token</h5>
-                    <div className="indent">
-                      {props.allVerifiedClaimsForIdTokenRequested ? (
-                        'All'
-                      ) : (
-                        <table
-                          border={1}
-                          cellPadding={5}
-                          style={{ borderCollapse: 'collapse' }}
-                          className="verified-claims"
-                        >
-                          <thead>
-                            <tr bgcolor="orange">
-                              <th>claim</th>
-                              <th>purpose</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {props.verifiedClaimsForIdToken?.map(
-                              (pair, index) => (
-                                <tr key={index}>
-                                  <td>{pair.key}</td>
-                                  <td>{pair.value}</td>
-                                </tr>
-                              )
-                            )}
-                          </tbody>
-                        </table>
-                      )}
-                    </div>
-                  </>
-                )}
-
-                {/* Verified Claims for UserInfo */}
-                {(props.allVerifiedClaimsForUserInfoRequested ||
-                  props.verifiedClaimsForUserInfo) && (
-                  <>
-                    <h5>Verified claims requested for userinfo</h5>
-                    <div className="indent">
-                      {props.allVerifiedClaimsForUserInfoRequested ? (
-                        'All'
-                      ) : (
-                        <table
-                          border={1}
-                          cellPadding={5}
-                          style={{ borderCollapse: 'collapse' }}
-                        >
-                          <thead>
-                            <tr bgcolor="orange">
-                              <th>claim</th>
-                              <th>purpose</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {props.verifiedClaimsForUserInfo?.map(
-                              (pair, index) => (
-                                <tr key={index}>
-                                  <td>{pair.key}</td>
-                                  <td>{pair.value}</td>
-                                </tr>
-                              )
-                            )}
-                          </tbody>
-                        </table>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-            </>
-          )}
+          {props.identityAssuranceRequired && <IdentityAssurance {...props} />}
 
           {props.authorizationDetails && (
             <>
@@ -208,85 +64,16 @@ export const AuthorizationPage: FC<AuthorizationPageModel> = (props) => {
             </>
           )}
 
-          {/* {!props.user && props.federations && (
-            <div id="federations" className="indent">
-              <div id="federations-prompt">
-                ID federation using an external OpenID Provider
-              </div>
-              {props.federationMessage && (
-                <div id="federation-message">{props.federationMessage}</div>
-              )}
-              <ul>
-                {props.federations.map((federation, index) => (
-                  <li key={index}>
-                    <a href={`/api/federation/initiation/${federation.id}`}>
-                      {federation.server.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )} */}
+          {/*
+          {!props.user && props.federations && (
+            <Federations
+              federations={props.federations}
+              federationMessage={props.federationMessage}
+            />
+          )}
+          */}
 
-          <h4 id="authorization">Authorization</h4>
-          <div className="indent">
-            <p>Do you grant authorization to the application?</p>
-
-            <form
-              id="authorization-form"
-              action="/api/authorization/decision"
-              method="post"
-            >
-              {!props.user ? (
-                <div id="login-fields" className="indent">
-                  <div id="login-prompt">Input Login ID and Password.</div>
-                  <input
-                    type="text"
-                    id="loginId"
-                    name="loginId"
-                    placeholder="Login ID"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    spellCheck={false}
-                    className="font-default"
-                    value={props.loginId}
-                    readOnly={props.loginIdReadOnly}
-                  />
-                  <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Password"
-                    className="font-default"
-                  />
-                </div>
-              ) : (
-                <div id="login-user" className="indent">
-                  Logged in as <b>{props.user.subject}</b>. If re-authentication
-                  is needed, append <code>&prompt=login</code>
-                  to the authorization request.
-                </div>
-              )}
-
-              <div id="authorization-form-buttons">
-                <input
-                  type="submit"
-                  name="authorized"
-                  id="authorize-button"
-                  value="Authorize"
-                  className="font-default"
-                />
-                <input
-                  type="submit"
-                  name="denied"
-                  id="deny-button"
-                  value="Deny"
-                  className="font-default"
-                />
-              </div>
-            </form>
-          </div>
+          <AuthorizationForm {...props} />
         </div>
       </body>
     </html>
