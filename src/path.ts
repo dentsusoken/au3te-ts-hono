@@ -18,6 +18,7 @@ import { ApiClientImpl } from 'au3te-ts-base/api';
 import { BaseHandlerConfigurationImpl } from 'au3te-ts-base/handler';
 import { ParHandlerConfigurationImpl } from 'au3te-ts-base/handler.par';
 import { AuthorizationHandlerConfigurationImpl } from 'au3te-ts-base/handler.authorization';
+import { TokenHandlerConfigurationImpl } from 'au3te-ts-base/handler.token';
 import { CredentialMetadataHandlerConfigurationImpl } from 'au3te-ts-base/handler.credential-metadata';
 import { ServiceConfigurationHandlerConfigurationImpl } from 'au3te-ts-base/handler.service-configuration';
 import { Session, sessionSchemas } from 'au3te-ts-base/session';
@@ -25,6 +26,8 @@ import { Session, sessionSchemas } from 'au3te-ts-base/session';
 export class EndpointPath {
   #parPath: string;
   #authorizationPath: string;
+  #authorizationDecisionPath: string;
+  #tokenPath: string;
   #serviceConfigurationPath: string;
   #credentialIssuerMetadataPath: string;
 
@@ -49,6 +52,14 @@ export class EndpointPath {
       authorizationFailHandlerConfiguration: {} as any,
       authorizationPageModelConfiguration: {} as any,
     }).path;
+    this.#authorizationDecisionPath = '/api/authorization/decision';
+    this.#tokenPath = new TokenHandlerConfigurationImpl({
+      baseHandlerConfiguration,
+      tokenCreateHandlerConfiguration: {} as any,
+      tokenIssueHandlerConfiguration: {} as any,
+      tokenFailHandlerConfiguration: {} as any,
+      userConfiguration: {} as any,
+    }).path;
     this.#serviceConfigurationPath =
       new ServiceConfigurationHandlerConfigurationImpl(
         baseHandlerConfiguration
@@ -64,6 +75,12 @@ export class EndpointPath {
   }
   get authorizationPath(): string {
     return this.#authorizationPath;
+  }
+  get authorizationDecisionPath(): string {
+    return this.#authorizationDecisionPath;
+  }
+  get tokenPath(): string {
+    return this.#tokenPath;
   }
   get serviceConfigurationPath(): string {
     return this.#serviceConfigurationPath;

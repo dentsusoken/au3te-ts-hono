@@ -25,6 +25,7 @@ import { AuthorizationDecisionController } from './controllers/AuthorizationDeci
 import { ServiceConfigurationController } from './controllers/ServiceConfigurationController';
 import { CredentialMetadataController } from './controllers/CredentialMetadataController';
 import { setupMiddleware } from './middleware/setup';
+import { TokenController } from './controllers/TokenController';
 
 const path = new EndpointPath();
 const app = new Hono<Env>();
@@ -38,7 +39,11 @@ app.use(
 
 app.post(path.parPath, PARController.handle);
 app.get(path.authorizationPath, AuthorizationController.handle);
-app.post('/api/authorization/decision', AuthorizationDecisionController.handle);
+app.post(
+  path.authorizationDecisionPath,
+  AuthorizationDecisionController.handle
+);
+app.post(path.tokenPath, TokenController.handle);
 app.get(path.serviceConfigurationPath, ServiceConfigurationController.handle);
 app.get(path.credentialIssuerMetadataPath, CredentialMetadataController.handle);
 
