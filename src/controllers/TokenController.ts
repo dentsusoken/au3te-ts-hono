@@ -22,7 +22,17 @@ import { TokenCreateHandlerConfigurationImpl } from 'au3te-ts-base/handler.token
 import { TokenHandlerConfigurationImpl } from 'au3te-ts-base/handler.token';
 import { UserHandlerConfigurationImpl } from 'au3te-ts-common/handler.user';
 
+/**
+ * Controller handling the OAuth 2.0 token endpoint.
+ * Processes token requests and issues access tokens, refresh tokens, and ID tokens.
+ */
 export class TokenController {
+  /**
+   * Handles the token request.
+   * Validates the request and issues appropriate tokens based on the grant type.
+   * @param {Context<Env>} c - The Hono context containing environment and request information.
+   * @returns {Promise<Response>} A promise that resolves to the token response.
+   */
   static async handle(c: Context<Env>) {
     const baseHandlerConfiguration = c.get('baseHandlerConfiguration');
     const extractorConfiguration = c.get('extractorConfiguration');

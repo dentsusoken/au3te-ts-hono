@@ -1,12 +1,41 @@
+/*
+ * Copyright (C) 2014-2024 Authlete, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the
+ * License.
+ */
 import { FC } from 'hono/jsx';
 import { User } from 'au3te-ts-common/schemas.common';
 
+/**
+ * Props for the AuthorizationForm component.
+ */
 type AuthorizationFormProps = {
+  /** Currently logged in user, if any */
   user: User | undefined | null;
+  /** Pre-filled login ID value */
   loginId: string | undefined | null;
+  /** Read-only login ID value */
   loginIdReadOnly: string | undefined | null;
 };
 
+/**
+ * Component that renders the authorization form.
+ * Displays either a login form or the current user's information,
+ * along with authorize/deny buttons.
+ * @param {AuthorizationFormProps} props - The component props
+ * @returns {JSX.Element} The rendered authorization form
+ */
 export const AuthorizationForm: FC<AuthorizationFormProps> = (props) => (
   <>
     <h4 id="authorization">Authorization</h4>

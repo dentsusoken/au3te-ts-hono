@@ -25,6 +25,10 @@ import { Session, sessionSchemas } from 'au3te-ts-base/session';
 import { ExtractorConfigurationImpl } from 'au3te-ts-base/extractor';
 import { CredentialSingleIssueHandlerConfigurationImpl } from 'au3te-ts-base/handler.credential-single-issue';
 
+/**
+ * Manages the endpoint paths for various OAuth 2.0 and OpenID Connect operations.
+ * This class centralizes the path configuration for all API endpoints used in the application.
+ */
 export class EndpointPath {
   #parPath: string;
   #authorizationPath: string;
@@ -34,6 +38,10 @@ export class EndpointPath {
   #serviceConfigurationPath: string;
   #credentialIssuerMetadataPath: string;
 
+  /**
+   * Initializes the endpoint paths using configurations from various handlers.
+   * Sets up all necessary paths for OAuth 2.0 and OpenID Connect operations.
+   */
   constructor() {
     const apiClient = new ApiClientImpl({
       apiVersion: '',
@@ -85,24 +93,58 @@ export class EndpointPath {
       ).path;
   }
 
+  /**
+   * Gets the Pushed Authorization Request (PAR) endpoint path.
+   * @returns {string} The PAR endpoint path string.
+   */
   get parPath(): string {
     return this.#parPath;
   }
+
+  /**
+   * Gets the authorization endpoint path.
+   * @returns {string} The authorization endpoint path string.
+   */
   get authorizationPath(): string {
     return this.#authorizationPath;
   }
+
+  /**
+   * Gets the authorization decision endpoint path.
+   * @returns {string} The authorization decision endpoint path string.
+   */
   get authorizationDecisionPath(): string {
     return this.#authorizationDecisionPath;
   }
+
+  /**
+   * Gets the token endpoint path.
+   * @returns {string} The token endpoint path string.
+   */
   get tokenPath(): string {
     return this.#tokenPath;
   }
+
+  /**
+   * Gets the credential endpoint path.
+   * @returns {string} The credential endpoint path string.
+   */
   get credentialPath(): string {
     return this.#credentialPath;
   }
+
+  /**
+   * Gets the service configuration endpoint path.
+   * @returns {string} The service configuration endpoint path string.
+   */
   get serviceConfigurationPath(): string {
     return this.#serviceConfigurationPath;
   }
+
+  /**
+   * Gets the credential issuer metadata endpoint path.
+   * @returns {string} The credential issuer metadata endpoint path string.
+   */
   get credentialIssuerMetadataPath(): string {
     return this.#credentialIssuerMetadataPath;
   }

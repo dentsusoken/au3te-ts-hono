@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2024 Authlete, Inc.
+ * Copyright (C) 2014-2024 Authlete, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,10 @@ import {
 } from 'au3te-ts-base/session';
 import { z } from 'zod';
 
+/** Default session expiration time in seconds (24 hours) */
 export const EXPIRATION_TTL = 24 * 60 * 60;
 
+/** Cookie name used for storing the session ID */
 const SESSION_COOKIE_NAME = '__session';
 
 /**
@@ -214,6 +216,11 @@ export class KVSession<T extends SessionSchemas> implements Session<T> {
   }
 }
 
+/**
+ * Generates a new session ID and sets it in a cookie.
+ * @param {Context} c - The Hono context.
+ * @returns {string} The generated session ID.
+ */
 export const generateAndSetSessionId = (c: Context): string => {
   const sessionId = crypto.randomUUID();
   setCookie(c, SESSION_COOKIE_NAME, sessionId, {
@@ -226,6 +233,10 @@ export const generateAndSetSessionId = (c: Context): string => {
   return sessionId;
 };
 
+/**
+ * Middleware that manages session handling.
+ * Creates or retrieves a session and makes it available in the context.
+ */
 export const sessionMiddleware = createMiddleware(
   async (c: Context, next: () => Promise<void>) => {
     const sessionId =

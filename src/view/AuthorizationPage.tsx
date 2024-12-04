@@ -23,6 +23,12 @@ import { IdentityAssurance } from './components/IdentityAssurance';
 import { AuthorizationForm } from './components/AuthorizationForm';
 // import { Federations } from './components/Federations';
 
+/**
+ * Authorization page component that renders the OAuth 2.0 authorization interface.
+ * Displays client information, requested permissions, claims, and authorization form.
+ * @param {AuthorizationPageModel} props - The authorization page model containing all necessary data.
+ * @returns {JSX.Element} The rendered authorization page.
+ */
 export const AuthorizationPage: FC<AuthorizationPageModel> = (props) => {
   return (
     <html>

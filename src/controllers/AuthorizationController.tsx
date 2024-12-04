@@ -25,7 +25,16 @@ import {
 import { Env } from '../env';
 import { AuthorizationPage } from '../view/AuthorizationPage';
 
+/**
+ * Controller handling OAuth 2.0 authorization endpoint requests.
+ * Processes authorization requests and renders the authorization page.
+ */
 export class AuthorizationController {
+  /**
+   * Handles the authorization request.
+   * @param {Context<Env>} c - The Hono context containing environment and request information.
+   * @returns {Promise<Response>} A promise that resolves to either the authorization page or an error response.
+   */
   static async handle(c: Context<Env>) {
     const baseHandlerConfiguration = c.get('baseHandlerConfiguration');
     const extractorConfiguration = c.get('extractorConfiguration');

@@ -24,7 +24,17 @@ import { CredentialMetadataHandlerConfigurationImpl } from 'au3te-ts-base/handle
 import { UserHandlerConfigurationImpl } from 'au3te-ts-common/handler.user';
 import { Env } from '../env';
 
+/**
+ * Controller handling the credential issuance endpoint.
+ * Processes credential requests and issues Verifiable Credentials.
+ */
 export class CredentialController {
+  /**
+   * Handles the credential issuance request.
+   * Validates the request, performs necessary checks, and issues credentials.
+   * @param {Context<Env>} c - The Hono context containing environment and request information.
+   * @returns {Promise<Response>} A promise that resolves to the credential issuance response.
+   */
   static async handle(c: Context<Env>) {
     const baseHandlerConfiguration = c.get('baseHandlerConfiguration');
     const extractorConfiguration = c.get('extractorConfiguration');
