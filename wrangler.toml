@@ -1,4 +1,4 @@
-name = "au3te-ts-hono"
+name = "issuer-hono"
 compatibility_date = "2024-10-25"
 assets = { directory = "./public/" }
 
@@ -7,7 +7,7 @@ assets = { directory = "./public/" }
 
 [[kv_namespaces]]
 binding = "SESSION_KV"
-id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+id = "76142d27e3b744ce949e81f45ebc2e28"
 
 # [[r2_buckets]]
 # binding = "MY_BUCKET"
