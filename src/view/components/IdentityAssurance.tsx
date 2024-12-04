@@ -2,11 +2,11 @@ import { FC } from 'hono/jsx';
 import { Pair } from 'au3te-ts-common/schemas.common';
 
 type IdentityAssuranceProps = {
-  purpose?: string;
-  allVerifiedClaimsForIdTokenRequested?: boolean;
-  allVerifiedClaimsForUserInfoRequested?: boolean;
-  verifiedClaimsForIdToken?: Pair[];
-  verifiedClaimsForUserInfo?: Pair[];
+  purpose: string | undefined | null;
+  allVerifiedClaimsForIdTokenRequested: boolean | undefined | null;
+  allVerifiedClaimsForUserInfoRequested: boolean | undefined | null;
+  verifiedClaimsForIdToken: Pair[] | undefined | null;
+  verifiedClaimsForUserInfo: Pair[] | undefined | null;
 };
 
 export const IdentityAssurance: FC<IdentityAssuranceProps> = (props) => (

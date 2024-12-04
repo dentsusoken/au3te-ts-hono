@@ -15,13 +15,13 @@
  * License.
  */
 import { Context } from 'hono';
-import { ServiceConfigurationEndpointConfigurationImpl } from 'au3te-ts-base/endpoint.service-configuration';
+import { ServiceConfigurationHandlerConfigurationImpl } from 'au3te-ts-base/handler.service-configuration';
 import { Env } from '../env';
 
 export class ServiceConfigurationController {
   static async handle(c: Context<Env>) {
     const endpointConfiguration =
-      new ServiceConfigurationEndpointConfigurationImpl(
+      new ServiceConfigurationHandlerConfigurationImpl(
         c.get('baseHandlerConfiguration')
       );
     return await endpointConfiguration.processRequest(c.req.raw);

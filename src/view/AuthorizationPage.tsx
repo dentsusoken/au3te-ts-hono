@@ -15,7 +15,7 @@
  * License.
  */
 import { FC } from 'hono/jsx';
-import { AuthorizationPageModel } from 'au3te-ts-common/page-model.authorization';
+import { AuthorizationPageModel } from 'au3te-ts-common/handler.authorization-page';
 import { ClientInfo } from './components/ClientInfo';
 import { Permissions } from './components/Permissions';
 import { Claims } from './components/Claims';
@@ -39,7 +39,14 @@ export const AuthorizationPage: FC<AuthorizationPageModel> = (props) => {
         <div id="page_title">{props.serviceName}</div>
 
         <div id="content">
-          <ClientInfo {...props} />
+          <ClientInfo
+            clientName={props.clientName}
+            logoUri={props.logoUri}
+            description={props.description}
+            clientUri={props.clientUri}
+            policyUri={props.policyUri}
+            tosUri={props.tosUri}
+          />
 
           {props.scopes && props.scopes.length > 0 && (
             <Permissions scopes={props.scopes} />
@@ -53,7 +60,19 @@ export const AuthorizationPage: FC<AuthorizationPageModel> = (props) => {
             <Claims type="userinfo" claims={props.claimsForUserInfo} />
           )}
 
-          {props.identityAssuranceRequired && <IdentityAssurance {...props} />}
+          {props.identityAssuranceRequired && (
+            <IdentityAssurance
+              purpose={props.purpose}
+              allVerifiedClaimsForIdTokenRequested={
+                props.allVerifiedClaimsForIdTokenRequested
+              }
+              allVerifiedClaimsForUserInfoRequested={
+                props.allVerifiedClaimsForUserInfoRequested
+              }
+              verifiedClaimsForIdToken={props.verifiedClaimsForIdToken}
+              verifiedClaimsForUserInfo={props.verifiedClaimsForUserInfo}
+            />
+          )}
 
           {props.authorizationDetails && (
             <>
@@ -65,6 +84,7 @@ export const AuthorizationPage: FC<AuthorizationPageModel> = (props) => {
           )}
 
           {/*
+          TODO: define Federation type at au3te-ts-common
           {!props.user && props.federations && (
             <Federations
               federations={props.federations}
@@ -73,7 +93,11 @@ export const AuthorizationPage: FC<AuthorizationPageModel> = (props) => {
           )}
           */}
 
-          <AuthorizationForm {...props} />
+          <AuthorizationForm
+            user={props.user}
+            loginId={props.loginId}
+            loginIdReadOnly={props.loginIdReadOnly}
+          />
         </div>
       </body>
     </html>

@@ -2,9 +2,9 @@ import { FC } from 'hono/jsx';
 import { User } from 'au3te-ts-common/schemas.common';
 
 type AuthorizationFormProps = {
-  user?: User;
-  loginId?: string;
-  loginIdReadOnly?: string;
+  user: User | undefined | null;
+  loginId: string | undefined | null;
+  loginIdReadOnly: string | undefined | null;
 };
 
 export const AuthorizationForm: FC<AuthorizationFormProps> = (props) => (
@@ -31,8 +31,8 @@ export const AuthorizationForm: FC<AuthorizationFormProps> = (props) => (
               autoCapitalize="off"
               spellCheck={false}
               className="font-default"
-              value={props.loginId}
-              readOnly={props.loginIdReadOnly}
+              value={props.loginId ?? undefined}
+              readOnly={Boolean(props.loginIdReadOnly)}
             />
             <input
               type="password"

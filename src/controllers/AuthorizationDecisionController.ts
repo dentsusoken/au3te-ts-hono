@@ -15,12 +15,12 @@
  * License.
  */
 import { Context } from 'hono';
-import { AuthorizationDecisionEndpointConfigurationImpl } from 'au3te-ts-base/endpoint.authorization-decision';
+import { AuthorizationDecisionHandlerConfigurationImpl } from 'au3te-ts-base/handler.authorization-decision';
 import { AuthorizationIssueHandlerConfigurationImpl } from 'au3te-ts-base/handler.authorization-issue';
 import { AuthorizationFailHandlerConfigurationImpl } from 'au3te-ts-base/handler.authorization-fail';
-import { AuthorizationPageModelConfigurationImpl } from 'au3te-ts-common/page-model.authorization';
+import { AuthorizationPageHandlerConfigurationImpl } from 'au3te-ts-common/handler.authorization-page';
 import { AuthorizationHandlerConfigurationImpl } from 'au3te-ts-base/handler.authorization';
-import { UserConfigurationImpl } from 'au3te-ts-common/user';
+import { UserHandlerConfigurationImpl } from 'au3te-ts-common/handler.user';
 import { ExtractorConfigurationImpl } from 'au3te-ts-base/extractor';
 import { Env } from '../env';
 
@@ -28,30 +28,32 @@ export class AuthorizationDecisionController {
   static async handle(c: Context<Env>) {
     const baseHandlerConfiguration = c.get('baseHandlerConfiguration');
     const extractorConfiguration = new ExtractorConfigurationImpl();
-    const userConfiguration = new UserConfigurationImpl();
+    const userHandlerConfiguration = new UserHandlerConfigurationImpl();
 
     const authorizationIssueHandlerConfiguration =
       new AuthorizationIssueHandlerConfigurationImpl(baseHandlerConfiguration);
     const authorizationFailHandlerConfiguration =
       new AuthorizationFailHandlerConfigurationImpl(baseHandlerConfiguration);
-    const authorizationPageModelConfiguration =
-      new AuthorizationPageModelConfigurationImpl();
+    const authorizationPageHandlerConfiguration =
+      new AuthorizationPageHandlerConfigurationImpl();
 
     const authorizationHandlerConfiguration =
       new AuthorizationHandlerConfigurationImpl({
         baseHandlerConfiguration,
         authorizationIssueHandlerConfiguration,
         authorizationFailHandlerConfiguration,
-        authorizationPageModelConfiguration,
+        authorizationPageHandlerConfiguration,
+        extractorConfiguration,
       });
 
     const endpointConfiguration =
-      new AuthorizationDecisionEndpointConfigurationImpl({
-        authorizationHandlerConfiguration,
-        authorizationIssueHandlerConfiguration,
+      new AuthorizationDecisionHandlerConfigurationImpl({
         baseHandlerConfiguration,
         extractorConfiguration,
-        userConfiguration,
+        userHandlerConfiguration,
+        authorizationHandlerConfiguration,
+        authorizationIssueHandlerConfiguration,
+        authorizationFailHandlerConfiguration,
       });
 
     return await endpointConfiguration.processRequest(c.req.raw);

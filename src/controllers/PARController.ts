@@ -15,15 +15,19 @@
  * License.
  */
 import { Context } from 'hono';
-import { ParEndpointConfigurationImpl } from 'au3te-ts-base/endpoint.par';
+import { ParHandlerConfigurationImpl } from 'au3te-ts-base/handler.par';
+import { ExtractorConfigurationImpl } from 'au3te-ts-base/extractor';
 import { Env } from '../env';
 
 export class PARController {
   static async handle(c: Context<Env>) {
-    const endpointConfiguration = new ParEndpointConfigurationImpl(
-      c.get('baseHandlerConfiguration'),
-      c.get('extractorConfiguration')
-    );
+    const baseHandlerConfiguration = c.get('baseHandlerConfiguration');
+    const extractorConfiguration = new ExtractorConfigurationImpl();
+
+    const endpointConfiguration = new ParHandlerConfigurationImpl({
+      baseHandlerConfiguration,
+      extractorConfiguration,
+    });
     return await endpointConfiguration.processRequest(c.req.raw);
   }
 }

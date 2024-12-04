@@ -19,14 +19,14 @@ import { Env } from '../env';
 import { TokenIssueHandlerConfigurationImpl } from 'au3te-ts-base/handler.token-issue';
 import { TokenFailHandlerConfigurationImpl } from 'au3te-ts-base/handler.token-fail';
 import { TokenCreateHandlerConfigurationImpl } from 'au3te-ts-base/handler.token-create';
-import { TokenEndpointConfigurationImpl } from 'au3te-ts-base/endpoint.token';
-import { UserConfigurationImpl } from 'au3te-ts-common/user';
+import { TokenHandlerConfigurationImpl } from 'au3te-ts-base/handler.token';
+import { UserHandlerConfigurationImpl } from 'au3te-ts-common/handler.user';
 
 export class TokenController {
   static async handle(c: Context<Env>) {
     const baseHandlerConfiguration = c.get('baseHandlerConfiguration');
     const extractorConfiguration = c.get('extractorConfiguration');
-    const userConfiguration = new UserConfigurationImpl();
+    const userHandlerConfiguration = new UserHandlerConfigurationImpl();
     const tokenFailHandlerConfiguration = new TokenFailHandlerConfigurationImpl(
       baseHandlerConfiguration
     );
@@ -35,10 +35,10 @@ export class TokenController {
     const tokenCreateHandlerConfiguration =
       new TokenCreateHandlerConfigurationImpl(baseHandlerConfiguration);
 
-    const tokenEndpointConfiguration = new TokenEndpointConfigurationImpl({
+    const tokenEndpointConfiguration = new TokenHandlerConfigurationImpl({
       baseHandlerConfiguration,
       extractorConfiguration,
-      userConfiguration,
+      userHandlerConfiguration,
       tokenFailHandlerConfiguration,
       tokenIssueHandlerConfiguration,
       tokenCreateHandlerConfiguration,

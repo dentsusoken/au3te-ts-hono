@@ -15,17 +15,34 @@
  * License.
  */
 import { Context } from 'hono';
-import { AuthorizationEndpointConfigurationImpl } from 'au3te-ts-base/endpoint.authorization';
-import { AuthorizationPageModel } from 'au3te-ts-common/page-model.authorization';
+import { AuthorizationHandlerConfigurationImpl } from 'au3te-ts-base/handler.authorization';
+import { AuthorizationIssueHandlerConfigurationImpl } from 'au3te-ts-base/handler.authorization-issue';
+import { AuthorizationFailHandlerConfigurationImpl } from 'au3te-ts-base/handler.authorization-fail';
+import {
+  AuthorizationPageHandlerConfigurationImpl,
+  AuthorizationPageModel,
+} from 'au3te-ts-common/handler.authorization-page';
 import { Env } from '../env';
 import { AuthorizationPage } from '../view/AuthorizationPage';
 
 export class AuthorizationController {
   static async handle(c: Context<Env>) {
-    const endpointConfiguration = new AuthorizationEndpointConfigurationImpl(
-      c.get('baseHandlerConfiguration'),
-      c.get('extractorConfiguration')
-    );
+    const baseHandlerConfiguration = c.get('baseHandlerConfiguration');
+    const extractorConfiguration = c.get('extractorConfiguration');
+
+    const authorizationIssueHandlerConfiguration =
+      new AuthorizationIssueHandlerConfigurationImpl(baseHandlerConfiguration);
+    const authorizationFailHandlerConfiguration =
+      new AuthorizationFailHandlerConfigurationImpl(baseHandlerConfiguration);
+    const authorizationPageHandlerConfiguration =
+      new AuthorizationPageHandlerConfigurationImpl();
+    const endpointConfiguration = new AuthorizationHandlerConfigurationImpl({
+      baseHandlerConfiguration,
+      authorizationIssueHandlerConfiguration,
+      authorizationFailHandlerConfiguration,
+      authorizationPageHandlerConfiguration,
+      extractorConfiguration,
+    });
     const result = await endpointConfiguration.processRequest(c.req.raw);
     if (result.ok) {
       const pageModel = (await result.json()) as AuthorizationPageModel;

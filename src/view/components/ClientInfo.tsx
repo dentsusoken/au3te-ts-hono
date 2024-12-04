@@ -1,19 +1,19 @@
 import { FC } from 'hono/jsx';
 
 type ClientInfoProps = {
-  clientName?: string;
-  logoUri?: string;
-  description?: string;
-  clientUri?: string;
-  policyUri?: string;
-  tosUri?: string;
+  clientName: string | undefined | null;
+  logoUri: string | undefined | null;
+  description: string | undefined | null;
+  clientUri: string | undefined | null;
+  policyUri: string | undefined | null;
+  tosUri: string | undefined | null;
 };
 
 export const ClientInfo: FC<ClientInfoProps> = (props) => (
   <>
     <h3 id="client-name">{props.clientName}</h3>
     <div className="indent">
-      <img id="logo" src={props.logoUri} alt="[Logo] (150x150)" />
+      <img id="logo" src={props.logoUri ?? undefined} alt="[Logo] (150x150)" />
       <div id="client-summary">
         <p>{props.description}</p>
         <ul id="client-link-list">

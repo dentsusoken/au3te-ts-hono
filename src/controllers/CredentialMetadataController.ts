@@ -15,13 +15,13 @@
  * License.
  */
 import { Context } from 'hono';
-import { CredentialMetadataEndpointConfigurationImpl } from 'au3te-ts-base/endpoint.credential-metadata';
+import { CredentialMetadataHandlerConfigurationImpl } from 'au3te-ts-base/handler.credential-metadata';
 import { Env } from '../env';
 
 export class CredentialMetadataController {
   static async handle(c: Context<Env>) {
     const endpointConfiguration =
-      new CredentialMetadataEndpointConfigurationImpl(
+      new CredentialMetadataHandlerConfigurationImpl(
         c.get('baseHandlerConfiguration')
       );
     return await endpointConfiguration.processRequest(c.req.raw);
