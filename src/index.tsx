@@ -26,6 +26,7 @@ import { ServiceConfigurationController } from './controllers/ServiceConfigurati
 import { CredentialMetadataController } from './controllers/CredentialMetadataController';
 import { setupMiddleware } from './middleware/setup';
 import { TokenController } from './controllers/TokenController';
+import { CredentialController } from './controllers/CredentialController';
 
 const path = new EndpointPath();
 const app = new Hono<Env>();
@@ -44,6 +45,7 @@ app.post(
   AuthorizationDecisionController.handle
 );
 app.post(path.tokenPath, TokenController.handle);
+app.post(path.credentialPath, CredentialController.handle);
 app.get(path.serviceConfigurationPath, ServiceConfigurationController.handle);
 app.get(path.credentialIssuerMetadataPath, CredentialMetadataController.handle);
 

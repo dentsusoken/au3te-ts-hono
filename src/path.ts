@@ -22,12 +22,15 @@ import { TokenHandlerConfigurationImpl } from 'au3te-ts-base/handler.token';
 import { CredentialMetadataHandlerConfigurationImpl } from 'au3te-ts-base/handler.credential-metadata';
 import { ServiceConfigurationHandlerConfigurationImpl } from 'au3te-ts-base/handler.service-configuration';
 import { Session, sessionSchemas } from 'au3te-ts-base/session';
+import { ExtractorConfigurationImpl } from 'au3te-ts-base/extractor';
+import { CredentialSingleIssueHandlerConfigurationImpl } from 'au3te-ts-base/handler.credential-single-issue';
 
 export class EndpointPath {
   #parPath: string;
   #authorizationPath: string;
   #authorizationDecisionPath: string;
   #tokenPath: string;
+  #credentialPath: string;
   #serviceConfigurationPath: string;
   #credentialIssuerMetadataPath: string;
 
@@ -42,15 +45,18 @@ export class EndpointPath {
       apiClient,
       {} as Session<typeof sessionSchemas>
     );
+    const extractorConfiguration = new ExtractorConfigurationImpl();
 
-    this.#parPath = new ParHandlerConfigurationImpl(
-      baseHandlerConfiguration
-    ).path;
+    this.#parPath = new ParHandlerConfigurationImpl({
+      baseHandlerConfiguration,
+      extractorConfiguration,
+    }).path;
     this.#authorizationPath = new AuthorizationHandlerConfigurationImpl({
       baseHandlerConfiguration,
       authorizationIssueHandlerConfiguration: {} as any,
       authorizationFailHandlerConfiguration: {} as any,
-      authorizationPageModelConfiguration: {} as any,
+      authorizationPageHandlerConfiguration: {} as any,
+      extractorConfiguration,
     }).path;
     this.#authorizationDecisionPath = '/api/authorization/decision';
     this.#tokenPath = new TokenHandlerConfigurationImpl({
@@ -58,7 +64,16 @@ export class EndpointPath {
       tokenCreateHandlerConfiguration: {} as any,
       tokenIssueHandlerConfiguration: {} as any,
       tokenFailHandlerConfiguration: {} as any,
-      userConfiguration: {} as any,
+      userHandlerConfiguration: {} as any,
+      extractorConfiguration,
+    }).path;
+    this.#credentialPath = new CredentialSingleIssueHandlerConfigurationImpl({
+      extractorConfiguration,
+      baseCredentialHandlerConfiguration: {} as any,
+      introspectionHandlerConfiguration: {} as any,
+      baseHandlerConfiguration,
+      credentialSingleParseHandlerConfiguration: {} as any,
+      commonCredentialHandlerConfiguration: {} as any,
     }).path;
     this.#serviceConfigurationPath =
       new ServiceConfigurationHandlerConfigurationImpl(
@@ -81,6 +96,9 @@ export class EndpointPath {
   }
   get tokenPath(): string {
     return this.#tokenPath;
+  }
+  get credentialPath(): string {
+    return this.#credentialPath;
   }
   get serviceConfigurationPath(): string {
     return this.#serviceConfigurationPath;
