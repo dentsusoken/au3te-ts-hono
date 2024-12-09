@@ -27,6 +27,7 @@ import { CredentialMetadataController } from './controllers/CredentialMetadataCo
 import { setupMiddleware } from './middleware/setup';
 import { TokenController } from './controllers/TokenController';
 import { CredentialController } from './controllers/CredentialController';
+import { TopPage } from './view/TopPage';
 
 const path = new EndpointPath();
 const app = new Hono<Env>();
@@ -37,7 +38,7 @@ app.use(
   '*',
   jsxRenderer(({ children }) => <>{children}</>)
 );
-
+app.get('/', (c) => c.render(<TopPage />));
 app.post(path.parPath, PARController.handle);
 app.get(path.authorizationPath, AuthorizationController.handle);
 app.post(
