@@ -24,6 +24,8 @@ import { ServiceConfigurationHandlerConfigurationImpl } from 'au3te-ts-base/hand
 import { Session, sessionSchemas } from 'au3te-ts-base/session';
 import { ExtractorConfigurationImpl } from 'au3te-ts-base/extractor';
 import { CredentialSingleIssueHandlerConfigurationImpl } from 'au3te-ts-base/handler.credential-single-issue';
+import { CredentialIssuerJwksHandlerConfigurationImpl } from 'au3te-ts-base/handler.credential-issuer-jwks';
+import { ServiceJwksHandlerConfigurationImpl } from 'au3te-ts-base/handler.service-jwks';
 
 /**
  * Manages the endpoint paths for various OAuth 2.0 and OpenID Connect operations.
@@ -37,6 +39,8 @@ export class EndpointPath {
   #credentialPath: string;
   #serviceConfigurationPath: string;
   #credentialIssuerMetadataPath: string;
+  #credentialIssuerJwksPath: string;
+  #serviceJwksPath: string;
 
   /**
    * Initializes the endpoint paths using configurations from various handlers.
@@ -91,6 +95,13 @@ export class EndpointPath {
       new CredentialMetadataHandlerConfigurationImpl(
         baseHandlerConfiguration
       ).path;
+    this.#credentialIssuerJwksPath =
+      new CredentialIssuerJwksHandlerConfigurationImpl(
+        baseHandlerConfiguration
+      ).path;
+    this.#serviceJwksPath = new ServiceJwksHandlerConfigurationImpl(
+      baseHandlerConfiguration
+    ).path;
   }
 
   /**
@@ -147,5 +158,21 @@ export class EndpointPath {
    */
   get credentialIssuerMetadataPath(): string {
     return this.#credentialIssuerMetadataPath;
+  }
+
+  /**
+   * Gets the credential issuer jwks endpoint path.
+   * @returns {string} The credential issuer jwks endpoint path string.
+   */
+  get credentialIssuerJwksPath(): string {
+    return this.#credentialIssuerJwksPath;
+  }
+
+  /**
+   * Gets the service jwks endpoint path.
+   * @returns {string} The service jwks endpoint path string.
+   */
+  get serviceJwksPath(): string {
+    return this.#serviceJwksPath;
   }
 }

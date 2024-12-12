@@ -27,6 +27,8 @@ import { CredentialMetadataController } from './controllers/CredentialMetadataCo
 import { setupMiddleware } from './middleware/setup';
 import { TokenController } from './controllers/TokenController';
 import { CredentialController } from './controllers/CredentialController';
+import { CredentialIssuerJwksController } from './controllers/CredentialIssuerJwksController';
+import { ServiceJwksController } from './controllers/ServiceJwksController';
 import { TopPage } from './view/TopPage';
 
 const path = new EndpointPath();
@@ -49,5 +51,7 @@ app.post(path.tokenPath, TokenController.handle);
 app.post(path.credentialPath, CredentialController.handle);
 app.get(path.serviceConfigurationPath, ServiceConfigurationController.handle);
 app.get(path.credentialIssuerMetadataPath, CredentialMetadataController.handle);
+app.get(path.credentialIssuerJwksPath, CredentialIssuerJwksController.handle);
+app.get(path.serviceJwksPath, ServiceJwksController.handle);
 
 export default app;
