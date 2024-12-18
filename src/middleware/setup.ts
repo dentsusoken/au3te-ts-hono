@@ -16,6 +16,8 @@
  */
 import { createMiddleware } from 'hono/factory';
 import { AppConfig } from '../config/AppConfig';
+import { env } from 'hono/adapter';
+import { Env } from '../env';
 
 /**
  * Middleware that sets up base configurations for the application.
@@ -24,7 +26,10 @@ import { AppConfig } from '../config/AppConfig';
  */
 export const setupMiddleware = createMiddleware(async (c, next) => {
   const { baseHandlerConfiguration, extractorConfiguration } =
-    AppConfig.createBaseConfigurations(c.env, c.get('session'));
+    AppConfig.createBaseConfigurations(
+      env<Env['Bindings']>(c),
+      c.get('session')
+    );
 
   c.set('baseHandlerConfiguration', baseHandlerConfiguration);
   c.set('extractorConfiguration', extractorConfiguration);

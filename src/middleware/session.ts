@@ -25,6 +25,8 @@ import {
   SessionSchemas,
 } from 'au3te-ts-base/session';
 import { z } from 'zod';
+import { DynamoDB } from 'oid4vc-core/dynamodb';
+import { createDynamoDBClient } from '../dynamodb';
 
 /** Default session expiration time in seconds (24 hours) */
 export const EXPIRATION_TTL = 24 * 60 * 60;
@@ -39,7 +41,7 @@ export class KVSession<T extends SessionSchemas> implements Session<T> {
   #data: StoredSessionData<T> = {};
   #schemas: T;
   #sessionId: string;
-  #kv: KVNamespace;
+  #kv: KVNamespace | DynamoDB;
   #expirationTtl: number;
   #loaded = false;
 
@@ -49,7 +51,7 @@ export class KVSession<T extends SessionSchemas> implements Session<T> {
   constructor(
     schemas: T,
     sessionId: string,
-    kv: KVNamespace,
+    kv: KVNamespace | DynamoDB,
     expirationTtl: number = EXPIRATION_TTL
   ) {
     this.#schemas = schemas;
@@ -72,6 +74,7 @@ export class KVSession<T extends SessionSchemas> implements Session<T> {
     }
 
     const data = await this.#kv.get(this.sessionId);
+    console.log('data', data);
     if (data) {
       this.#data = JSON.parse(data);
     } else {
@@ -244,6 +247,29 @@ export const sessionMiddleware = createMiddleware(
     c.set(
       'session',
       new KVSession(sessionSchemas, sessionId, c.env.SESSION_KV, EXPIRATION_TTL)
+    );
+    await next();
+  }
+);
+
+/**
+ * Middleware that manages session handling.
+ * Creates or retrieves a session and makes it available in the context.
+ */
+export const sessionLambdaMiddleware = createMiddleware(
+  async (c: Context, next: () => Promise<void>) => {
+    const client = createDynamoDBClient({
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? '',
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? '',
+      },
+    });
+    const dynamo = new DynamoDB(client, process.env.TABLE_NAME ?? '');
+    const sessionId =
+      getCookie(c, SESSION_COOKIE_NAME) || generateAndSetSessionId(c);
+    c.set(
+      'session',
+      new KVSession(sessionSchemas, sessionId, dynamo, EXPIRATION_TTL)
     );
     await next();
   }
