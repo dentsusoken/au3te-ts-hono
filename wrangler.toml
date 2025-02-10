@@ -1,4 +1,4 @@
-name = "issuer"
+name = "vc-issuer"
 compatibility_date = "2024-10-25"
 assets = { directory = "./public/" }
 
