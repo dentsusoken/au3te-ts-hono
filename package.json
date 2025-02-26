@@ -3,11 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev src/index.tsx",
-    "deploy": "wrangler deploy --minify src/index.tsx",
-    "build": "node esbuild.config.js",
-    "build-container": "sam build --use-container --build-image public.ecr.aws/sam/build-nodejs20.x --debug --skip-pull-image",
-    "start-api": "sam local start-api --host 0.0.0.0 --warm-containers EAGER --debug --container-host host.docker.internal --container-host-interface 0.0.0.0 --docker-network hono-lambda-dynamodb_devcontainer_dev-network",
-    "emulate:lambda": "npm run build && npm run build-container && npm run start-api"
+    "deploy": "wrangler deploy --minify src/index.tsx"
   },
   "dependencies": {
     "hono": "^4.5.5",
