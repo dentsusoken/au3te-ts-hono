@@ -7,7 +7,7 @@ services:
       - "4566:4566" # LocalStack メインエンドポイント
       - "4510-4559:4510-4559" # その他のサービス用ポート
     environment:
-      - SERVICES=lambda,apigateway,dynamodb
+      - SERVICES=lambda,apigateway,dynamodb,logs
       - DEBUG=1
       - LAMBDA_EXECUTOR=docker
       - DOCKER_HOST=unix:///var/run/docker.sock
@@ -38,6 +38,7 @@ services:
       - EDGE_PORT=4566
       - DYNAMODB_TABLE=ISSUER_SESSION_DYNAMO
       - DYNAMODB_ENDPOINT="http://localstack:4566"
+    env_file: .env
     volumes:
       - ./src:/app/src
       - ./package.json:/app/package.json

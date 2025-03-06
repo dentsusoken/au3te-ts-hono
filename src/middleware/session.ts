@@ -14,6 +14,7 @@
  * language governing permissions and limitations under the
  * License.
  */
+import crypto from 'crypto';
 import { Context } from 'hono';
 import { createMiddleware } from 'hono/factory';
 import { getCookie, setCookie } from 'hono/cookie';
