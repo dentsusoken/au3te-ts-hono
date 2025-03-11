@@ -35,3 +35,18 @@ export const setupMiddleware = createMiddleware(async (c, next) => {
   c.set('extractorConfiguration', extractorConfiguration);
   return next();
 });
+
+export const setupLambdaMiddleware = createMiddleware(async (c, next) => {
+  c.env = {
+    ...c.env,
+    API_VERSION: process.env.API_VERSION || '',
+    API_BASE_URL: process.env.API_BASE_URL || '',
+    API_KEY: process.env.API_KEY || '',
+    ACCESS_TOKEN: process.env.ACCESS_TOKEN || '',
+    SESSION_KV: process.env.SESSION_KV || '',
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || '',
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || '',
+    TABLE_NAME: process.env.DYNAMODB_TABLE || '',
+  };
+  return next();
+});

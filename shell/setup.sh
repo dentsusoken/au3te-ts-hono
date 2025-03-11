@@ -13,9 +13,9 @@ echo "Creating DynamoDB table: $DYNAMODB_TABLE"
 awslocal dynamodb create-table \
     --table-name "$DYNAMODB_TABLE" \
     --attribute-definitions \
-        AttributeName=id,AttributeType=S \
+        AttributeName=key,AttributeType=S \
     --key-schema \
-        AttributeName=id,KeyType=HASH \
+        AttributeName=key,KeyType=HASH \
     --provisioned-throughput \
         ReadCapacityUnits=5,WriteCapacityUnits=5
 
@@ -29,11 +29,11 @@ echo "DynamoDB table created successfully"
 # Lambda関数の作成
 awslocal lambda create-function \
     --function-name my-function \
-    --runtime nodejs18.x \
+    --runtime nodejs20.x \
     --handler index.handler \
     --zip-file fileb://lambda.zip \
     --role arn:aws:iam::000000000000:role/lambda-role \
-    --environment "Variables={DYNAMODB_TABLE=$DYNAMODB_TABLE}"
+    --environment "Variables={DYNAMODB_TABLE=$DYNAMODB_TABLE,API_BASE_URL=$API_BASE_URL,API_VERSION=$API_VERSION,API_KEY=$API_KEY,ACCESS_TOKEN=$ACCESS_TOKEN,AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY,DYNAMODB_ENDPOINT=$DYNAMODB_ENDPOINT,AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION}"
 
 # エラーチェック
 if [ $? -ne 0 ]; then

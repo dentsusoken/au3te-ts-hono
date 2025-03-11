@@ -25,7 +25,7 @@ import { AuthorizationController } from './controllers/AuthorizationController';
 import { AuthorizationDecisionController } from './controllers/AuthorizationDecisionController';
 import { ServiceConfigurationController } from './controllers/ServiceConfigurationController';
 import { CredentialMetadataController } from './controllers/CredentialMetadataController';
-import { setupMiddleware } from './middleware/setup';
+import { setupLambdaMiddleware, setupMiddleware } from './middleware/setup';
 import { TokenController } from './controllers/TokenController';
 import { CredentialController } from './controllers/CredentialController';
 import { CredentialIssuerJwksController } from './controllers/CredentialIssuerJwksController';
@@ -35,6 +35,7 @@ import { TopPage } from './view/TopPage';
 const path = new EndpointPath();
 const app = new Hono<Env>();
 
+app.use(setupLambdaMiddleware);
 app.use(sessionLambdaMiddleware);
 app.use(setupMiddleware);
 app.use(
