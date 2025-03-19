@@ -43,7 +43,9 @@ export interface Env {
     /** AWS secret access key */
     AWS_SECRET_ACCESS_KEY: string;
     /** DynamoDB table name for session storage */
-    TABLE_NAME: string;
+    DYNAMODB_TABLE: string;
+    /** Where to deploy ('local' or none) */
+    DEPLOY_ENV: string;
   };
 
   /**

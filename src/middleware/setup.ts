@@ -18,6 +18,29 @@ import { createMiddleware } from 'hono/factory';
 import { AppConfig } from '../config/AppConfig';
 import { env } from 'hono/adapter';
 import { Env } from '../env';
+import * as Aws from 'aws-sdk'
+
+async function getSecret(secretName: string, region: string, endpoint?: string): Promise<void> {
+  const client = new Aws.SecretsManager({
+    region,
+    endpoint
+  });
+
+  try {
+    const data = await client.getSecretValue({ SecretId: secretName }).promise();
+
+    if ('SecretString' in data) {
+      const secret = data.SecretString;
+      const secretObj = JSON.parse(secret!);
+
+      for (const [key, value] of Object.entries(secretObj)) {
+        process.env[key] = value as string;
+      }
+    }
+  } catch (err) {
+    console.error(`Error retrieving secret: ${err}`);
+  }
+}
 
 /**
  * Middleware that sets up base configurations for the application.
@@ -37,6 +60,13 @@ export const setupMiddleware = createMiddleware(async (c, next) => {
 });
 
 export const setupLambdaMiddleware = createMiddleware(async (c, next) => {
+  const deployEnv = process.env.DEPLOY_ENV || 'aws';
+  const secretName = "twEnviromentVariables";
+  const region = "ap-northeast-1";
+  const endpoint = deployEnv === 'local' ? 'http://localhost:4566' : undefined;
+
+  await getSecret(secretName, region, endpoint);
+
   c.env = {
     ...c.env,
     API_VERSION: process.env.API_VERSION || '',
@@ -44,9 +74,9 @@ export const setupLambdaMiddleware = createMiddleware(async (c, next) => {
     API_KEY: process.env.API_KEY || '',
     ACCESS_TOKEN: process.env.ACCESS_TOKEN || '',
     SESSION_KV: process.env.SESSION_KV || '',
-    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || '',
-    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || '',
-    TABLE_NAME: process.env.DYNAMODB_TABLE || '',
+    // AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || '',
+    // AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || '',
+    DYNAMODB_TABLE: process.env.DYNAMODB_TABLE || '',
   };
   return next();
 });

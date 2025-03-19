@@ -5,11 +5,14 @@
     "build": "esbuild --bundle --outfile=./dist/index.js --platform=node --target=node20 ./src/lambda.tsx",
     "zip": "zip -j lambda.zip dist/index.js",
     "dev": "wrangler dev src/index.tsx",
-    "deploy": "wrangler deploy --minify src/index.tsx"
+    "deploy": "wrangler deploy --minify src/index.tsx",
+    "dev:aws": "docker-compose up --build",
+    "deploy:aws": "docker build -t issuer:latest . && docker run --env-file ./.env issuer:latest"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.709.0",
     "@aws-sdk/lib-dynamodb": "^3.709.0",
+    "aws-sdk": "^2.1692.0",
     "hono": "^4.5.5",
     "zod": "^3.23.8"
   },

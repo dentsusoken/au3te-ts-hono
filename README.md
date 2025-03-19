@@ -21,9 +21,8 @@ npm run dev
 
 npm run deploy
 
-## How to emulate AWS Lambda
+## How to emulate AWS Lambda (localstack)
 
-### Prerequisites
 1. Clone or copy the following repositories into the `./build` directory:
    - [`oid4vc-core`](https://github.com/dentsusoken/oid4vc-core.git)
    - [`au3te-ts-common`](https://github.com/dentsusoken/au3te-ts-common.git)
@@ -48,20 +47,61 @@ npm run deploy
     API_VERSION=YOUR_API_VERSION
     API_KEY=YOUR_API_KEY
     ACCESS_TOKEN=YOUR_ACCESS_TOKEN
+    DEPLOY_ENV=local
     ```
 
-3. Start the Dev Container:
+3. Rebuilding the Image and Starting the Container:
    ```bash
-   # Open in VS Code and click "Reopen in Container"
-   # Or use the command palette: F1 -> "Dev Containers: Rebuild and Reopen in Container"
+   docker-compose up --build
    ```
 
-4. Inside the container, run the setup script:
+## How to deploy AWS Lambda
+
+1. Clone or copy the following repositories into the `./build` directory:
+   - [`oid4vc-core`](https://github.com/dentsusoken/oid4vc-core.git)
+   - [`au3te-ts-common`](https://github.com/dentsusoken/au3te-ts-common.git)
+   - [`au3te-ts-base`](https://github.com/dentsusoken/au3te-ts-base.git)
+
    ```bash
-   ./shell/setupLinks.sh
+   # If cloning new repositories
+   cd build
+   git clone https://github.com/dentsusoken/oid4vc-core.git
+   git clone https://github.com/dentsusoken/au3te-ts-common.git
+   git clone https://github.com/dentsusoken/au3te-ts-base.git
+   
+   # Or if copying existing local development repositories
+   cp -r /path/to/local/oid4vc-core ./build/
+   cp -r /path/to/local/au3te-ts-common ./build/
+   cp -r /path/to/local/au3te-ts-base ./build/
    ```
 
-5. Start the Lambda emulator:
+2. IAM Role Configuration:
+
+   **Add to the IAM role you are using**
+
+   * AWSLambdaBasicExecutionRole
+   * AWSLambdaDynamoDBExecutionRole
+   * dynamodb:GetItem
+   * SecretsManagerReadWrite
+
+3. Set Environment Variables for SecretsManager:
    ```bash
-   npm run emulate:lambda
+   API_BASE_URL=YOUR_API_BASE_URL
+   API_VERSION=YOUR_API_VERSION
+   API_KEY=YOUR_API_KEY
+   ACCESS_TOKEN=YOUR_ACCESS_TOKEN
+   AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
+   AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
+   AWS_DEFAULT_REGION=YOUR_AWS_DEFAULT_REGION
+   LAMBDA_ROLE_NAME=YOUR_LAMBDA_ROLE_NAME
+   ```
+
+4. Build:
+   ```bash
+   docker build -t issuer:latest .
+   ```
+
+5. Run:
+   ```bash
+   docker run --env-file ./.env issuer:latest
    ```

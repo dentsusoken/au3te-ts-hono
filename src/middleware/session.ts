@@ -260,12 +260,12 @@ export const sessionMiddleware = createMiddleware(
 export const sessionLambdaMiddleware = createMiddleware(
   async (c: Context, next: () => Promise<void>) => {
     const client = createDynamoDBClient({
-      credentials: {
-        accessKeyId: c.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: c.env.AWS_SECRET_ACCESS_KEY,
-      },
+      // credentials: {
+      //   accessKeyId: c.env.AWS_ACCESS_KEY_ID,
+      //   secretAccessKey: c.env.AWS_SECRET_ACCESS_KEY,
+      // },
     });
-    const dynamo = new DynamoDB(client, c.env.TABLE_NAME);
+    const dynamo = new DynamoDB(client, c.env.DYNAMODB_TABLE);
     const sessionId =
       getCookie(c, SESSION_COOKIE_NAME) || generateAndSetSessionId(c);
     c.set(
