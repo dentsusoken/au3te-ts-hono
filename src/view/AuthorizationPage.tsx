@@ -30,7 +30,7 @@ import { AuthorizationForm } from './components/AuthorizationForm';
  * @returns {JSX.Element} The rendered authorization page.
  */
 export const AuthorizationPage: FC<AuthorizationPageModel> = (props) => {
-  const cssLink = props.host.includes('local') ? '/css/authorization.css' : '/dev/css/authorization.css';
+  const cssLink = props.host.includes('localhost') ? '/css/authorization.css' : '/dev/css/authorization.css';
 
   return (
     <html>
