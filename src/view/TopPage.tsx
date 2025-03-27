@@ -31,7 +31,7 @@ export const TopPage: FC = () => {
           content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes"
         />
         <title>Authorization Server</title>
-        <link rel="stylesheet" href="css/index.css" />
+        <link rel="stylesheet" href="/dev/css/index.css" />
       </head>
       <body className="font-default" style={{ margin: 0, textShadow: 'none' }}>
         <div id="page_title">Authorization Server</div>

@@ -31,6 +31,7 @@ import { CredentialController } from './controllers/CredentialController';
 import { CredentialIssuerJwksController } from './controllers/CredentialIssuerJwksController';
 import { ServiceJwksController } from './controllers/ServiceJwksController';
 import { TopPage } from './view/TopPage';
+import * as Aws from 'aws-sdk'
 
 const path = new EndpointPath();
 const app = new Hono<Env>();
@@ -43,6 +44,34 @@ app.use(
   jsxRenderer(({ children }) => <>{children}</>)
 );
 app.get('/', (c) => c.render(<TopPage />));
+app.get('/css/index.css', async (c) => {
+
+  const s3 = new Aws.S3();
+  const bucketName = 'tw-css';
+  const objectKey = 'index.css';
+  const params = {
+    Bucket: bucketName,
+    Key: objectKey
+  };
+  const data = await s3.getObject(params).promise();
+  const cssContent = data.Body.toString('utf-8');
+  // return c.text(cssContent);
+  return c.body(cssContent, 200, { 'Content-Type': 'text/css' });
+});
+app.get('/css/authorization.css', async (c) => {
+
+  const s3 = new Aws.S3();
+  const bucketName = 'tw-css';
+  const objectKey = 'authorization.css';
+  const params = {
+    Bucket: bucketName,
+    Key: objectKey
+  };
+  const data = await s3.getObject(params).promise();
+  const cssContent = data.Body.toString('utf-8');
+  // return c.text(cssContent);
+  return c.body(cssContent, 200, { 'Content-Type': 'text/css' });
+});
 app.post(path.parPath, PARController.handle);
 app.get(path.authorizationPath, AuthorizationController.handle);
 app.post(

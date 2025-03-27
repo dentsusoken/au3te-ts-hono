@@ -39,7 +39,7 @@ export const AuthorizationPage: FC<AuthorizationPageModel> = (props) => {
           content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes"
         />
         <title>{props.serviceName} | Authorization</title>
-        <link rel="stylesheet" href="/css/authorization.css" />
+        <link rel="stylesheet" href="/dev/css/authorization.css" />
       </head>
       <body className="font-default">
         <div id="page_title">{props.serviceName}</div>

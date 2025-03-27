@@ -41,6 +41,10 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+awslocal s3 mb s3://css
+awslocal s3 cp ./public/css/index.css s3://css
+awslocal s3 cp ./public/css/authorization.css s3://css
+
 # API Gatewayの作成
 API_ID=$(awslocal apigateway create-rest-api \
     --name "my-api" \
