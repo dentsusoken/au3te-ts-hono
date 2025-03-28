@@ -1,8 +1,6 @@
 # Node.jsのベースイメージを使用
 FROM node:20-slim
 
-ENV DYNAMODB_TABLE=ISSUER_SESSION_DYNAMO
-
 # 必要なツールのインストール
 RUN apt-get update && apt-get install -y \
     zip \

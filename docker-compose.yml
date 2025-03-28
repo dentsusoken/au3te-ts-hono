@@ -36,7 +36,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=test
       - AWS_DEFAULT_REGION=us-east-1
       - EDGE_PORT=4566
-      - DYNAMODB_TABLE=ISSUER_SESSION_DYNAMO
+      - DYNAMODB_TABLE_ISSUER=ISSUER_SESSION_DYNAMO
       - DYNAMODB_ENDPOINT="http://localstack:4566"
     env_file: .env
     volumes:

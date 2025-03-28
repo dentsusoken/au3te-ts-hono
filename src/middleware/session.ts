@@ -265,7 +265,7 @@ export const sessionLambdaMiddleware = createMiddleware(
       //   secretAccessKey: c.env.AWS_SECRET_ACCESS_KEY,
       // },
     });
-    const dynamo = new DynamoDB(client, c.env.DYNAMODB_TABLE);
+    const dynamo = new DynamoDB(client, c.env.DYNAMODB_TABLE_ISSUER);
     const sessionId =
       getCookie(c, SESSION_COOKIE_NAME) || generateAndSetSessionId(c);
     c.set(

@@ -5,14 +5,14 @@ echo "Current directory: $(pwd)"
 echo "Listing zip files:"
 ls -la *.zip
 
-echo "Checking if DynamoDB table exists: $DYNAMODB_TABLE"
-TABLE_EXISTS=$(aws dynamodb describe-table --table-name "$DYNAMODB_TABLE" --region $AWS_DEFAULT_REGION 2>/dev/null)
+echo "Checking if DynamoDB table exists: $DYNAMODB_TABLE_ISSUER"
+TABLE_EXISTS=$(aws dynamodb describe-table --table-name "$DYNAMODB_TABLE_ISSUER" --region $AWS_DEFAULT_REGION 2>/dev/null)
 
 # DynamoDBテーブルの作成または、更新
 if [ -z "$TABLE_EXISTS" ];then
-    echo "Creating DynamoDB table: $DYNAMODB_TABLE"
+    echo "Creating DynamoDB table: $DYNAMODB_TABLE_ISSUER"
     aws dynamodb create-table \
-        --table-name "$DYNAMODB_TABLE" \
+        --table-name "$DYNAMODB_TABLE_ISSUER" \
         --attribute-definitions \
             AttributeName=key,AttributeType=S \
         --key-schema \

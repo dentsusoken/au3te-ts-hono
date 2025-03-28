@@ -74,9 +74,7 @@ export const setupLambdaMiddleware = createMiddleware(async (c, next) => {
     API_KEY: process.env.API_KEY || '',
     ACCESS_TOKEN: process.env.ACCESS_TOKEN || '',
     SESSION_KV: process.env.SESSION_KV || '',
-    // AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || '',
-    // AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || '',
-    DYNAMODB_TABLE: process.env.DYNAMODB_TABLE_ISSUER || '',
+    DYNAMODB_TABLE_ISSUER: process.env.DYNAMODB_TABLE_ISSUER || '',
   };
   return next();
 });
