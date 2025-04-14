@@ -16,12 +16,18 @@
  */
 import { FC } from 'hono/jsx';
 
+interface TopPageProps {
+  host: string;
+}
+
 /**
  * Top page component that displays the service landing page.
  * Shows service information and available endpoints.
  * @returns {JSX.Element} The rendered top page
  */
-export const TopPage: FC = () => {
+export const TopPage: FC<TopPageProps> = ({ host }) => {
+  const cssLink = host.includes('localhost') ? '/css/index.css' : '/dev/css/index.css';
+
   return (
     <html lang="en">
       <head>
@@ -31,7 +37,7 @@ export const TopPage: FC = () => {
           content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes"
         />
         <title>Authorization Server</title>
-        <link rel="stylesheet" href="css/index.css" />
+        <link rel="stylesheet" href={cssLink} />
       </head>
       <body className="font-default" style={{ margin: 0, textShadow: 'none' }}>
         <div id="page_title">Authorization Server</div>

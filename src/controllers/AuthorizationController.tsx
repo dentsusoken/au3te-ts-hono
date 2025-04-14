@@ -55,7 +55,8 @@ export class AuthorizationController {
     const result = await endpointConfiguration.processRequest(c.req.raw);
     if (result.ok) {
       const pageModel = (await result.json()) as AuthorizationPageModel;
-      return c.render(<AuthorizationPage {...pageModel} />);
+      const host = c.req.header('host') || '';
+      return c.render(<AuthorizationPage {...pageModel} host={host} />);
     }
     return result;
   }

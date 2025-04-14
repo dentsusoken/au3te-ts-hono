@@ -38,6 +38,14 @@ export interface Env {
     ACCESS_TOKEN: string;
     /** KV namespace for session storage */
     SESSION_KV: KVNamespace;
+    /** AWS access key ID */
+    AWS_ACCESS_KEY_ID: string;
+    /** AWS secret access key */
+    AWS_SECRET_ACCESS_KEY: string;
+    /** DynamoDB table name for session storage */
+    DYNAMODB_TABLE_ISSUER: string;
+    /** Where to deploy ('local' or none) */
+    DEPLOY_ENV: string;
   };
 
   /**
