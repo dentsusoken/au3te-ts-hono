@@ -25,13 +25,14 @@ import { AuthorizationController } from './controllers/AuthorizationController';
 import { AuthorizationDecisionController } from './controllers/AuthorizationDecisionController';
 import { ServiceConfigurationController } from './controllers/ServiceConfigurationController';
 import { CredentialMetadataController } from './controllers/CredentialMetadataController';
-import { setupLambdaMiddleware, setupMiddleware } from './middleware/setup';
+import { setupMiddleware } from './middleware/setup';
+import { setupLambdaMiddleware } from './middleware/setupLambda';
 import { TokenController } from './controllers/TokenController';
 import { CredentialController } from './controllers/CredentialController';
 import { CredentialIssuerJwksController } from './controllers/CredentialIssuerJwksController';
 import { ServiceJwksController } from './controllers/ServiceJwksController';
 import { TopPage } from './view/TopPage';
-import * as Aws from 'aws-sdk'
+import * as Aws from 'aws-sdk';
 
 const path = new EndpointPath();
 const app = new Hono<Env>();
@@ -45,16 +46,15 @@ app.use(
 );
 app.get('/', (c) => {
   const host = c.req.header('host') || '';
-  return c.render(<TopPage host={host} />)
+  return c.render(<TopPage host={host} />);
 });
 app.get('/css/index.css', async (c) => {
-
   const s3 = new Aws.S3();
   const bucketName = 'tw-css';
   const objectKey = 'index.css';
   const params = {
     Bucket: bucketName,
-    Key: objectKey
+    Key: objectKey,
   };
   const data = await s3.getObject(params).promise();
   const cssContent = data.Body.toString('utf-8');
@@ -62,13 +62,12 @@ app.get('/css/index.css', async (c) => {
   return c.body(cssContent, 200, { 'Content-Type': 'text/css' });
 });
 app.get('/css/authorization.css', async (c) => {
-
   const s3 = new Aws.S3();
   const bucketName = 'tw-css';
   const objectKey = 'authorization.css';
   const params = {
     Bucket: bucketName,
-    Key: objectKey
+    Key: objectKey,
   };
   const data = await s3.getObject(params).promise();
   const cssContent = data.Body.toString('utf-8');

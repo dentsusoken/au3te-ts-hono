@@ -26,7 +26,12 @@ interface TopPageProps {
  * @returns {JSX.Element} The rendered top page
  */
 export const TopPage: FC<TopPageProps> = ({ host }) => {
-  const cssLink = host.includes('localhost') ? '/css/index.css' : '/dev/css/index.css';
+  const cssLink =
+    host.includes('localhost') ||
+    host.includes('127.0.0.1') ||
+    host.includes('g-trustedweb.workers')
+      ? '/css/index.css'
+      : '/dev/css/index.css';
 
   return (
     <html lang="en">

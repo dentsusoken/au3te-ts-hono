@@ -23,14 +23,23 @@ import { IdentityAssurance } from './components/IdentityAssurance';
 import { AuthorizationForm } from './components/AuthorizationForm';
 // import { Federations } from './components/Federations';
 
+interface AuthorizationPageProps extends AuthorizationPageModel {
+  host: string;
+}
+
 /**
  * Authorization page component that renders the OAuth 2.0 authorization interface.
  * Displays client information, requested permissions, claims, and authorization form.
- * @param {AuthorizationPageModel} props - The authorization page model containing all necessary data.
+ * @param {AuthorizationPageProps} props - The authorization page model containing all necessary data.
  * @returns {JSX.Element} The rendered authorization page.
  */
-export const AuthorizationPage: FC<AuthorizationPageModel> = (props) => {
-  const cssLink = props.host.includes('localhost') ? '/css/authorization.css' : '/dev/css/authorization.css';
+export const AuthorizationPage: FC<AuthorizationPageProps> = (props) => {
+  const cssLink =
+    props.host.includes('localhost') ||
+    props.host.includes('127.0.0.1') ||
+    props.host.includes('g-trustedweb.workers')
+      ? '/css/authorization.css'
+      : '/dev/css/authorization.css';
 
   return (
     <html>

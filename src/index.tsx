@@ -40,7 +40,10 @@ app.use(
   '*',
   jsxRenderer(({ children }) => <>{children}</>)
 );
-app.get('/', (c) => c.render(<TopPage />));
+app.get('/', (c) => {
+  const host = c.req.header('host') || '';
+  return c.render(<TopPage host={host} />);
+});
 app.post(path.parPath, PARController.handle);
 app.get(path.authorizationPath, AuthorizationController.handle);
 app.post(
