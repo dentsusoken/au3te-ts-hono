@@ -20,7 +20,8 @@ import { AuthorizationIssueHandlerConfigurationImpl } from 'au3te-ts-base/handle
 import { AuthorizationFailHandlerConfigurationImpl } from 'au3te-ts-base/handler.authorization-fail';
 import { AuthorizationPageHandlerConfigurationImpl } from 'au3te-ts-common/handler.authorization-page';
 import { AuthorizationHandlerConfigurationImpl } from 'au3te-ts-base/handler.authorization';
-import { UserHandlerConfigurationImpl } from 'au3te-ts-common/handler.user';
+// import { UserHandlerConfigurationImpl } from 'au3te-ts-common/handler.user';
+import { UserHandlerKV as UserHandlerConfigurationImpl } from '../user/UserHandlerKV';
 import { ExtractorConfigurationImpl } from 'au3te-ts-base/extractor';
 import { Env } from '../env';
 
@@ -38,7 +39,10 @@ export class AuthorizationDecisionController {
   static async handle(c: Context<Env>) {
     const baseHandlerConfiguration = c.get('baseHandlerConfiguration');
     const extractorConfiguration = new ExtractorConfigurationImpl();
-    const userHandlerConfiguration = new UserHandlerConfigurationImpl();
+    const userHandlerConfiguration = new UserHandlerConfigurationImpl(
+      c.env.USER_KV,
+      c.env.MDOC_KV
+    );
 
     const authorizationIssueHandlerConfiguration =
       new AuthorizationIssueHandlerConfigurationImpl(baseHandlerConfiguration);

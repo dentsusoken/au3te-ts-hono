@@ -21,7 +21,8 @@ import { BaseCredentialHandlerConfigurationImpl } from 'au3te-ts-base/handler.cr
 import { IntrospectionHandlerConfigurationImpl } from 'au3te-ts-base/handler.introspection';
 import { CommonCredentialHandlerConfigurationImpl } from 'au3te-ts-common/handler.credential';
 import { CredentialMetadataHandlerConfigurationImpl } from 'au3te-ts-base/handler.credential-metadata';
-import { UserHandlerConfigurationImpl } from 'au3te-ts-common/handler.user';
+// import { UserHandlerConfigurationImpl } from 'au3te-ts-common/handler.user';
+import { UserHandlerKV as UserHandlerConfigurationImpl } from '../user/UserHandlerKV';
 import { Env } from '../env';
 
 /**
@@ -38,7 +39,10 @@ export class CredentialController {
   static async handle(c: Context<Env>) {
     const baseHandlerConfiguration = c.get('baseHandlerConfiguration');
     const extractorConfiguration = c.get('extractorConfiguration');
-    const userHandlerConfiguration = new UserHandlerConfigurationImpl();
+    const userHandlerConfiguration = new UserHandlerConfigurationImpl(
+      c.env.USER_KV,
+      c.env.MDOC_KV
+    );
 
     const introspectionHandlerConfiguration =
       new IntrospectionHandlerConfigurationImpl(baseHandlerConfiguration);

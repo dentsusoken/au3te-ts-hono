@@ -123,6 +123,4 @@ call npm run deploy || (
 
 echo Issuerのデプロイが完了しました。
 
-:: 正常終了時のクリーンアップ
-call :cleanup
 exit /b 0 

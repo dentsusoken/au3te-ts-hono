@@ -20,7 +20,8 @@ import { TokenIssueHandlerConfigurationImpl } from 'au3te-ts-base/handler.token-
 import { TokenFailHandlerConfigurationImpl } from 'au3te-ts-base/handler.token-fail';
 import { TokenCreateHandlerConfigurationImpl } from 'au3te-ts-base/handler.token-create';
 import { TokenHandlerConfigurationImpl } from 'au3te-ts-base/handler.token';
-import { UserHandlerConfigurationImpl } from 'au3te-ts-common/handler.user';
+// import { UserHandlerConfigurationImpl } from 'au3te-ts-common/handler.user';
+import { UserHandlerKV as UserHandlerConfigurationImpl } from '../user/UserHandlerKV';
 
 /**
  * Controller handling the OAuth 2.0 token endpoint.
@@ -36,7 +37,10 @@ export class TokenController {
   static async handle(c: Context<Env>) {
     const baseHandlerConfiguration = c.get('baseHandlerConfiguration');
     const extractorConfiguration = c.get('extractorConfiguration');
-    const userHandlerConfiguration = new UserHandlerConfigurationImpl();
+    const userHandlerConfiguration = new UserHandlerConfigurationImpl(
+      c.env.USER_KV,
+      c.env.MDOC_KV
+    );
     const tokenFailHandlerConfiguration = new TokenFailHandlerConfigurationImpl(
       baseHandlerConfiguration
     );
