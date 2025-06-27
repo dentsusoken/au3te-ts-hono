@@ -40,7 +40,7 @@ app.use(
   '*',
   jsxRenderer(({ children }) => <>{children}</>)
 );
-app.get('/', (c) => {
+app.get('/', async (c) => {
   const host = c.req.header('host') || '';
   return c.render(<TopPage host={host} />);
 });

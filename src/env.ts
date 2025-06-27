@@ -38,6 +38,10 @@ export interface Env {
     ACCESS_TOKEN: string;
     /** KV namespace for session storage */
     SESSION_KV: KVNamespace;
+    /** KV namespace for user storage */
+    USER_KV: KVNamespace;
+    /** KV namespace for mdoc storage */
+    MDOC_KV: KVNamespace;
     /** AWS access key ID */
     AWS_ACCESS_KEY_ID: string;
     /** AWS secret access key */

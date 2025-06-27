@@ -9,6 +9,12 @@ assets = { directory = "./public/" }
 [[kv_namespaces]]
 binding = "SESSION_KV"
 id = "76142d27e3b744ce949e81f45ebc2e28"
+[[kv_namespaces]]
+binding = "USER_KV"
+id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+[[kv_namespaces]]
+binding = "MDOC_KV"
+id = "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
 
 # [[r2_buckets]]
 # binding = "MY_BUCKET"
