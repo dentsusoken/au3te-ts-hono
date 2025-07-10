@@ -26,6 +26,7 @@ npm run deploy
 ## How to emulate AWS Lambda (localstack)
 
 1. Clone or copy the following repositories into the `./build` directory:
+
    - [`oid4vc-core`](https://github.com/dentsusoken/oid4vc-core.git)
    - [`au3te-ts-common`](https://github.com/dentsusoken/au3te-ts-common.git)
    - [`au3te-ts-base`](https://github.com/dentsusoken/au3te-ts-base.git)
@@ -36,7 +37,7 @@ npm run deploy
    git clone https://github.com/dentsusoken/oid4vc-core.git
    git clone https://github.com/dentsusoken/au3te-ts-common.git
    git clone https://github.com/dentsusoken/au3te-ts-base.git
-   
+
    # Or if copying existing local development repositories
    cp -r /path/to/local/oid4vc-core ./build/
    cp -r /path/to/local/au3te-ts-common ./build/
@@ -44,7 +45,8 @@ npm run deploy
    ```
 
 2. Create .env
-    ```bash
+
+   ```bash
    API_BASE_URL=https://nextdev-api.authlete.net
    API_VERSION=V3
    API_KEY=YOUR_API_KEY
@@ -57,9 +59,29 @@ npm run deploy
    docker-compose up --build
    ```
 
+## How to deploy AWS SAM + LocalStack
+
+1. Build with SAM CLI
+
+   ```bash
+   sam build
+   ```
+
+2. Rebuilding the Image and Starting the Container:
+
+   ```bash
+   docker-compose up --build
+   ```
+
+3. Launch local API with SAM CLI
+   ```bash
+   sam local start-api --template template.yml --docker-network localstack-net
+   ```
+
 ## How to deploy AWS Lambda
 
 1. Clone or copy the following repositories into the `./build` directory:
+
    - [`oid4vc-core`](https://github.com/dentsusoken/oid4vc-core.git)
    - [`au3te-ts-common`](https://github.com/dentsusoken/au3te-ts-common.git)
    - [`au3te-ts-base`](https://github.com/dentsusoken/au3te-ts-base.git)
@@ -70,7 +92,7 @@ npm run deploy
    git clone https://github.com/dentsusoken/oid4vc-core.git
    git clone https://github.com/dentsusoken/au3te-ts-common.git
    git clone https://github.com/dentsusoken/au3te-ts-base.git
-   
+
    # Or if copying existing local development repositories
    cp -r /path/to/local/oid4vc-core ./build/
    cp -r /path/to/local/au3te-ts-common ./build/
@@ -81,12 +103,13 @@ npm run deploy
 
    **Add to the IAM role you are using**
 
-   * AWSLambdaBasicExecutionRole
-   * AWSLambdaDynamoDBExecutionRole
-   * dynamodb:GetItem
-   * SecretsManagerReadWrite
+   - AWSLambdaBasicExecutionRole
+   - AWSLambdaDynamoDBExecutionRole
+   - dynamodb:GetItem
+   - SecretsManagerReadWrite
 
 3. Set Environment Variables for SecretsManager:
+
    ```bash
    API_BASE_URL=YOUR_API_BASE_URL
    API_VERSION=YOUR_API_VERSION
@@ -96,6 +119,7 @@ npm run deploy
    ```
 
 4. Create .env
+
    ```bash
    AWS_DEFAULT_REGION=YOUR_AWS_DEFAULT_REGION
    LAMBDA_ROLE_NAME=YOUR_LAMBDA_ROLE_NAME
@@ -104,12 +128,13 @@ npm run deploy
    AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
    ```
 
-4. Build:
+5. Build:
+
    ```bash
    docker build -t issuer:latest .
    ```
 
-5. Run:
+6. Run:
    ```bash
    docker run --env-file ./.env issuer:latest
    ```
