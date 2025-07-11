@@ -1,27 +1,11 @@
-/*
- * Copyright (C) 2014-2024 Authlete, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
- * either express or implied. See the License for the specific
- * language governing permissions and limitations under the
- * License.
- */
 import { Context } from 'hono';
-import { AuthorizationHandlerConfigurationImpl } from 'au3te-ts-base/handler.authorization';
-import { AuthorizationIssueHandlerConfigurationImpl } from 'au3te-ts-base/handler.authorization-issue';
-import { AuthorizationFailHandlerConfigurationImpl } from 'au3te-ts-base/handler.authorization-fail';
+import { AuthorizationHandlerConfigurationImpl } from '@vecrea/au3te-ts-server/handler.authorization';
+import { AuthorizationIssueHandlerConfigurationImpl } from '@vecrea/au3te-ts-server/handler.authorization-issue';
+import { AuthorizationFailHandlerConfigurationImpl } from '@vecrea/au3te-ts-server/handler.authorization-fail';
 import {
   AuthorizationPageHandlerConfigurationImpl,
   AuthorizationPageModel,
-} from 'au3te-ts-common/handler.authorization-page';
+} from '@vecrea/au3te-ts-common/handler.authorization-page';
 import { Env } from '../env';
 import { AuthorizationPage } from '../view/AuthorizationPage';
 
@@ -36,17 +20,19 @@ export class AuthorizationController {
    * @returns {Promise<Response>} A promise that resolves to either the authorization page or an error response.
    */
   static async handle(c: Context<Env>) {
-    const baseHandlerConfiguration = c.get('baseHandlerConfiguration');
+    const serverHandlerConfiguration = c.get('serverHandlerConfiguration');
     const extractorConfiguration = c.get('extractorConfiguration');
 
     const authorizationIssueHandlerConfiguration =
-      new AuthorizationIssueHandlerConfigurationImpl(baseHandlerConfiguration);
+      new AuthorizationIssueHandlerConfigurationImpl(
+        serverHandlerConfiguration
+      );
     const authorizationFailHandlerConfiguration =
-      new AuthorizationFailHandlerConfigurationImpl(baseHandlerConfiguration);
+      new AuthorizationFailHandlerConfigurationImpl(serverHandlerConfiguration);
     const authorizationPageHandlerConfiguration =
       new AuthorizationPageHandlerConfigurationImpl();
     const endpointConfiguration = new AuthorizationHandlerConfigurationImpl({
-      baseHandlerConfiguration,
+      serverHandlerConfiguration,
       authorizationIssueHandlerConfiguration,
       authorizationFailHandlerConfiguration,
       authorizationPageHandlerConfiguration,

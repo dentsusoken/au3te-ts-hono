@@ -1,27 +1,19 @@
-/*
- * Copyright (C) 2014-2024 Authlete, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
- * either express or implied. See the License for the specific
- * language governing permissions and limitations under the
- * License.
- */
 import { createMiddleware } from 'hono/factory';
 import * as Aws from 'aws-sdk';
 
-async function getSecret(
+/**
+ * Retrieves and sets environment variables from AWS Secrets Manager.
+ *
+ * @param {string} secretName - The name of the secret to retrieve.
+ * @param {string} region - The AWS region where the secret is stored.
+ * @param {string} [endpoint] - Optional endpoint for local development.
+ * @returns {Promise<void>} A promise that resolves when the secret is retrieved and environment variables are set.
+ */
+const getSecret = async (
   secretName: string,
   region: string,
   endpoint?: string
-): Promise<void> {
+): Promise<void> => {
   const client = new Aws.SecretsManager({
     region,
     endpoint,
@@ -43,8 +35,12 @@ async function getSecret(
   } catch (err) {
     console.error(`Error retrieving secret: ${err}`);
   }
-}
+};
 
+/**
+ * Middleware that sets up environment variables for AWS Lambda.
+ * Retrieves secrets and sets them in the context environment.
+ */
 export const setupLambdaMiddleware = createMiddleware(async (c, next) => {
   const deployEnv = process.env.DEPLOY_ENV || 'aws';
   const secretName = 'twEnviromentVariables';

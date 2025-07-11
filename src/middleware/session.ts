@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2014-2024 Authlete, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
- * either express or implied. See the License for the specific
- * language governing permissions and limitations under the
- * License.
- */
 import crypto from 'crypto';
 import { Context } from 'hono';
 import { createMiddleware } from 'hono/factory';
@@ -24,9 +8,9 @@ import {
   StoredSessionData,
   ParsedSessionData,
   SessionSchemas,
-} from 'au3te-ts-base/session';
+} from '@vecrea/au3te-ts-server/session';
 import { z } from 'zod';
-import { DynamoDB } from 'oid4vc-core/dynamodb';
+import { DynamoDB } from '@vecrea/oid4vc-core/dynamodb';
 import { createDynamoDBClient } from '../dynamodb';
 
 /** Default session expiration time in seconds (24 hours) */
@@ -61,21 +45,33 @@ export class KVSession<T extends SessionSchemas> implements Session<T> {
     this.#expirationTtl = expirationTtl;
   }
 
+  /**
+   * Gets the session ID.
+   * @returns {string} The session ID.
+   */
   public get sessionId() {
     return this.#sessionId;
   }
 
+  /**
+   * Gets the expiration time-to-live (TTL) for the session.
+   * @returns {number} The expiration TTL in seconds.
+   */
   public get expirationTtl() {
     return this.#expirationTtl;
   }
 
+  /**
+   * Loads session data from the KV store.
+   * If the data is already loaded, it does nothing.
+   * @returns {Promise<void>} A promise that resolves when the data is loaded.
+   */
   public async loadData() {
     if (this.#loaded) {
       return;
     }
 
     const data = await this.#kv.get(this.sessionId);
-    console.log('data', data);
     if (data) {
       this.#data = JSON.parse(data);
     } else {
@@ -85,6 +81,10 @@ export class KVSession<T extends SessionSchemas> implements Session<T> {
     this.#loaded = true;
   }
 
+  /**
+   * Saves session data to the KV store.
+   * @returns {Promise<void>} A promise that resolves when the data is saved.
+   */
   private async saveData() {
     await this.#kv.put(this.sessionId, JSON.stringify(this.#data), {
       expirationTtl: this.expirationTtl,

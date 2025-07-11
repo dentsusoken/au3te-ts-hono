@@ -18,7 +18,7 @@ import { Hono } from 'hono';
 import { jsxRenderer } from 'hono/jsx-renderer';
 import { Env } from './env';
 import { sessionMiddleware } from './middleware/session';
-import { EndpointPath } from './path';
+import { EndpointPath } from './config/EndpointPath';
 import { PARController } from './controllers/PARController';
 import { AuthorizationController } from './controllers/AuthorizationController';
 import { AuthorizationDecisionController } from './controllers/AuthorizationDecisionController';
@@ -31,7 +31,6 @@ import { CredentialIssuerJwksController } from './controllers/CredentialIssuerJw
 import { ServiceJwksController } from './controllers/ServiceJwksController';
 import { TopPage } from './view/TopPage';
 
-const path = new EndpointPath();
 const app = new Hono<Env>();
 
 app.use(sessionMiddleware);
@@ -44,17 +43,26 @@ app.get('/', async (c) => {
   const host = c.req.header('host') || '';
   return c.render(<TopPage host={host} />);
 });
-app.post(path.parPath, PARController.handle);
-app.get(path.authorizationPath, AuthorizationController.handle);
+app.post(EndpointPath.parPath, PARController.handle);
+app.get(EndpointPath.authorizationPath, AuthorizationController.handle);
 app.post(
-  path.authorizationDecisionPath,
+  EndpointPath.authorizationDecisionPath,
   AuthorizationDecisionController.handle
 );
-app.post(path.tokenPath, TokenController.handle);
-app.post(path.credentialPath, CredentialController.handle);
-app.get(path.serviceConfigurationPath, ServiceConfigurationController.handle);
-app.get(path.credentialIssuerMetadataPath, CredentialMetadataController.handle);
-app.get(path.credentialIssuerJwksPath, CredentialIssuerJwksController.handle);
-app.get(path.serviceJwksPath, ServiceJwksController.handle);
+app.post(EndpointPath.tokenPath, TokenController.handle);
+app.post(EndpointPath.credentialPath, CredentialController.handle);
+app.get(
+  EndpointPath.serviceConfigurationPath,
+  ServiceConfigurationController.handle
+);
+app.get(
+  EndpointPath.credentialIssuerMetadataPath,
+  CredentialMetadataController.handle
+);
+app.get(
+  EndpointPath.credentialIssuerJwksPath,
+  CredentialIssuerJwksController.handle
+);
+app.get(EndpointPath.serviceJwksPath, ServiceJwksController.handle);
 
 export default app;

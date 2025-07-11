@@ -15,7 +15,7 @@
  * License.
  */
 import { FC } from 'hono/jsx';
-import { Pair } from 'au3te-ts-common/schemas.common';
+import { Pair } from '@vecrea/au3te-ts-common/schemas.common';
 
 /**
  * Props for the IdentityAssurance component.

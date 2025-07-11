@@ -15,7 +15,7 @@
  * License.
  */
 import { FC } from 'hono/jsx';
-import { User } from 'au3te-ts-common/schemas.common';
+import { User } from '@vecrea/au3te-ts-common/schemas.common';
 
 /**
  * Props for the AuthorizationForm component.

@@ -15,7 +15,7 @@
  * License.
  */
 import { FC, Fragment } from 'hono/jsx';
-import { Scope } from 'au3te-ts-common/schemas.common';
+import { Scope } from '@vecrea/au3te-ts-common/schemas.common';
 
 /**
  * Props for the Permissions component.

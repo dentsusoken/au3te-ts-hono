@@ -3,9 +3,15 @@ import {
   GetBySubject,
   GetByCredentials,
   GetMdocClaimsBySubjectAndDoctype,
-} from 'au3te-ts-common/handler.user';
-import { User } from 'au3te-ts-common/schemas.common';
+} from '@vecrea/au3te-ts-common/handler.user';
+import { User } from '@vecrea/au3te-ts-common/schemas.common';
 
+/**
+ * Creates a function to retrieve a user by their subject from a KV store.
+ *
+ * @param {KVNamespace} kv - The KV namespace to search for the user.
+ * @returns {GetBySubject} A function that takes a subject and returns a user.
+ */
 const createGetBySubjectKV =
   (kv: KVNamespace): GetBySubject =>
   async (subject) => {
@@ -23,6 +29,12 @@ const createGetBySubjectKV =
     }
   };
 
+/**
+ * Creates a function to retrieve a user by their credentials from a KV store.
+ *
+ * @param {KVNamespace} kv - The KV namespace to search for the user.
+ * @returns {GetByCredentials} A function that takes loginId and password and returns a user.
+ */
 const createGetByCredentialsKV =
   (kv: KVNamespace): GetByCredentials =>
   async (loginId, password) => {
@@ -40,6 +52,12 @@ const createGetByCredentialsKV =
     }
   };
 
+/**
+ * Creates a function to retrieve mdoc claims by subject and document type from a KV store.
+ *
+ * @param {KVNamespace} kv - The KV namespace to search for the mdoc claims.
+ * @returns {GetMdocClaimsBySubjectAndDoctype} A function that takes a subject and document type and returns mdoc claims.
+ */
 const createGetMdocClaimsBySubjectAndDoctypeKV =
   (kv: KVNamespace): GetMdocClaimsBySubjectAndDoctype =>
   async (subject, doctype) => {

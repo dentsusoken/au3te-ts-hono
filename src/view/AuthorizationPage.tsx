@@ -15,7 +15,7 @@
  * License.
  */
 import { FC } from 'hono/jsx';
-import { AuthorizationPageModel } from 'au3te-ts-common/handler.authorization-page';
+import { AuthorizationPageModel } from '@vecrea/au3te-ts-common/handler.authorization-page';
 import { ClientInfo } from './components/ClientInfo';
 import { Permissions } from './components/Permissions';
 import { Claims } from './components/Claims';
