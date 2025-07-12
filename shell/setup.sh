@@ -103,6 +103,13 @@ awslocal apigateway put-integration \
     --integration-http-method POST \
     --uri arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:000000000000:function:my-function/invocations
 
+awslocal lambda add-permission \
+  --function-name my-function \
+  --statement-id apigateway-access \
+  --action lambda:InvokeFunction \
+  --principal apigateway.amazonaws.com \
+  --source-arn arn:aws:execute-api:us-east-1:000000000000:$API_ID/dev/*/*
+
 # APIのデプロイ
 awslocal apigateway create-deployment \
     --rest-api-id "$API_ID" \
