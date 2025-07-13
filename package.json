@@ -27,7 +27,7 @@
     "aws-cdk": "^2.114.1",
     "aws-cdk-lib": "^2.114.1",
     "constructs": "^10.3.0",
-    "esbuild": "^0.21.4",
+    "esbuild": "^0.21.5",
     "wrangler": "^4.24.3"
   }
 }
