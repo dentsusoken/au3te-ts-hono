@@ -17,23 +17,18 @@ const createGetBySubjectKV =
   async (subject) => {
     const { keys } = await kv.list();
 
-    let foundUser: User | undefined;
+    for (let i = 0; i < keys.length; i++) {
+      const { name: key } = keys[i];
+      const strUser = await kv.get(key);
+      if (!strUser) continue;
 
-    await Promise.all(
-      keys.map(async ({ name: key }) => {
-        if (foundUser) return;
+      const user = JSON.parse(strUser) as User;
+      if (user.subject === subject) {
+        return user;
+      }
+    }
 
-        const strUser = await kv.get(key);
-        if (!strUser) return;
-
-        const user = JSON.parse(strUser) as User;
-        if (user.subject === subject) {
-          foundUser = user;
-        }
-      })
-    );
-
-    return foundUser;
+    return undefined;
   };
 
 /**
@@ -46,23 +41,19 @@ const createGetByCredentialsKV =
   (kv: KVNamespace): GetByCredentials =>
   async (loginId, password) => {
     const { keys } = await kv.list();
-    let foundUser: User | undefined;
 
-    await Promise.all(
-      keys.map(async ({ name: key }) => {
-        if (foundUser) return;
+    for (let i = 0; i < keys.length; i++) {
+      const { name: key } = keys[i];
+      const strUser = await kv.get(key);
+      if (!strUser) continue;
 
-        const strUser = await kv.get(key);
-        if (!strUser) return;
+      const user = JSON.parse(strUser) as User;
+      if (user.loginId === loginId && user.password === password) {
+        return user;
+      }
+    }
 
-        const user = JSON.parse(strUser) as User;
-        if (user.loginId === loginId && user.password === password) {
-          foundUser = user;
-        }
-      })
-    );
-
-    return foundUser;
+    return undefined;
   };
 
 /**
