@@ -104,7 +104,54 @@ USER_KV_ID=3ff4347455a94aea9507aba0881f2ec4
 MDOC_KV_ID=2cf695d7db584e2b82f475a4f719787b
 ```
 
-4. (Optional) Add test data to your KV namespaces:
+4. Ignore `wrangler.toml` changes in git (recommended for local development):
+
+```bash
+git update-index --assume-unchanged wrangler.toml
+```
+
+This prevents accidental commits of your local KV namespace IDs while allowing you to modify the file for local development.
+
+5. Update `wrangler.toml` with your local KV namespace IDs:
+
+```bash
+# Use the provided script to automatically update wrangler.toml
+./shell/update-wrangler-kv-ids.sh
+```
+
+This script reads the KV namespace IDs from your `.env.local` file and updates the placeholders in `wrangler.toml`.
+
+**To commit changes to wrangler.toml when needed:**
+
+```bash
+# Temporarily track the file
+git update-index --no-assume-unchanged wrangler.toml
+
+# Add and commit your changes
+git add wrangler.toml
+git commit -m "Update wrangler.toml configuration"
+
+# Resume ignoring the file
+git update-index --assume-unchanged wrangler.toml
+```
+
+**Optional: Create aliases for easier management:**
+
+```bash
+# Add these to your ~/.zshrc or ~/.bashrc
+alias ignore-wrangler="git update-index --assume-unchanged wrangler.toml"
+alias track-wrangler="git update-index --no-assume-unchanged wrangler.toml"
+
+# Reload your shell configuration
+source ~/.zshrc  # or source ~/.bashrc
+```
+
+Then you can use:
+
+- `ignore-wrangler` to ignore wrangler.toml changes
+- `track-wrangler` to track wrangler.toml changes
+
+7. (Optional) Add test data to your KV namespaces:
 
 ```bash
 # Add user data to USER_KV
@@ -123,6 +170,15 @@ MDOC_KV_ID=2cf695d7db584e2b82f475a4f719787b
 ### KV Helper Scripts
 
 The project includes helper scripts in the `shell/` directory for easy KV operations:
+
+#### Using update-wrangler-kv-ids.sh
+
+```bash
+# Update wrangler.toml with KV namespace IDs from .env.local
+./shell/update-wrangler-kv-ids.sh
+```
+
+This script automatically updates the KV namespace IDs in `wrangler.toml` using the values from your `.env.local` file.
 
 #### Using kv-put.sh
 

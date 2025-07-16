@@ -21,13 +21,13 @@ assets = { directory = "./public/" }
 
 [[kv_namespaces]]
 binding = "SESSION_KV"
-id = "SESSION_KV_ID"
+id = "SESSION_KV_ID_PLACEHOLDER"
 [[kv_namespaces]]
 binding = "USER_KV"
-id = "USER_KV_ID"
+id = "USER_KV_ID_PLACEHOLDER"
 [[kv_namespaces]]
 binding = "MDOC_KV"
-id = "MDOC_KV_ID"
+id = "MDOC_KV_ID_PLACEHOLDER"
 
 # [[r2_buckets]]
 # binding = "MY_BUCKET"
