@@ -1,0 +1,29 @@
+{
+  "org.iso.18013.5.1.mDL": {
+    "org.iso.18013.5.1": {
+      "family_name": "Silverstone",
+      "given_name": "Inga",
+      "birth_date": "cbor:1004(\"1991-11-06\")",
+      "issuing_country": "US",
+      "document_number": "12345678",
+      "driving_privileges": [
+        {
+          "vehicle_category_code": "A",
+          "issue_date": "cbor:1004(\"2023-01-01\")",
+          "expiry_date": "cbor:1004(\"2043-01-01\")"
+        }
+      ]
+    }
+  },
+  "com.dentsusoken.vecrea.UnifiedID": {
+    "com.dentsusoken.vecrea": {
+      "issue_date": "cbor:0(\"2025-06-18T12:54:00Z\")",
+      "expiry_date": "cbor:0(\"2026-06-18T12:59:00Z\")",
+      "type": "UnifiedID",
+      "issuer": "Unified ID VC Issuer",
+      "service": "ShopVC",
+      "user_id": "44da59c4-b2a0-4a3a-83c0-8b2d95b639cb",
+      "unified_id": "e21d5f6b-1a97-4767-839e-0c688ca561a2"
+    }
+  }
+}

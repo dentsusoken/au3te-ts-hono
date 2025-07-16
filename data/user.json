@@ -1,0 +1,27 @@
+{
+  "subject": "1004",
+  "loginId": "inga",
+  "password": "inga",
+  "name": "Inga Silverstone",
+  "email": "inga@example.com",
+  "address": {
+    "formatted": "114 Old State Hwy 127, Shoshone, CA 92384, USA",
+    "country": "USA",
+    "locality": "Shoshone",
+    "streetAddress": "114 Old State Hwy 127",
+    "postalCode": "CA 92384"
+  },
+  "phoneNumberVerified": false,
+  "emailVerified": false,
+  "givenName": "Inga",
+  "familyName": "Silverstone",
+  "profile": "https://example.com/inga/profile",
+  "picture": "https://example.com/inga/me.jpg",
+  "website": "https://example.com/inga/",
+  "gender": "female",
+  "zoneinfo": "America/Toronto",
+  "locale": "en-US",
+  "preferredUsername": "inga",
+  "birthdate": "1991-11-06",
+  "updatedAt": "2022-04-30"
+}

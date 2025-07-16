@@ -63,21 +63,92 @@ npx wrangler kv namespace create "USER_KV"
 npx wrangler kv namespace create "MDOC_KV"
 ```
 
-2. Set environment variables with your KV IDs:
+2. Find your KV namespace IDs:
 
 ```bash
-export SESSION_KV_ID=your_session_kv_id_here
-export USER_KV_ID=your_user_kv_id_here
-export MDOC_KV_ID=your_mdoc_kv_id_here
+npx wrangler kv namespace list
 ```
 
-Or create a `.env.local` file:
+This will show output like:
+
+```json
+[
+  {
+    "id": "8b4ec28a716544169c2814a6ca02cb76",
+    "title": "SESSION_KV",
+    "supports_url_encoding": true,
+    "beta": false
+  },
+  {
+    "id": "3ff4347455a94aea9507aba0881f2ec4",
+    "title": "USER_KV",
+    "supports_url_encoding": true,
+    "beta": false
+  },
+  {
+    "id": "2cf695d7db584e2b82f475a4f719787b",
+    "title": "MDOC_KV",
+    "supports_url_encoding": true,
+    "beta": false
+  }
+]
+```
+
+3. Set environment variables with your KV IDs:
+
+Create a `.env.local` file:
 
 ```bash
-SESSION_KV_ID=your_session_kv_id_here
-USER_KV_ID=your_user_kv_id_here
-MDOC_KV_ID=your_mdoc_kv_id_here
+SESSION_KV_ID=8b4ec28a716544169c2814a6ca02cb76
+USER_KV_ID=3ff4347455a94aea9507aba0881f2ec4
+MDOC_KV_ID=2cf695d7db584e2b82f475a4f719787b
 ```
+
+4. (Optional) Add test data to your KV namespaces:
+
+```bash
+# Add user data to USER_KV
+./shell/kv-put.sh USER_KV 1004 "$(cat data/user.json)"
+
+# Add mdoc data to MDOC_KV
+./shell/kv-put.sh MDOC_KV 1004 "$(cat data/mdoc.json)"
+
+# Verify the data
+./shell/kv-get.sh USER_KV 1004
+./shell/kv-get.sh MDOC_KV 1004
+```
+
+**Note**: The `kv-put.sh` and `kv-get.sh` scripts automatically read namespace IDs from your `.env.local` file.
+
+### KV Helper Scripts
+
+The project includes helper scripts in the `shell/` directory for easy KV operations:
+
+#### Using kv-put.sh
+
+```bash
+# Put data to KV
+./shell/kv-put.sh <namespace> <key> <value>
+
+# Examples
+./shell/kv-put.sh USER_KV 1004 '{"name":"test"}'
+./shell/kv-put.sh USER_KV 1004 "$(cat data/user.json)"
+./shell/kv-put.sh MDOC_KV 1004 "$(cat data/mdoc.json)"
+```
+
+#### Using kv-get.sh
+
+```bash
+# Get data from KV
+./shell/kv-get.sh <namespace> <key>
+
+# Examples
+./shell/kv-get.sh USER_KV 1004
+./shell/kv-get.sh MDOC_KV 1004
+./shell/kv-get.sh SESSION_KV session123
+```
+
+**Available namespaces**: `SESSION_KV`, `USER_KV`, `MDOC_KV`
 
 ## Local Development
 
