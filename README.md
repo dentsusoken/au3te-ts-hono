@@ -47,7 +47,7 @@ npm install
 Create a `.dev.vars` file in the project root:
 
 ```bash
-API_BASE_URL=https://ja.authlete.com
+API_BASE_URL=https://jp.authlete.com
 API_VERSION=V3
 API_KEY=YOUR_SERVICE_ID
 ACCESS_TOKEN=YOUR_ACCESS_TOKEN
