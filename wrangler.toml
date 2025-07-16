@@ -7,22 +7,27 @@ assets = { directory = "./public/" }
 # MY_VAR = "my-variable"
 
 # KV Namespaces
-# For local development, create your own KV namespaces and set the IDs as environment variables:
-# export SESSION_KV_ID=your_session_kv_id
-# export USER_KV_ID=your_user_kv_id
-# export MDOC_KV_ID=your_mdoc_kv_id
+# These use environment variables for the IDs to allow sharing wrangler.toml
+# while keeping local KV namespace IDs separate.
 #
-# Or create a .env.local file with these variables
+# For local development:
+# 1. Create your own KV namespaces: npx wrangler kv namespace create
+# 2. Create a .env.local file with the KV namespace IDs:
+#    SESSION_KV_ID=your_session_kv_id
+#    USER_KV_ID=your_user_kv_id
+#    MDOC_KV_ID=your_mdoc_kv_id
+#
+# Wrangler will automatically load .env.local and use these environment variables
 
 [[kv_namespaces]]
 binding = "SESSION_KV"
-id = "${SESSION_KV_ID}"
+id = "SESSION_KV_ID"
 [[kv_namespaces]]
 binding = "USER_KV"
-id = "${USER_KV_ID}"
+id = "USER_KV_ID"
 [[kv_namespaces]]
 binding = "MDOC_KV"
-id = "${MDOC_KV_ID}"
+id = "MDOC_KV_ID"
 
 # [[r2_buckets]]
 # binding = "MY_BUCKET"
