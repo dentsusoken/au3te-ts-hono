@@ -3,7 +3,7 @@ import { ApiClientImpl } from '@vecrea/au3te-ts-server/api';
 import {
   ServerHandlerConfiguration,
   ServerHandlerConfigurationImpl,
-} from '@vecrea/au3te-ts-server/handler';
+} from '@vecrea/au3te-ts-server/handler.core';
 import {
   ExtractorConfiguration,
   ExtractorConfigurationImpl,

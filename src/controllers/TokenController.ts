@@ -19,6 +19,7 @@ export class TokenController {
    * @returns {Promise<Response>} A promise that resolves to the token response.
    */
   static async handle(c: Context<Env>) {
+    console.log('TokenController.handle');
     const serverHandlerConfiguration = c.get('serverHandlerConfiguration');
     const extractorConfiguration = c.get('extractorConfiguration');
     const userHandlerConfiguration = new UserHandlerConfigurationImpl(
