@@ -11,7 +11,9 @@ import {
 } from '@vecrea/au3te-ts-server/session';
 import { z } from 'zod';
 import { DynamoDB } from '@vecrea/oid4vc-core/dynamodb';
-import { createDynamoDBClient } from '../dynamodb';
+import { Env } from '../env';
+import { Env as DynamoDBEnv } from '@squilla/hono-aws-middlewares/dynamodb';
+import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 
 /** Default session expiration time in seconds (24 hours) */
 export const EXPIRATION_TTL = 24 * 60 * 60;
@@ -257,15 +259,12 @@ export const sessionMiddleware = createMiddleware(
  * Middleware that manages session handling.
  * Creates or retrieves a session and makes it available in the context.
  */
-export const sessionLambdaMiddleware = createMiddleware(
-  async (c: Context, next: () => Promise<void>) => {
-    const client = createDynamoDBClient({
-      // credentials: {
-      //   accessKeyId: c.env.AWS_ACCESS_KEY_ID,
-      //   secretAccessKey: c.env.AWS_SECRET_ACCESS_KEY,
-      // },
-    });
-    const dynamo = new DynamoDB(client, c.env.DYNAMODB_TABLE_ISSUER);
+export const sessionLambdaMiddleware = createMiddleware<Env & DynamoDBEnv>(
+  async (c: Context<Env & DynamoDBEnv>, next: () => Promise<void>) => {
+    const dynamo = new DynamoDB(
+      DynamoDBDocumentClient.from(c.get('DynamoDB')),
+      c.env.DYNAMODB_TABLE_ISSUER
+    );
     const sessionId =
       getCookie(c, SESSION_COOKIE_NAME) || generateAndSetSessionId(c);
     c.set(
