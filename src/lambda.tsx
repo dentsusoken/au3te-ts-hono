@@ -32,10 +32,14 @@ import { CredentialController } from './controllers/CredentialController';
 import { CredentialIssuerJwksController } from './controllers/CredentialIssuerJwksController';
 import { ServiceJwksController } from './controllers/ServiceJwksController';
 import { TopPage } from './view/TopPage';
-import * as Aws from 'aws-sdk';
+import { dynamoDBMiddleware } from '@squilla/hono-aws-middlewares/dynamodb';
+import { s3Middleware, Env as S3Env } from '@squilla/hono-aws-middlewares/s3';
+import { secretsManagerMiddleware } from '@squilla/hono-aws-middlewares/secrets-manager';
 
-const app = new Hono<Env>();
-
+const app = new Hono<Env & S3Env>();
+app.use(dynamoDBMiddleware());
+app.use(secretsManagerMiddleware());
+app.use("/css/*",s3Middleware());
 app.use(setupLambdaMiddleware);
 app.use(sessionLambdaMiddleware);
 app.use(setupMiddleware);
@@ -46,32 +50,6 @@ app.use(
 app.get('/', (c) => {
   const host = c.req.header('host') || '';
   return c.render(<TopPage host={host} />);
-});
-app.get('/css/index.css', async (c) => {
-  const s3 = new Aws.S3();
-  const bucketName = 'tw-css';
-  const objectKey = 'index.css';
-  const params = {
-    Bucket: bucketName,
-    Key: objectKey,
-  };
-  const data = await s3.getObject(params).promise();
-  const cssContent = data.Body?.toString('utf-8') || '';
-  // return c.text(cssContent);
-  return c.body(cssContent, 200, { 'Content-Type': 'text/css' });
-});
-app.get('/css/authorization.css', async (c) => {
-  const s3 = new Aws.S3();
-  const bucketName = 'tw-css';
-  const objectKey = 'authorization.css';
-  const params = {
-    Bucket: bucketName,
-    Key: objectKey,
-  };
-  const data = await s3.getObject(params).promise();
-  const cssContent = data.Body?.toString('utf-8') || '';
-  // return c.text(cssContent);
-  return c.body(cssContent, 200, { 'Content-Type': 'text/css' });
 });
 app.post(EndpointPath.parPath, PARController.handle);
 app.get(EndpointPath.authorizationPath, AuthorizationController.handle);
@@ -94,6 +72,28 @@ app.get(
   CredentialIssuerJwksController.handle
 );
 app.get(EndpointPath.serviceJwksPath, ServiceJwksController.handle);
+
+
+// Routes for CSS files
+const CSS_HEADERS = {
+  'Content-Type': 'text/css',
+};
+app.get('/css/index.css', async (c) => {
+  const s3 = c.get('S3');
+  const bucket = await s3.getObject({
+    Bucket: process.env.CSS_BUCKET_NAME || 'issuer-css',
+    Key: 'index.css',
+  });
+  return c.text(await bucket.Body?.transformToString() ?? '', 200, CSS_HEADERS);
+});
+app.get('/css/authorization.css', async (c) => {
+  const s3 = c.get('S3');
+  const bucket = await s3.getObject({
+    Bucket: process.env.CSS_BUCKET_NAME || 'issuer-css',
+    Key: 'authorization.css',
+  });
+  return c.text(await bucket.Body?.transformToString() ?? '', 200, CSS_HEADERS);
+});
 
 // export default app;
 export const handler = handle(app);
