@@ -1,0 +1,18 @@
+version = 0.1
+
+# Development
+[default.deploy.parameters]
+stack_name = "oid4vc-issuer"
+resolve_s3 = true
+s3_prefix = "oid4vc-issuer"
+region = "ap-northeast-1"
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+confirm_changeset = false
+disable_rollback = false
+parameter_overrides = [
+    "APIBaseURL=${API_BASE_URL}",
+    "APIVersion=${API_VERSION}",
+    "APIKey=${API_KEY}",
+    "AccessToken=${ACCESS_TOKEN}"
+]
