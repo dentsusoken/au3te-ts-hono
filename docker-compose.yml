@@ -1,54 +1,51 @@
-version: '3.8'
-
 services:
-  localstack:
-    networks:
-      - localstack-net
-    image: localstack/localstack:latest
-    ports:
-      - '4566:4566' # LocalStack メインエンドポイント
-      - '4510-4559:4510-4559' # その他のサービス用ポート
-    environment:
-      - SERVICES=lambda,apigateway,dynamodb,logs
-      - DEBUG=1
-      - LAMBDA_EXECUTOR=docker
-      - DOCKER_HOST=unix:///var/run/docker.sock
-      - AWS_DEFAULT_REGION=us-east-1
-      - EDGE_PORT=4566
-    volumes:
-      - '${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack'
-      - '/var/run/docker.sock:/var/run/docker.sock'
-
-    healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:4566/_localstack/health']
-      interval: 5s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-
   app:
-    networks:
-      - localstack-net
-    build:
+    container_name: app
+    build: 
       context: .
-      dockerfile: Dockerfile.local
+      dockerfile: Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        HTTP_PROXY: ${HTTP_PROXY}
+        https_proxy: ${https_proxy}
+        HTTPS_PROXY: ${HTTPS_PROXY}
+        no_proxy: ${no_proxy}
+        NO_PROXY: ${NO_PROXY}
+    volumes:
+      - .:/app:cached
     depends_on:
-      localstack:
-        condition: service_healthy
+      - localstack
+    command: sleep infinity
+    env_file:
+      - .env
     environment:
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
-      - AWS_DEFAULT_REGION=us-east-1
-      - EDGE_PORT=4566
-      - DYNAMODB_TABLE_ISSUER=ISSUER_SESSION_DYNAMO
-      - DYNAMODB_ENDPOINT="http://localstack:4566"
-    env_file: .env
-    volumes:
-      - ./src:/app/src
-      - ./package.json:/app/package.json
-      - ./package-lock.json:/app/package-lock.json
-      - ./shell:/app/shell
+      - AWS_DEFAULT_REGION=ap-northeast-1
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - http_proxy
+      - HTTP_PROXY
+      - https_proxy
+      - HTTPS_PROXY
+      - no_proxy
+      - NO_PROXY
 
-networks:
-  localstack-net:
-    external: true
+  localstack:
+    container_name: localstack
+    image: localstack/localstack
+    ports:
+      - 4566:4566            
+      - 4510-4559:4510-4559  # external services port range
+    environment:
+      - SERVICES=logs,lambda,apigateway,s3,cloudformation,iam,secretsmanager,dynamodb
+    env_file:
+      - .env
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+
+
+volumes:
+  localstack_data: 
