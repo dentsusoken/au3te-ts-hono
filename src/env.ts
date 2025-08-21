@@ -1,6 +1,6 @@
 import { Session, sessionSchemas } from '@vecrea/au3te-ts-server/session';
 import { ExtractorConfiguration } from '@vecrea/au3te-ts-server/extractor';
-import { ServerHandlerConfiguration } from '@vecrea/au3te-ts-server/handler';
+import { ServerHandlerConfiguration } from '@vecrea/au3te-ts-server/handler.core';
 
 /**
  * Environment configuration interface for the application.
@@ -31,7 +31,7 @@ export interface Env {
     /** AWS secret access key */
     AWS_SECRET_ACCESS_KEY: string;
     /** DynamoDB table name for session storage */
-    DYNAMODB_TABLE_ISSUER: string;
+    ISSUER_SESSION_DYNAMODB: string;
     /** Where to deploy ('local' or none) */
     DEPLOY_ENV: string;
   };

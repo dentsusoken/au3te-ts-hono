@@ -263,7 +263,7 @@ export const sessionLambdaMiddleware = createMiddleware<Env & DynamoDBEnv>(
   async (c: Context<Env & DynamoDBEnv>, next: () => Promise<void>) => {
     const dynamo = new DynamoDB(
       DynamoDBDocumentClient.from(c.get('DynamoDB')),
-      c.env.DYNAMODB_TABLE_ISSUER
+      c.env.ISSUER_SESSION_DYNAMODB
     );
     const sessionId =
       getCookie(c, SESSION_COOKIE_NAME) || generateAndSetSessionId(c);
