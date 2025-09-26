@@ -19,10 +19,10 @@ services:
     env_file:
       - .env
     environment:
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_ACCESS_KEY_ID=${LOCALSTACK_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${LOCALSTACK_SECRET_ACCESS_KEY}
       - AWS_DEFAULT_REGION=ap-northeast-1
-      - AWS_ENDPOINT_URL=http://localstack:4566
+      - AWS_ENDPOINT_URL=${LOCALSTACK_ENDPOINT_URL}
       - http_proxy
       - HTTP_PROXY
       - https_proxy
@@ -38,8 +38,8 @@ services:
       - 4510-4559:4510-4559  # external services port range
     environment:
       - SERVICES=logs,lambda,apigateway,s3,cloudformation,iam,secretsmanager,dynamodb
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     volumes:
       - localstack_data:/var/lib/localstack
       - "/var/run/docker.sock:/var/run/docker.sock"
