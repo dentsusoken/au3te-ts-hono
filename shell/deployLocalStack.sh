@@ -30,6 +30,7 @@ upload_css() {
 set_localstack_credentials() {
     export AWS_ACCESS_KEY_ID="$LOCALSTACK_ACCESS_KEY_ID"
     export AWS_SECRET_ACCESS_KEY="$LOCALSTACK_SECRET_ACCESS_KEY"
+    export AWS_DEFAULT_REGION="$LOCALSTACK_REGION"
     export AWS_ENDPOINT_URL="$LOCALSTACK_ENDPOINT_URL"
 }
 
