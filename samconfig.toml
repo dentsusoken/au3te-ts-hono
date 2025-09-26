@@ -10,9 +10,4 @@ capabilities = "CAPABILITY_IAM"
 image_repositories = []
 confirm_changeset = false
 disable_rollback = false
-parameter_overrides = [
-    "APIBaseURL=${API_BASE_URL}",
-    "APIVersion=${API_VERSION}",
-    "APIKey=${API_KEY}",
-    "AccessToken=${ACCESS_TOKEN}"
-]
+parameter_overrides = "ApiStageName=dev"

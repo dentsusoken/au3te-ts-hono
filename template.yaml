@@ -11,25 +11,9 @@ Parameters:
     Type: String
     Default: issuer-secrets
     Description: 'Secrets Manager ID'
-  APIBaseURL:
+  ApiStageName:
     Type: String
-    Default: https://jp.authlete.com
-    Description: 'Authlete API base URL'
-  APIVersion:
-    Type: String
-    Default: V3
-    Description: 'Authlete API version'
-  APIKey:
-    Type: String
-    Default: YOUR_SERVICE_ID
-    Description: 'Authlete API key. Confirm it in Authlete Console.'
-  AccessToken:
-    Type: String
-    Default: YOUR_ACCESS_TOKEN
-    Description: 'Authlete Access token. Issue it in Authlete Console.'
-  StageName:
-    Type: String
-    Default: dev
+    Default: default
     Description: 'API Gateway stage name'
   ApiName:
     Type: String
@@ -46,23 +30,6 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref CSSBucketName
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: false
-        BlockPublicPolicy: false
-        IgnorePublicAcls: false
-        RestrictPublicBuckets: false
-
-  # S3 Bucket Policy for public read access to CSS files
-  CSSBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref CSSBucket
-      PolicyDocument:
-        Statement:
-          - Effect: Allow
-            Principal: '*'
-            Action: s3:GetObject
-            Resource: !Sub '${CSSBucket}/*'
 
   # Secrets Manager
   OID4VCIssuerSecrets:
@@ -70,14 +37,20 @@ Resources:
     Properties:
       Name: !Ref SecretsManagerId
       Description: 'OID4VC Issuer Secrets'
-      GenerateSecretString:
-        SecretStringTemplate: !Sub '{ "API_BASE_URL": "${APIBaseURL}", "API_VERSION": "${APIVersion}", "API_KEY": "${APIKey}", "ACCESS_TOKEN": "${AccessToken}" }'
+      SecretString: > 
+        {
+          "API_BASE_URL": "",
+          "API_VERSION": "",
+          "API_KEY": "",
+          "ACCESS_TOKEN": "",
+          "PUBLIC_URL": ""
+        }
 
   # DynamoDB Table
   OID4VCIssuerSessionTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Ref OID4VCIssuerSessionTable
+      TableName: !Ref SessionTableName
       AttributeDefinitions:
         - AttributeName: key
           AttributeType: S
@@ -95,7 +68,7 @@ Resources:
   OID4VCIssuerApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: !Ref StageName
+      StageName: !Ref ApiStageName
       Name: !Ref ApiName
   
   # Lambda Function
@@ -105,24 +78,51 @@ Resources:
       CodeUri: ./
       Handler: lambda.handler
       Runtime: nodejs22.x
+      Timeout: 600
       Architectures:
         - x86_64
       Environment:
         Variables:
           ISSUER_SESSION_DYNAMODB: !Ref OID4VCIssuerSessionTable
           SECRET_NAME: !Ref OID4VCIssuerSecrets
+          CSS_BUCKET_NAME: !Ref CSSBucket
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OID4VCIssuerSessionTable
+        - S3ReadPolicy:
+            BucketName: !Ref CSSBucket
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref OID4VCIssuerSecrets
       Events:
-        Index:
+        Root:
           Type: Api
           Properties:
             Path: /
             Method: GET
             RestApiId: !Ref OID4VCIssuerApi
-        All:
+        APIGet:
           Type: Api
           Properties:
-            Path: /{proxy+}
-            Method: ANY
+            Path: /api/{proxy+}
+            Method: GET
+            RestApiId: !Ref OID4VCIssuerApi
+        APIPost:
+          Type: Api
+          Properties:
+            Path: /api/{proxy+}
+            Method: POST
+            RestApiId: !Ref OID4VCIssuerApi
+        WellKnown:
+          Type: Api
+          Properties:
+            Path: /.well-known/{proxy+}
+            Method: GET
+            RestApiId: !Ref OID4VCIssuerApi
+        CSS:
+          Type: Api
+          Properties:
+            Path: /css/{proxy+}
+            Method: GET
             RestApiId: !Ref OID4VCIssuerApi
     Metadata:
       BuildMethod: esbuild
@@ -139,4 +139,4 @@ Outputs:
     Value: !Ref OID4VCIssuerApi
   LocalStackApi:
     Description: "LocalStack API Gateway endpoint URL"
-    Value: !Sub "http://localhost:4566/restapis/${OID4VCIssuerApi}/${StageName}/_user_request_/"
+    Value: !Sub "http://localhost:4566/restapis/${OID4VCIssuerApi}/${ApiStageName}/_user_request_/"
