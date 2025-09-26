@@ -39,10 +39,7 @@ app.use(
   '*',
   jsxRenderer(({ children }) => <>{children}</>)
 );
-app.get('/', async (c) => {
-  const host = c.req.header('host') || '';
-  return c.render(<TopPage host={host} />);
-});
+app.get('/', (c) => c.render(<TopPage publicUrl={c.env.PUBLIC_URL} />));
 app.post(EndpointPath.parPath, PARController.handle);
 app.get(EndpointPath.authorizationPath, AuthorizationController.handle);
 app.post(

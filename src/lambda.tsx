@@ -39,7 +39,7 @@ import { secretsManagerMiddleware } from '@squilla/hono-aws-middlewares/secrets-
 const app = new Hono<Env & S3Env>();
 app.use(dynamoDBMiddleware());
 app.use(secretsManagerMiddleware());
-app.use("/css/*",s3Middleware());
+app.use('/css/*', s3Middleware());
 app.use(setupLambdaMiddleware);
 app.use(sessionLambdaMiddleware);
 app.use(setupMiddleware);
@@ -47,10 +47,7 @@ app.use(
   '*',
   jsxRenderer(({ children }) => <>{children}</>)
 );
-app.get('/', (c) => {
-  const host = c.req.header('host') || '';
-  return c.render(<TopPage host={host} />);
-});
+app.get('/', (c) => c.render(<TopPage publicUrl={c.env.PUBLIC_URL} />));
 app.post(EndpointPath.parPath, PARController.handle);
 app.get(EndpointPath.authorizationPath, AuthorizationController.handle);
 app.post(
@@ -73,7 +70,6 @@ app.get(
 );
 app.get(EndpointPath.serviceJwksPath, ServiceJwksController.handle);
 
-
 // Routes for CSS files
 const CSS_HEADERS = {
   'Content-Type': 'text/css',
@@ -84,7 +80,11 @@ app.get('/css/index.css', async (c) => {
     Bucket: process.env.CSS_BUCKET_NAME || 'issuer-css',
     Key: 'index.css',
   });
-  return c.text(await bucket.Body?.transformToString() ?? '', 200, CSS_HEADERS);
+  return c.text(
+    (await bucket.Body?.transformToString()) ?? '',
+    200,
+    CSS_HEADERS
+  );
 });
 app.get('/css/authorization.css', async (c) => {
   const s3 = c.get('S3');
@@ -92,7 +92,11 @@ app.get('/css/authorization.css', async (c) => {
     Bucket: process.env.CSS_BUCKET_NAME || 'issuer-css',
     Key: 'authorization.css',
   });
-  return c.text(await bucket.Body?.transformToString() ?? '', 200, CSS_HEADERS);
+  return c.text(
+    (await bucket.Body?.transformToString()) ?? '',
+    200,
+    CSS_HEADERS
+  );
 });
 
 // export default app;

@@ -24,7 +24,7 @@ import { AuthorizationForm } from './components/AuthorizationForm';
 // import { Federations } from './components/Federations';
 
 interface AuthorizationPageProps extends AuthorizationPageModel {
-  host: string;
+  publicUrl?: string;
 }
 
 /**
@@ -33,13 +33,11 @@ interface AuthorizationPageProps extends AuthorizationPageModel {
  * @param {AuthorizationPageProps} props - The authorization page model containing all necessary data.
  * @returns {JSX.Element} The rendered authorization page.
  */
-export const AuthorizationPage: FC<AuthorizationPageProps> = (props) => {
-  const cssLink =
-    props.host.includes('localhost') ||
-    props.host.includes('127.0.0.1') ||
-    props.host.includes('g-trustedweb.workers')
-      ? '/css/authorization.css'
-      : '/dev/css/authorization.css';
+export const AuthorizationPage: FC<AuthorizationPageProps> = ({
+  publicUrl = '',
+  ...props
+}) => {
+  const cssLink = `${publicUrl}/css/authorization.css`;
 
   return (
     <html>

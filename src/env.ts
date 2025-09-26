@@ -20,6 +20,8 @@ export interface Env {
     API_KEY: string;
     /** Access token for authorization with Authlete */
     ACCESS_TOKEN: string;
+    /** Public URL for the application */
+    PUBLIC_URL?: string;
     /** KV namespace for session storage */
     SESSION_KV: KVNamespace;
     /** KV namespace for user storage */

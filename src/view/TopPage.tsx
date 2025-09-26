@@ -17,7 +17,7 @@
 import { FC } from 'hono/jsx';
 
 interface TopPageProps {
-  host: string;
+  publicUrl?: string;
 }
 
 /**
@@ -25,13 +25,8 @@ interface TopPageProps {
  * Shows service information and available endpoints.
  * @returns {JSX.Element} The rendered top page
  */
-export const TopPage: FC<TopPageProps> = ({ host }) => {
-  const cssLink =
-    host.includes('localhost') ||
-    host.includes('127.0.0.1') ||
-    host.includes('g-trustedweb.workers')
-      ? '/css/index.css'
-      : '/dev/css/index.css';
+export const TopPage: FC<TopPageProps> = ({ publicUrl = '' }) => {
+  const cssLink = `${publicUrl}/css/index.css`;
 
   return (
     <html lang="en">
@@ -78,13 +73,13 @@ export const TopPage: FC<TopPageProps> = ({ host }) => {
               <tr>
                 <td valign="top">JWK Set Endpoint</td>
                 <td>
-                  <a href="/api/jwks">/api/jwks</a>
+                  <a href={`${publicUrl}/api/jwks`}>/api/jwks</a>
                 </td>
               </tr>
               <tr>
                 <td valign="top">Discovery Endpoint</td>
                 <td>
-                  <a href="/.well-known/openid-configuration">
+                  <a href={`${publicUrl}/.well-known/openid-configuration`}>
                     /.well-known/openid-configuration
                   </a>
                 </td>
@@ -112,7 +107,7 @@ export const TopPage: FC<TopPageProps> = ({ host }) => {
               <tr>
                 <td valign="top">Federation Configuration Endpoint</td>
                 <td>
-                  <a href="/.well-known/openid-federation">
+                  <a href={`${publicUrl}/.well-known/openid-federation`}>
                     /.well-known/openid-federation
                   </a>
                 </td>
@@ -124,7 +119,7 @@ export const TopPage: FC<TopPageProps> = ({ host }) => {
               <tr>
                 <td valign="top">Credential Issuer Metadata Endpoint</td>
                 <td>
-                  <a href="/.well-known/openid-credential-issuer">
+                  <a href={`${publicUrl}/.well-known/openid-credential-issuer`}>
                     /.well-known/openid-credential-issuer
                   </a>
                 </td>
@@ -132,13 +127,15 @@ export const TopPage: FC<TopPageProps> = ({ host }) => {
               <tr>
                 <td valign="top">JWT Issuer Metadata Endpoint</td>
                 <td>
-                  <a href="/.well-known/jwt-issuer">/.well-known/jwt-issuer</a>
+                  <a href={`${publicUrl}/.well-known/jwt-issuer`}>
+                    /.well-known/jwt-issuer
+                  </a>
                 </td>
               </tr>
               <tr>
                 <td valign="top">JWT VC Issuer Metadata Endpoint</td>
                 <td>
-                  <a href="/.well-known/jwt-vc-issuer">
+                  <a href={`${publicUrl}/.well-known/jwt-vc-issuer`}>
                     /.well-known/jwt-vc-issuer
                   </a>
                 </td>

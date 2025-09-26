@@ -20,6 +20,7 @@ export const setupLambdaMiddleware = createMiddleware<SecretsManagerEnv & Env>(
       API_BASE_URL: secret.API_BASE_URL || '',
       API_KEY: secret.API_KEY || '',
       ACCESS_TOKEN: secret.ACCESS_TOKEN || '',
+      PUBLIC_URL: secret.PUBLIC_URL || '',
       ISSUER_SESSION_DYNAMODB: process.env.ISSUER_SESSION_DYNAMODB || '',
     };
     return next();
