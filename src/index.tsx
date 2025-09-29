@@ -65,4 +65,5 @@ app.get(
 );
 app.get(EndpointPath.serviceJwksPath, ServiceJwksController.handle);
 
+export { DurableObjectBase } from './session/DurableObjectSession';
 export default app;

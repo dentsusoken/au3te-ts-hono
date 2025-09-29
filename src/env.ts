@@ -1,6 +1,7 @@
 import { Session, sessionSchemas } from '@vecrea/au3te-ts-server/session';
 import { ExtractorConfiguration } from '@vecrea/au3te-ts-server/extractor';
-import { ServerHandlerConfiguration } from '@vecrea/au3te-ts-server/handler';
+import { ServerHandlerConfiguration } from '@vecrea/au3te-ts-server/handler.core';
+import { DurableObjectBase } from './session/DurableObjectSession';
 
 /**
  * Environment configuration interface for the application.
@@ -34,6 +35,8 @@ export interface Env {
     DYNAMODB_TABLE_ISSUER: string;
     /** Where to deploy ('local' or none) */
     DEPLOY_ENV: string;
+
+    SESSION: DurableObjectNamespace<DurableObjectBase>;
   };
 
   /**
