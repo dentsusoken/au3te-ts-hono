@@ -19,15 +19,24 @@ assets = { directory = "./public/" }
 #
 # Wrangler will automatically load .env.local and use these environment variables
 
-[[kv_namespaces]]
-binding = "SESSION_KV"
-id = "SESSION_KV_ID_PLACEHOLDER"
+# [[kv_namespaces]]
+# binding = "SESSION_KV"
+# id = "SESSION_KV_ID_PLACEHOLDER"
 [[kv_namespaces]]
 binding = "USER_KV"
 id = "USER_KV_ID_PLACEHOLDER"
 [[kv_namespaces]]
 binding = "MDOC_KV"
 id = "MDOC_KV_ID_PLACEHOLDER"
+
+
+[[durable_objects.bindings]]
+name = "SESSION"
+class_name = "DurableObjectBase"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["DurableObjectBase"]
 
 # [[r2_buckets]]
 # binding = "MY_BUCKET"
