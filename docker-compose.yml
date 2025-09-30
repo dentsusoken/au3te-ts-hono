@@ -1,6 +1,5 @@
 services:
   app:
-    container_name: app
     build: 
       context: .
       dockerfile: Dockerfile
@@ -31,10 +30,9 @@ services:
       - NO_PROXY
 
   localstack:
-    container_name: localstack
     image: localstack/localstack
     ports:
-      - 4566:4566            
+      - 4566:4566
       - 4510-4559:4510-4559  # external services port range
     environment:
       - SERVICES=logs,lambda,apigateway,s3,cloudformation,iam,secretsmanager,dynamodb
