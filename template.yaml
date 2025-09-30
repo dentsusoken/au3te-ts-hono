@@ -58,7 +58,7 @@ Resources:
         - AttributeName: key
           KeyType: HASH
       TimeToLiveSpecification:
-        AttributeName: expireAt
+        AttributeName: expiresAt
         Enabled: true
       ProvisionedThroughput:
         ReadCapacityUnits: 1
