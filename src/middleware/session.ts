@@ -3,11 +3,7 @@ import { Context } from 'hono';
 import { createMiddleware } from 'hono/factory';
 import { getCookie, setCookie } from 'hono/cookie';
 import { sessionSchemas } from '@vecrea/au3te-ts-server/session';
-import { DynamoDB } from '@vecrea/oid4vc-core/dynamodb';
 import { Env } from '../env';
-import { Env as DynamoDBEnv } from '@squilla/hono-aws-middlewares/dynamodb';
-import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { DynamoSession } from '../session';
 import { DurableObjectSession } from '../session/DurableObjectSession';
 
 /** Default session expiration time in seconds (24 hours) */
@@ -57,26 +53,6 @@ export const sessionMiddleware = createMiddleware(
     c.set(
       'session',
       new DurableObjectSession(sessionSchemas, sessionId, stub, EXPIRATION_TTL)
-    );
-    await next();
-  }
-);
-
-/**
- * Middleware that manages session handling.
- * Creates or retrieves a session and makes it available in the context.
- */
-export const sessionLambdaMiddleware = createMiddleware<Env & DynamoDBEnv>(
-  async (c: Context<Env & DynamoDBEnv>, next: () => Promise<void>) => {
-    const dynamo = new DynamoDB(
-      DynamoDBDocumentClient.from(c.get('DynamoDB')),
-      c.env.ISSUER_SESSION_DYNAMODB
-    );
-    const sessionId =
-      getCookie(c, SESSION_COOKIE_NAME) || generateAndSetSessionId(c);
-    c.set(
-      'session',
-      new DynamoSession(sessionSchemas, sessionId, dynamo, EXPIRATION_TTL)
     );
     await next();
   }

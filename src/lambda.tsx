@@ -18,7 +18,7 @@ import { Hono } from 'hono';
 import { handle } from 'hono/aws-lambda';
 import { jsxRenderer } from 'hono/jsx-renderer';
 import { Env } from './env';
-import { sessionLambdaMiddleware } from './middleware/session';
+import { sessionLambdaMiddleware } from './middleware/lambdaSession';
 import { EndpointPath } from './config/EndpointPath';
 import { PARController } from './controllers/PARController';
 import { AuthorizationController } from './controllers/AuthorizationController';
