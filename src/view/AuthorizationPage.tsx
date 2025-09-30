@@ -112,6 +112,7 @@ export const AuthorizationPage: FC<AuthorizationPageProps> = ({
             user={props.user}
             loginId={props.loginId}
             loginIdReadOnly={props.loginIdReadOnly}
+            publicUrl={publicUrl}
           />
         </div>
       </body>
