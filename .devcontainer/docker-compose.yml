@@ -11,12 +11,12 @@ services:
         no_proxy: ${no_proxy}
         NO_PROXY: ${NO_PROXY}
     volumes:
-      - .:/app:cached
+      - ..:/app:cached
     depends_on:
       - localstack
     command: sleep infinity
     env_file:
-      - .env
+      - ../.env
     environment:
       - AWS_ACCESS_KEY_ID=${LOCALSTACK_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${LOCALSTACK_SECRET_ACCESS_KEY}

@@ -1,11 +1,11 @@
 {
-    "name": "${localWorkspaceFolderBasename}",
-    "dockerComposeFile": "../docker-compose.yml",
-    "service": "app",
-    "runServices": ["localstack", "app"],
-    "workspaceFolder": "/app",
-    "customizations": {
-      "vscode": { "extensions": ["esbenp.prettier-vscode"] }
-    },
-    "postCreateCommand": "npm install"
-  }
+  "name": "${localWorkspaceFolderBasename}",
+  "dockerComposeFile": "./docker-compose.yml",
+  "service": "app",
+  "runServices": ["localstack", "app"],
+  "workspaceFolder": "/app",
+  "customizations": {
+    "vscode": { "extensions": ["esbenp.prettier-vscode"] }
+  },
+  "postCreateCommand": "npm install"
+}
