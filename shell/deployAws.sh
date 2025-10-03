@@ -6,6 +6,8 @@ set_aws_prod_credentials() {
     export AWS_SECRET_ACCESS_KEY="$AWS_PROD_SECRET_ACCESS_KEY"
     export AWS_DEFAULT_REGION="$AWS_PROD_REGION"
     export AWS_ENDPOINT_URL=
+    export AWS_ECR_REPOSITORY="$AWS_ECR_REPOSITORY"
+    export COMMIT_HASH=$(git rev-parse --short=7 HEAD)
 }
 
 # Cleanup process (delete S3 and SAM stack)
@@ -18,13 +20,16 @@ cleanup() {
 # Build process
 build() {
     echo "Building SAM application..."
-    sam build
+    sam build --parameter-overrides ImageTag=$COMMIT_HASH
 }
 
 # Deploy process
 deploy() {
     echo "Deploying SAM application..."
-    sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+    sam deploy --no-confirm-changeset \
+     --no-fail-on-empty-changeset \
+     --image-repository $AWS_ECR_REPOSITORY \
+     --parameter-overrides ImageTag=$COMMIT_HASH
 }
 
 # Upload CSS files
@@ -39,6 +44,7 @@ set_localstack_credentials() {
     export AWS_SECRET_ACCESS_KEY="$LOCALSTACK_SECRET_ACCESS_KEY"
     export AWS_DEFAULT_REGION="$LOCALSTACK_REGION"
     export AWS_ENDPOINT_URL="$LOCALSTACK_ENDPOINT_URL"
+    export AWS_ECR_REPOSITORY="$LOCALSTACK_ECR_REPOSITORY"
 }
 
 # Main process
@@ -78,3 +84,4 @@ main() {
 
 # Execute script
 main "$@"
+ 

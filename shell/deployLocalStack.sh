@@ -11,13 +11,13 @@ cleanup() {
 # Build process
 build() {
     echo "Building SAM application..."
-    sam build
+    sam build -t template.local.yaml
 }
 
 # Deploy process
 deploy() {
     echo "Deploying SAM application..."
-    sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+    sam deploy --no-confirm-changeset --no-fail-on-empty-changeset -t template.local.yaml
 }
 
 # Upload CSS files

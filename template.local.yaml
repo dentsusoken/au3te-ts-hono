@@ -23,10 +23,6 @@ Parameters:
     Type: String
     Default: oid4vc-issuer-session-table
     Description: 'DynamoDB table name for session'
-  ImageTag:
-    Type: String
-    Default: latest
-    Description: 'Image tag'
 
 Resources:
   # S3 Bucket for CSS files
@@ -79,7 +75,9 @@ Resources:
   OID4VCIssuerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      PackageType: Image
+      CodeUri: ./
+      Handler: lambda.handler
+      Runtime: nodejs22.x
       Timeout: 600
       Architectures:
         - x86_64
@@ -127,6 +125,18 @@ Resources:
             Method: GET
             RestApiId: !Ref OID4VCIssuerApi
     Metadata:
-      DockerTag: !Ref ImageTag
-      DockerContext: .
-      Dockerfile: Dockerfile
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2020'
+        Sourcemap: true
+        EntryPoints:
+          - src/lambda.tsx
+
+Outputs:
+  APIGatewayId:
+    Description: 'API Gateway ID'
+    Value: !Ref OID4VCIssuerApi
+  LocalStackApi:
+    Description: 'LocalStack API Gateway endpoint URL'
+    Value: !Sub 'http://localhost:4566/restapis/${OID4VCIssuerApi}/${ApiStageName}/_user_request_/'
