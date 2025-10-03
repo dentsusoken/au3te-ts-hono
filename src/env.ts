@@ -21,6 +21,8 @@ export interface Env {
     API_KEY: string;
     /** Access token for authorization with Authlete */
     ACCESS_TOKEN: string;
+    /** Public URL for the application */
+    PUBLIC_URL?: string;
     /** KV namespace for session storage */
     SESSION_KV: KVNamespace;
     /** KV namespace for user storage */
@@ -32,7 +34,7 @@ export interface Env {
     /** AWS secret access key */
     AWS_SECRET_ACCESS_KEY: string;
     /** DynamoDB table name for session storage */
-    DYNAMODB_TABLE_ISSUER: string;
+    ISSUER_SESSION_DYNAMODB: string;
     /** Where to deploy ('local' or none) */
     DEPLOY_ENV: string;
 

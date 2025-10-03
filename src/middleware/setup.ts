@@ -11,7 +11,7 @@ import { Env } from '../env';
 export const setupMiddleware = createMiddleware(async (c, next) => {
   const { serverHandlerConfiguration, extractorConfiguration } =
     AppConfig.createBaseConfigurations(
-      env<Env['Bindings']>(c),
+      c.env,
       c.get('session')
     );
 

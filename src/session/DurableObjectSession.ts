@@ -12,12 +12,6 @@ import { Env } from '../env';
 const EXPIRATION_TTL = 24 * 60 * 60;
 
 /**
- * Duration for setting the next alarm for garbage collection (24 hours in milliseconds).
- * @constant {number}
- */
-const ALARM_DURATION_MS = 24 * 60 * 60 * 1000;
-
-/**
  * Presentation information stored within the Durable Object
  *
  * @interface StoredSession
@@ -61,7 +55,7 @@ export class DurableObjectBase extends DurableObject {
     });
 
     // Ensure garbage collection alarm is set
-    await this.setNextAlarm();
+    // await this.setNextAlarm();
   }
 
   /**
@@ -89,50 +83,6 @@ export class DurableObjectBase extends DurableObject {
 
     // Return the actual presentation data
     return storedData.data;
-  }
-
-  /**
-   * Sets the next alarm for garbage collection
-   *
-   * Does nothing if an alarm is already set.
-   * Sets an alarm 24 hours from now for garbage collection.
-   *
-   * @private
-   */
-  private async setNextAlarm() {
-    // Check if an alarm is already scheduled
-    const alarm = await this.ctx.storage.getAlarm();
-    if (alarm && alarm > 0) {
-      return; // Alarm already exists, nothing to do
-    }
-
-    // Schedule the next garbage collection alarm
-    await this.ctx.storage.setAlarm(Date.now() + ALARM_DURATION_MS);
-  }
-
-  /**
-   * Alarm handler for garbage collection of expired data
-   *
-   * Executed periodically to automatically delete presentation data
-   * that has passed its expiration time. Sets the next alarm after completion.
-   *
-   * @async
-   */
-  async alarm(): Promise<void> {
-    const now = Date.now();
-
-    // Get all stored data for expiration check
-    const allData = await this.ctx.storage.list<StoredSession>();
-
-    // Delete expired entries
-    for (const [key, value] of allData) {
-      if (value.expiresAt < now) {
-        await this.ctx.storage.delete(key);
-      }
-    }
-
-    // Schedule the next garbage collection cycle
-    await this.setNextAlarm();
   }
 }
 

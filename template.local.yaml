@@ -1,0 +1,142 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'OID4VC Issuer'
+
+Parameters:
+  CSSBucketName:
+    Type: String
+    Default: issuer-css
+    Description: 'S3 bucket name for CSS files'
+  SecretsManagerId:
+    Type: String
+    Default: issuer-secrets
+    Description: 'Secrets Manager ID'
+  ApiStageName:
+    Type: String
+    Default: default
+    Description: 'API Gateway stage name'
+  ApiName:
+    Type: String
+    Default: oid4vc-issuer-api
+    Description: 'API Gateway API name'
+  SessionTableName:
+    Type: String
+    Default: oid4vc-issuer-session-table
+    Description: 'DynamoDB table name for session'
+
+Resources:
+  # S3 Bucket for CSS files
+  CSSBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref CSSBucketName
+
+  # Secrets Manager
+  OID4VCIssuerSecrets:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Ref SecretsManagerId
+      Description: 'OID4VC Issuer Secrets'
+      SecretString: >
+        {
+          "API_BASE_URL": "",
+          "API_VERSION": "",
+          "API_KEY": "",
+          "ACCESS_TOKEN": "",
+          "PUBLIC_URL": ""
+        }
+
+  # DynamoDB Table
+  OID4VCIssuerSessionTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref SessionTableName
+      AttributeDefinitions:
+        - AttributeName: key
+          AttributeType: S
+      KeySchema:
+        - AttributeName: key
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+  # API Gateway
+  OID4VCIssuerApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref ApiStageName
+      Name: !Ref ApiName
+
+  # Lambda Function
+  OID4VCIssuerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: lambda.handler
+      Runtime: nodejs22.x
+      Timeout: 600
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          ISSUER_SESSION_DYNAMODB: !Ref OID4VCIssuerSessionTable
+          SECRET_NAME: !Ref OID4VCIssuerSecrets
+          CSS_BUCKET_NAME: !Ref CSSBucket
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OID4VCIssuerSessionTable
+        - S3ReadPolicy:
+            BucketName: !Ref CSSBucket
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref OID4VCIssuerSecrets
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+            RestApiId: !Ref OID4VCIssuerApi
+        APIGet:
+          Type: Api
+          Properties:
+            Path: /api/{proxy+}
+            Method: GET
+            RestApiId: !Ref OID4VCIssuerApi
+        APIPost:
+          Type: Api
+          Properties:
+            Path: /api/{proxy+}
+            Method: POST
+            RestApiId: !Ref OID4VCIssuerApi
+        WellKnown:
+          Type: Api
+          Properties:
+            Path: /.well-known/{proxy+}
+            Method: GET
+            RestApiId: !Ref OID4VCIssuerApi
+        CSS:
+          Type: Api
+          Properties:
+            Path: /css/{proxy+}
+            Method: GET
+            RestApiId: !Ref OID4VCIssuerApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2020'
+        Sourcemap: true
+        EntryPoints:
+          - src/lambda.tsx
+
+Outputs:
+  APIGatewayId:
+    Description: 'API Gateway ID'
+    Value: !Ref OID4VCIssuerApi
+  LocalStackApi:
+    Description: 'LocalStack API Gateway endpoint URL'
+    Value: !Sub 'http://localhost:4566/restapis/${OID4VCIssuerApi}/${ApiStageName}/_user_request_/'

@@ -27,6 +27,7 @@ type AuthorizationFormProps = {
   loginId: string | undefined | null;
   /** Read-only login ID value */
   loginIdReadOnly: string | undefined | null;
+  publicUrl: string;  
 };
 
 /**
@@ -48,7 +49,7 @@ export const AuthorizationForm: FC<AuthorizationFormProps> = (props) => {
 
         <form
           id="authorization-form"
-          action="/api/authorization/decision"
+          action={`${props.publicUrl}/api/authorization/decision`}
           method="post"
         >
           {!props.user ? (

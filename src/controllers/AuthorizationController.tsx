@@ -42,7 +42,7 @@ export class AuthorizationController {
     if (result.ok) {
       const pageModel = (await result.json()) as AuthorizationPageModel;
       const host = c.req.header('host') || '';
-      return c.render(<AuthorizationPage {...pageModel} host={host} />);
+      return c.render(<AuthorizationPage {...pageModel} publicUrl={c.env.PUBLIC_URL} />);
     }
     return result;
   }

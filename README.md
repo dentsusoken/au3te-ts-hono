@@ -7,9 +7,9 @@ A Hono-based implementation of the au3te-ts server for OAuth 2.0 and OpenID Conn
 - [Setup](#setup)
 - [Local Development](#local-development)
 - [Deployment](#deployment)
-- [AWS Lambda Emulation](#aws-lambda-emulation)
-- [AWS SAM + LocalStack](#aws-sam--localstack)
-- [AWS Lambda Deployment](#aws-lambda-deployment)
+- [AWS Setup](#aws-setup)
+- [LocalStack Deployment](#localstack-deployment)
+- [AWS Deployment](#aws-deployment)
 
 ## Setup
 
@@ -222,134 +222,100 @@ npm run dev
 npm run deploy
 ```
 
-## AWS Lambda Emulation
+## AWS Setup
+
+This section describes the setup procedure for the au3te-ts-hono application in an AWS Lambda environment.
 
 ### Prerequisites
 
-1. Clone or copy the following repositories into the `./build` directory:
+- Docker installed
+- VSCode Dev Container available
 
-   - [`oid4vc-core`](https://github.com/dentsusoken/oid4vc-core.git)
-   - [`au3te-ts-common`](https://github.com/dentsusoken/au3te-ts-common.git)
-   - [`au3te-ts-base`](https://github.com/dentsusoken/au3te-ts-base.git)
+### Setup Steps
 
-   ```bash
-   # If cloning new repositories
-   cd build
-   git clone https://github.com/dentsusoken/oid4vc-core.git
-   git clone https://github.com/dentsusoken/au3te-ts-common.git
-   git clone https://github.com/dentsusoken/au3te-ts-base.git
+#### Environment Variables Configuration
 
-   # Or if copying existing local development repositories
-   cp -r /path/to/local/oid4vc-core ./build/
-   cp -r /path/to/local/au3te-ts-common ./build/
-   cp -r /path/to/local/au3te-ts-base ./build/
-   ```
-
-2. Create `.env` file:
-
-   ```bash
-   API_BASE_URL=https://nextdev-api.authlete.net
-   API_VERSION=V3
-   API_KEY=YOUR_API_KEY
-   ACCESS_TOKEN=YOUR_ACCESS_TOKEN
-   DEPLOY_ENV=local
-   ```
-
-3. Build and start the container:
-
-   ```bash
-   docker-compose up --build
-   ```
-
-## AWS SAM + LocalStack
-
-### Setup
-
-1. Build with SAM CLI:
-
-   ```bash
-   sam build
-   ```
-
-2. Build and start the container:
-
-   ```bash
-   docker-compose up --build
-   ```
-
-3. Launch local API with SAM CLI:
-
-   ```bash
-   sam local start-api --template template.yml --docker-network localstack-net
-   ```
-
-## AWS Lambda Deployment
-
-### Prerequisites
-
-1. Clone or copy the following repositories into the `./build` directory:
-
-   - [`oid4vc-core`](https://github.com/dentsusoken/oid4vc-core.git)
-   - [`au3te-ts-common`](https://github.com/dentsusoken/au3te-ts-common.git)
-   - [`au3te-ts-base`](https://github.com/dentsusoken/au3te-ts-base.git)
-
-   ```bash
-   # If cloning new repositories
-   cd build
-   git clone https://github.com/dentsusoken/oid4vc-core.git
-   git clone https://github.com/dentsusoken/au3te-ts-common.git
-   git clone https://github.com/dentsusoken/au3te-ts-base.git
-
-   # Or if copying existing local development repositories
-   cp -r /path/to/local/oid4vc-core ./build/
-   cp -r /path/to/local/au3te-ts-common ./build/
-   cp -r /path/to/local/au3te-ts-base ./build/
-   ```
-
-### IAM Role Configuration
-
-Add the following to your IAM role:
-
-- AWSLambdaBasicExecutionRole
-- AWSLambdaDynamoDBExecutionRole
-- dynamodb:GetItem
-- SecretsManagerReadWrite
-
-### Environment Variables
-
-Set environment variables for SecretsManager:
+Copy the `.env.template` file to create a `.env` file and configure your AWS credentials.
 
 ```bash
-API_BASE_URL=YOUR_API_BASE_URL
-API_VERSION=YOUR_API_VERSION
-API_KEY=YOUR_API_KEY
-ACCESS_TOKEN=YOUR_ACCESS_TOKEN
-DYNAMODB_TABLE_ISSUER=ISSUER_SESSION_DYNAMO
+cp .env.template .env
 ```
 
-Create `.env` file:
+Set the following information in the `.env` file:
 
 ```bash
-AWS_DEFAULT_REGION=YOUR_AWS_DEFAULT_REGION
-LAMBDA_ROLE_NAME=YOUR_LAMBDA_ROLE_NAME
-DYNAMODB_TABLE_ISSUER=ISSUER_SESSION_DYNAMO
-AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
+# AWS credentials
+AWS_PROD_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
+AWS_PROD_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
+AWS_PROD_REGION=YOUR_AWS_REGION
+AWS_ECR_REPOSITORY=YOUR_ECR_REPOSITORY
+
+# LocalStack configuration (for local development)
+LOCALSTACK_ACCESS_KEY_ID=test
+LOCALSTACK_SECRET_ACCESS_KEY=test
+LOCALSTACK_ENDPOINT_URL=http://localstack:4566
+LOCALSTACK_REGION=ap-northeast-1
+LOCALSTACK_ECR_REPOSITORY=
 ```
 
-### Build and Deploy
+#### VSCode Dev Container Startup
 
-1. Build the Docker image:
+Start the Dev Container in VSCode:
 
-   ```bash
-   docker build -t issuer:latest .
-   ```
+1. Open the project in VSCode
+2. Open the command palette (Ctrl+Shift+P)
+3. Select "Dev Containers: Reopen in Container"
+4. Wait for the container to start
 
-2. Run the container:
+## LocalStack Deployment
 
-   ```bash
-   docker run --env-file ./.env issuer:latest
-   ```
+When using LocalStack as a local development environment:
+
+```bash
+# Deploy to LocalStack
+./shell/deployLocalStack.sh
+```
+
+After deployment, configure appropriate secret information in SecretsManager.
+
+## AWS Deployment
+
+When deploying to AWS production environment:
+
+```bash
+# Deploy to AWS production environment
+./shell/deployAws.sh
+```
+
+For initial deployment or when cleanup is needed:
+
+```bash
+# Deploy with cleanup
+./shell/deployAws.sh --clean
+```
+
+After deployment, configure appropriate secret information in AWS SecretsManager.
+
+### Deploy Script Details
+
+#### deployLocalStack.sh
+
+Script for deploying to LocalStack environment:
+
+- Cleanup of S3 bucket and SAM stack
+- Build SAM application
+- Deploy to LocalStack
+- Upload CSS files to S3
+
+#### deployAws.sh
+
+Script for deploying to AWS production environment:
+
+- `--clean` option for deployment with cleanup
+- Cleanup of S3 bucket and SAM stack
+- Build SAM application
+- Deploy to AWS production environment
+- Upload CSS files to S3
 
 ## License
 
