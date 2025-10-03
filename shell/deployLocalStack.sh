@@ -17,7 +17,7 @@ build() {
 # Deploy process
 deploy() {
     echo "Deploying SAM application..."
-    sam deploy --no-confirm-changeset --no-fail-on-empty-changeset -t template.local.yaml
+    sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
 }
 
 # Upload CSS files
