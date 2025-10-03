@@ -7,9 +7,9 @@ A Hono-based implementation of the au3te-ts server for OAuth 2.0 and OpenID Conn
 - [Setup](#setup)
 - [Local Development](#local-development)
 - [Deployment](#deployment)
-- [AWS Lambda Emulation](#aws-lambda-emulation)
-- [AWS SAM + LocalStack](#aws-sam--localstack)
-- [AWS Lambda Deployment](#aws-lambda-deployment)
+- [AWS Setup](#aws-setup)
+- [LocalStack Deployment](#localstack-deployment)
+- [AWS Deployment](#aws-deployment)
 
 ## Setup
 
@@ -233,7 +233,7 @@ This section describes the setup procedure for the au3te-ts-hono application in 
 
 ### Setup Steps
 
-#### 1. Environment Variables Configuration
+#### Environment Variables Configuration
 
 Copy the `.env.template` file to create a `.env` file and configure your AWS credentials.
 
@@ -248,14 +248,17 @@ Set the following information in the `.env` file:
 AWS_PROD_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
 AWS_PROD_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
 AWS_PROD_REGION=YOUR_AWS_REGION
+AWS_ECR_REPOSITORY=YOUR_ECR_REPOSITORY
 
 # LocalStack configuration (for local development)
 LOCALSTACK_ACCESS_KEY_ID=test
 LOCALSTACK_SECRET_ACCESS_KEY=test
-LOCALSTACK_ENDPOINT_URL=http://localhost:4566
+LOCALSTACK_ENDPOINT_URL=http://localstack:4566
+LOCALSTACK_REGION=ap-northeast-1
+LOCALSTACK_ECR_REPOSITORY=
 ```
 
-#### 2. VSCode Dev Container Startup
+#### VSCode Dev Container Startup
 
 Start the Dev Container in VSCode:
 
@@ -264,7 +267,7 @@ Start the Dev Container in VSCode:
 3. Select "Dev Containers: Reopen in Container"
 4. Wait for the container to start
 
-#### 3. LocalStack Environment Deployment
+## LocalStack Deployment
 
 When using LocalStack as a local development environment:
 
@@ -275,7 +278,7 @@ When using LocalStack as a local development environment:
 
 After deployment, configure appropriate secret information in SecretsManager.
 
-#### 4. AWS Production Environment Deployment
+## AWS Deployment
 
 When deploying to AWS production environment:
 
