@@ -1,13 +1,14 @@
-import { Session, sessionSchemas } from '@vecrea/au3te-ts-server/session';
+import { Session, SessionSchemas, sessionSchemas } from '@vecrea/au3te-ts-server/session';
 import { ExtractorConfiguration } from '@vecrea/au3te-ts-server/extractor';
 import { ServerHandlerConfiguration } from '@vecrea/au3te-ts-server/handler.core';
 import { DurableObjectBase } from './session/DurableObjectSession';
+import { GetDI } from './di';
 
 /**
  * Environment configuration interface for the application.
  * Defines the structure of environment bindings and runtime variables.
  */
-export interface Env {
+export interface Env<SS extends SessionSchemas = typeof sessionSchemas> {
   /**
    * External bindings configuration for the application.
    * Contains API credentials and KV namespace configurations.
@@ -47,12 +48,8 @@ export interface Env {
    */
   Variables: {
     /** Current session instance with schema validation */
-    session: Session<typeof sessionSchemas>;
-    /** Configuration for request parameter extraction */
-    extractorConfiguration: ExtractorConfiguration;
-    /** Server configuration for request handlers */
-    serverHandlerConfiguration: ServerHandlerConfiguration<
-      typeof sessionSchemas
-    >;
+    session: Session<SS>;
+
+    getDI: GetDI
   };
 }
