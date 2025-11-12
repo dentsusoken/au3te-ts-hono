@@ -25,7 +25,6 @@ import { AuthorizationController } from './controllers/AuthorizationController';
 import { AuthorizationDecisionController } from './controllers/AuthorizationDecisionController';
 import { ServiceConfigurationController } from './controllers/ServiceConfigurationController';
 import { CredentialMetadataController } from './controllers/CredentialMetadataController';
-import { setupMiddleware } from './middleware/setup';
 import { setupLambdaMiddleware } from './middleware/setupLambda';
 import { TokenController } from './controllers/TokenController';
 import { CredentialController } from './controllers/CredentialController';
@@ -35,6 +34,10 @@ import { TopPage } from './view/TopPage';
 import { dynamoDBMiddleware } from '@squilla/hono-aws-middlewares/dynamodb';
 import { s3Middleware, Env as S3Env } from '@squilla/hono-aws-middlewares/s3';
 import { secretsManagerMiddleware } from '@squilla/hono-aws-middlewares/secrets-manager';
+import { createGetDI } from './di';
+import { createUnifiedIdAuthorizationHandler } from './extensions/unified-id/handler/authorization';
+import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/handler/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
+import { createUnifiedIdUserHandler } from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
 
 const app = new Hono<Env & S3Env>();
 app.use(dynamoDBMiddleware());
@@ -42,7 +45,17 @@ app.use(secretsManagerMiddleware());
 app.use('/css/*', s3Middleware());
 app.use(setupLambdaMiddleware);
 app.use(sessionLambdaMiddleware);
-app.use(setupMiddleware);
+app.use(async (c, next) => {
+  c.set(
+    'getDI',
+    createGetDI({
+      authorizationHandler: createUnifiedIdAuthorizationHandler,
+      authorizationDecisionHandler: createUnifiedIdAuthorizationDecisionHandler,
+      userHandler: createUnifiedIdUserHandler,
+    })
+  );
+  await next();
+});
 app.use(
   '*',
   jsxRenderer(({ children }) => <>{children}</>)

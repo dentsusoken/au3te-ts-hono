@@ -24,7 +24,6 @@ import { AuthorizationController } from './controllers/AuthorizationController';
 import { AuthorizationDecisionController } from './controllers/AuthorizationDecisionController';
 import { ServiceConfigurationController } from './controllers/ServiceConfigurationController';
 import { CredentialMetadataController } from './controllers/CredentialMetadataController';
-import { setupMiddleware } from './middleware/setup';
 import { TokenController } from './controllers/TokenController';
 import { CredentialController } from './controllers/CredentialController';
 import { CredentialIssuerJwksController } from './controllers/CredentialIssuerJwksController';
@@ -49,7 +48,6 @@ app.use(async (c, next) => {
   await next();
 });
 app.use(sessionMiddleware);
-app.use(setupMiddleware);
 app.use(
   '*',
   jsxRenderer(({ children }) => <>{children}</>)
