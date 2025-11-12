@@ -3,11 +3,11 @@ import {
   UserHandlerConfiguration,
   UserHandlerConfigurationImpl,
 } from '@vecrea/au3te-ts-common/handler.user';
-import { UnifiedIdUser } from '../schemas/User';
+import { UnifiedIdUser } from '../../schemas/User';
 import { mockGetByCredentials } from './mockGetByCredentials';
 import { mockGetMdocClaimsBySubjectAndDoctype } from './mockGetMdocClaimsBySubjectAndDoctype';
 import { mockGetBySubject } from './mockGetBySubject';
-import { UserHandlerFactory } from '../../../di/DIContainer';
+import { UserHandlerFactory } from '../../../../di/DIContainer';
 
 export interface UnifiedIdUserHandlerConfiguration
   extends UserHandlerConfiguration {
@@ -26,6 +26,9 @@ export class UnifiedIdUserHandlerConfigurationImpl
 export const createUnifiedIdUserHandler: UserHandlerFactory = ({
   users: _users,
   mdocs: _mdocs,
+}: {
+  users: KVNamespace;
+  mdocs: KVNamespace;
 }) => {
   // Mock実装のため、KVNamespaceパラメータは使用しないが、型の整合性のために受け取る
   return new UnifiedIdUserHandlerConfigurationImpl();

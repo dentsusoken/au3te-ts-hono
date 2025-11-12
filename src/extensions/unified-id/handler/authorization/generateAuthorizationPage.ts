@@ -20,8 +20,8 @@ import {
   GenerateAuthorizationPage,
 } from '@vecrea/au3te-ts-server/handler.authorization';
 import { SessionSchemas } from '@vecrea/au3te-ts-server/session';
-import { UnifiedIdSessionSchemas } from '../session';
-import { UnifiedIdParams } from '../schemas/UnifiedIdParams';
+import { UnifiedIdSessionSchemas } from '../../session';
+import { UnifiedIdParams } from '../../schemas/UnifiedIdParams';
 import { AuthorizationPageModel } from '@vecrea/au3te-ts-common/handler.authorization-page';
 
 /**

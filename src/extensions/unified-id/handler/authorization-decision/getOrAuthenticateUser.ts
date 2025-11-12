@@ -17,8 +17,8 @@
 
 import { GetByCredentials } from '@vecrea/au3te-ts-common/handler.user';
 import { GetOrAuthenticateUserFactory } from '@vecrea/au3te-ts-server/handler.authorization-decision';
-import { UnifiedIdUser } from '../schemas/User';
-import { UnifiedIdParams } from '../schemas/UnifiedIdParams';
+import { UnifiedIdUser } from '../../schemas/User';
+import { UnifiedIdParams } from '../../schemas/UnifiedIdParams';
 
 const emptyAuthenticationResult = { user: undefined, authTime: undefined };
 

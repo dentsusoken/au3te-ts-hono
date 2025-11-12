@@ -15,7 +15,7 @@
  * License.
  */
 
-import { UnifiedIdUser } from '../schemas/User';
+import { UnifiedIdUser } from '../../schemas/User';
 
 /**
  * Static array containing mock user data for testing and development.

@@ -17,7 +17,7 @@
 
 import { GetByCredentials } from '@vecrea/au3te-ts-common/handler.user';
 import { mockUsers } from './mockUsers';
-import { UnifiedIdUser } from '../schemas/User';
+import { UnifiedIdUser } from '../../schemas/User';
 
 /**
  * Implements a mock user authentication service.

@@ -31,9 +31,9 @@ import { CredentialIssuerJwksController } from './controllers/CredentialIssuerJw
 import { ServiceJwksController } from './controllers/ServiceJwksController';
 import { TopPage } from './view/TopPage';
 import { createGetDI } from './di';
-import { createUnifiedIdAuthorizationHandler } from './extensions/unified-id/authorization';
-import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
-import { createUnifiedIdUserHandler } from './extensions/unified-id/user/UnifiedIdUserHandlerConfigurationImpl';
+import { createUnifiedIdAuthorizationHandler } from './extensions/unified-id/handler/authorization';
+import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/handler/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
+import { createUnifiedIdUserHandler } from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
 
 const app = new Hono<Env>();
 

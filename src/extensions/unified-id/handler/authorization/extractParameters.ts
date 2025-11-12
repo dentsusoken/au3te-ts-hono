@@ -1,6 +1,6 @@
 import { isFormUrlEncodedType } from '@vecrea/au3te-ts-common/utils';
 import { ExtractParameters } from '@vecrea/au3te-ts-server/extractor';
-import { unifiedIdParamsSchema } from '../schemas/UnifiedIdParams';
+import { unifiedIdParamsSchema } from '../../schemas/UnifiedIdParams';
 
 const splitParameters = (params: URLSearchParams) => {
   const context = new URLSearchParams();

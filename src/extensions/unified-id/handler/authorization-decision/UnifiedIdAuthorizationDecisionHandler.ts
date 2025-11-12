@@ -2,11 +2,11 @@ import {
   AuthorizationDecisionHandlerConfigurationImpl,
   CreateAuthorizationDecisionHandlerConfigurationImplConstructorParams,
 } from '@vecrea/au3te-ts-server/handler.authorization-decision';
-import { UnifiedIdSessionSchemas } from '../session';
-import { AuthorizationDecisionHandlerFactory } from '../../../di/DIContainer';
+import { UnifiedIdSessionSchemas } from '../../session';
+import { AuthorizationDecisionHandlerFactory } from '../../../../di/DIContainer';
 import { createGetOrAuthenticateUser } from './getOrAuthenticateUser';
 import { SessionSchemas } from '@vecrea/au3te-ts-server/session';
-import { UnifiedIdUser } from '../schemas/User';
+import { UnifiedIdUser } from '../../schemas/User';
 
 export const createUnifiedIdAuthorizationDecisionHandler: AuthorizationDecisionHandlerFactory =
   <SS extends SessionSchemas = UnifiedIdSessionSchemas, OPTS = unknown>({

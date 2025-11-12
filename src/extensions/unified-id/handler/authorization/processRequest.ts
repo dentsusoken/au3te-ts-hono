@@ -21,7 +21,7 @@ import {
   ProcessRequestWithOptions,
 } from '@vecrea/au3te-ts-server/handler.core';
 import { AuthorizationRequest } from '@vecrea/au3te-ts-common/schemas.authorization';
-import { UnifiedIdParams } from '../schemas/UnifiedIdParams';
+import { UnifiedIdParams } from '../../schemas/UnifiedIdParams';
 
 /**
  * Creates a function to process an HTTP request.

@@ -3,14 +3,14 @@ import {
   AuthorizationHandlerConfigurationImpl,
   AuthorizationHandlerConfigurationImplConstructorParams,
 } from '@vecrea/au3te-ts-server/handler.authorization';
-import { UnifiedIdSessionSchemas } from '../session';
+import { UnifiedIdSessionSchemas } from '../../session';
 import { SessionSchemas } from '@vecrea/au3te-ts-server/session';
 import { ExtractUnifiedIdParameters } from './extractParameters';
 import { createGenerateAuthorizationPage } from './generateAuthorizationPage';
-import { UnifiedIdParams } from '../schemas/UnifiedIdParams';
+import { UnifiedIdParams } from '../../schemas/UnifiedIdParams';
 import { createProcessApiResponse } from './processApiResponse';
 import { createProcessRequest } from './processRequest';
-import { AuthorizationHandlerFactory } from '../../../di/DIContainer';
+import { AuthorizationHandlerFactory } from '../../../../di/DIContainer';
 import { createToApiRequest } from './toApiRequest';
 
 export class UnifiedIdAuthorizationHandler<

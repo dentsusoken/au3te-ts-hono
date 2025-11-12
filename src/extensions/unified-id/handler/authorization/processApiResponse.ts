@@ -22,7 +22,7 @@ import {
 } from '@vecrea/au3te-ts-server/handler.core';
 import { CreateProcessApiResponseParams4Authorization } from '@vecrea/au3te-ts-server/handler.authorization';
 import { SessionSchemas } from '@vecrea/au3te-ts-server/session';
-import { UnifiedIdParams } from '../schemas/UnifiedIdParams';
+import { UnifiedIdParams } from '../../schemas/UnifiedIdParams';
 
 export const createProcessApiResponse =
   <SS extends SessionSchemas, OPTS extends UnifiedIdParams = UnifiedIdParams>({

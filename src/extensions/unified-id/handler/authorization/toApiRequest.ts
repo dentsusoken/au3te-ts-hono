@@ -4,7 +4,7 @@ import {
   ApiRequestWithOptions,
   ToApiRequest,
 } from '@vecrea/au3te-ts-server/handler.core';
-import { UnifiedIdParams } from '../schemas/UnifiedIdParams';
+import { UnifiedIdParams } from '../../schemas/UnifiedIdParams';
 
 export const createToApiRequest =
   <OPTS extends UnifiedIdParams = UnifiedIdParams>({
