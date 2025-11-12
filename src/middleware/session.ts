@@ -2,9 +2,9 @@ import crypto from 'crypto';
 import { Context } from 'hono';
 import { createMiddleware } from 'hono/factory';
 import { getCookie, setCookie } from 'hono/cookie';
-import { sessionSchemas } from '@vecrea/au3te-ts-server/session';
 import { Env } from '../env';
 import { DurableObjectSession } from '../session/DurableObjectSession';
+import { unifiedIdSessionSchemas, UnifiedIdSessionSchemas } from '../extensions/unified-id/session';
 
 /** Default session expiration time in seconds (24 hours) */
 export const EXPIRATION_TTL = 24 * 60 * 60;
@@ -44,7 +44,7 @@ export const generateAndSetSessionId = (c: Context): string => {
 //     await next();
 //   }
 // );
-
+// TODO: DI Session Schemas
 export const sessionMiddleware = createMiddleware(
   async (c: Context<Env>, next: () => Promise<void>) => {
     const sessionId =
@@ -52,7 +52,8 @@ export const sessionMiddleware = createMiddleware(
     const stub = c.env.SESSION.get(c.env.SESSION.idFromName(sessionId));
     c.set(
       'session',
-      new DurableObjectSession(sessionSchemas, sessionId, stub, EXPIRATION_TTL)
+      // new DurableObjectSession<UnifiedIdSessionSchemas>(sessionSchemas, sessionId, stub, EXPIRATION_TTL)
+      new DurableObjectSession<UnifiedIdSessionSchemas>(unifiedIdSessionSchemas, sessionId, stub, EXPIRATION_TTL)
     );
     await next();
   }

@@ -161,12 +161,12 @@ export class DurableObjectSession<T extends SessionSchemas>
    */
   parseValue<K extends keyof T>(key: K): z.infer<T[K]> | undefined {
     const value = this.#data[key];
-
     if (!value) {
       return undefined;
     }
 
     const parsedJson = JSON.parse(value);
+
     return this.#schemas[key].parse(parsedJson);
   }
 
