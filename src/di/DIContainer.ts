@@ -30,26 +30,102 @@ import { UserHandlerConfiguration } from '@vecrea/au3te-ts-common/handler.user';
 import { Env } from '../env';
 import { Context } from 'hono';
 
+/**
+ * Dependency Injection Container interface.
+ * Provides factory methods for creating handler configurations.
+ * @template SS - The session schemas type, defaults to the base sessionSchemas.
+ */
 export interface DIContainer<
   SS extends SessionSchemas = typeof sessionSchemas,
 > {
+  /**
+   * Creates a session instance for the given context.
+   * @param {Context<Env<SS>>} c - The Hono context containing environment and session information.
+   * @returns {Session<SS>} A session instance configured with the session schemas.
+   */
   session(c: Context<Env<SS>>): Session<SS>;
+
+  /**
+   * Creates a server handler configuration.
+   * @returns {ServerHandlerConfiguration<SS>} The server handler configuration.
+   */
   serverHandlerConfiguration(): ServerHandlerConfiguration<SS>;
+
+  /**
+   * Creates an extractor configuration.
+   * @returns {ExtractorConfiguration} The extractor configuration.
+   */
   extractorConfiguration(): ExtractorConfiguration;
+
+  /**
+   * Creates an authorization handler configuration.
+   * @template OPTS - Additional options type for the authorization handler.
+   * @returns {AuthorizationHandlerConfiguration<SS, OPTS>} The authorization handler configuration.
+   */
   authorizationHandler<
     OPTS extends object,
   >(): AuthorizationHandlerConfiguration<SS, OPTS>;
+
+  /**
+   * Creates a token handler configuration.
+   * @returns {TokenHandlerConfiguration} The token handler configuration.
+   */
   tokenHandler(): TokenHandlerConfiguration;
+
+  /**
+   * Creates a credential handler configuration.
+   * @returns {CredentialSingleIssueHandlerConfiguration} The credential handler configuration.
+   */
   credentialHandler(): CredentialSingleIssueHandlerConfiguration;
+
+  /**
+   * Creates an authorization decision handler configuration.
+   * @returns {AuthorizationDecisionHandlerConfiguration} The authorization decision handler configuration.
+   */
   authorizationDecisionHandler(): AuthorizationDecisionHandlerConfiguration;
+
+  /**
+   * Creates a PAR (Pushed Authorization Request) handler configuration.
+   * @returns {ParHandlerConfiguration} The PAR handler configuration.
+   */
   parHandler(): ParHandlerConfiguration;
+
+  /**
+   * Creates a credential issuer JWKS handler configuration.
+   * @returns {CredentialIssuerJwksHandlerConfiguration} The credential issuer JWKS handler configuration.
+   */
   credentialIssuerJwksHandler(): CredentialIssuerJwksHandlerConfiguration;
+
+  /**
+   * Creates a credential metadata handler configuration.
+   * @returns {CredentialMetadataHandlerConfiguration} The credential metadata handler configuration.
+   */
   credentialMetadataHandler(): CredentialMetadataHandlerConfiguration;
+
+  /**
+   * Creates a service configuration handler configuration.
+   * @returns {ServiceConfigurationHandlerConfiguration} The service configuration handler configuration.
+   */
   serviceConfigurationHandler(): ServiceConfigurationHandlerConfiguration;
+
+  /**
+   * Creates a service JWKS handler configuration.
+   * @returns {ServiceJwksHandlerConfiguration} The service JWKS handler configuration.
+   */
   serviceJwksHandler(): ServiceJwksHandlerConfiguration;
+
+  /**
+   * Creates a user handler configuration.
+   * @returns {UserHandlerConfiguration} The user handler configuration.
+   */
   userHandler(): UserHandlerConfiguration;
 }
 
+/**
+ * Factory function type for creating authorization handler configurations.
+ * @template SS - The session schemas type.
+ * @template OPTS - Additional options type for the authorization handler.
+ */
 export type AuthorizationHandlerFactory = <
   SS extends SessionSchemas,
   OPTS extends object,
@@ -57,6 +133,9 @@ export type AuthorizationHandlerFactory = <
   params: AuthorizationHandlerConfigurationImplConstructorParams<SS, OPTS>,
 ) => AuthorizationHandlerConfiguration<SS, OPTS>;
 
+/**
+ * Factory interface for creating token handler configurations.
+ */
 export interface TokenHandlerFactory {
   <SS extends SessionSchemas = typeof sessionSchemas>(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
@@ -68,6 +147,9 @@ export interface TokenHandlerFactory {
   }): TokenHandlerConfiguration;
 }
 
+/**
+ * Factory interface for creating credential handler configurations.
+ */
 export interface CredentialHandlerFactory {
   <SS extends SessionSchemas = typeof sessionSchemas>(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
@@ -79,6 +161,9 @@ export interface CredentialHandlerFactory {
   }): CredentialSingleIssueHandlerConfiguration;
 }
 
+/**
+ * Factory interface for creating authorization decision handler configurations.
+ */
 export interface AuthorizationDecisionHandlerFactory {
   <
     SS extends SessionSchemas = typeof sessionSchemas,
@@ -96,6 +181,9 @@ export interface AuthorizationDecisionHandlerFactory {
   }): AuthorizationDecisionHandlerConfiguration;
 }
 
+/**
+ * Factory interface for creating PAR (Pushed Authorization Request) handler configurations.
+ */
 export interface PARHandlerFactory {
   <SS extends SessionSchemas = typeof sessionSchemas>(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
@@ -103,40 +191,74 @@ export interface PARHandlerFactory {
   }): ParHandlerConfiguration;
 }
 
+/**
+ * Factory interface for creating credential issuer JWKS handler configurations.
+ */
 export interface CredentialIssuerJwksHandlerFactory {
   <SS extends SessionSchemas = typeof sessionSchemas>(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
   }): CredentialIssuerJwksHandlerConfiguration;
 }
 
+/**
+ * Factory interface for creating credential metadata handler configurations.
+ */
 export interface CredentialMetadataHandlerFactory {
   <SS extends SessionSchemas = typeof sessionSchemas>(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
   }): CredentialMetadataHandlerConfiguration;
 }
 
+/**
+ * Factory interface for creating service configuration handler configurations.
+ */
 export interface ServiceConfigurationHandlerFactory {
   <SS extends SessionSchemas = typeof sessionSchemas>(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
   }): ServiceConfigurationHandlerConfiguration;
 }
 
+/**
+ * Factory interface for creating service JWKS handler configurations.
+ */
 export interface ServiceJwksHandlerFactory {
   <SS extends SessionSchemas = typeof sessionSchemas>(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
   }): ServiceJwksHandlerConfiguration;
 }
 
+/**
+ * Factory interface for creating user handler configurations.
+ */
 export interface UserHandlerFactory {
+  /**
+   * Creates a user handler configuration.
+   * @template SS - The session schemas type.
+   * @param {Context<Env<SS>>} c - The Hono context.
+   * @returns {UserHandlerConfiguration} The user handler configuration.
+   */
   <SS extends SessionSchemas>(c: Context<Env<SS>>): UserHandlerConfiguration;
 }
 
+/**
+ * Factory interface for creating session instances.
+ */
 export interface SessionFactory {
+  /**
+   * Creates a session factory function.
+   * @template SS - The session schemas type.
+   * @param {SS} sessionSchemas - The session schemas to use.
+   * @returns A function that creates a session instance from a context.
+   */
   <SS extends SessionSchemas>(
     sessionSchemas: SS,
   ): (c: Context<Env<SS>>) => Session<SS>;
 }
 
+/**
+ * Override configuration for DI container.
+ * Allows custom implementations to be injected for specific handlers.
+ */
 export interface DIContainerOverrides {
   authorizationHandler?: AuthorizationHandlerFactory;
   tokenHandler?: TokenHandlerFactory;

@@ -25,6 +25,11 @@ export const generateAndSetSessionId = (c: Context): string => {
   return sessionId;
 };
 
+/**
+ * Gets the session ID from the cookie, or generates a new one if not present.
+ * @param {Context} c - The Hono context.
+ * @returns {string} The session ID from the cookie, or a newly generated session ID.
+ */
 export const getSessionId = (c: Context): string => {
   return getCookie(c, SESSION_COOKIE_NAME) || generateAndSetSessionId(c);
 };

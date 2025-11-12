@@ -74,14 +74,26 @@ import {
 // import { UserHandlerKV } from '../extensions/kv-user/handler/user/UserHandlerKV';
 import { createDOSession } from '../session/DurableObjectSession';
 
+/**
+ * Default implementation of the DI container.
+ * Provides factory methods for creating handler configurations with dependency injection.
+ * @template SS - The session schemas type.
+ */
 export class DIContainerImpl<SS extends SessionSchemas>
   implements DIContainer<SS>
 {
   readonly #c: Context<Env<SS>>;
   readonly #overrides: DIContainerOverrides;
 
+  /** Session factory function that creates session instances from contexts */
   session: (c: Context<Env<SS>>) => Session<SS>;
 
+  /**
+   * Creates a new DIContainerImpl instance.
+   * @param {Context<Env<SS>>} c - The Hono context.
+   * @param {SS} sessionSchemas - The session schemas to use.
+   * @param {DIContainerOverrides} [overrides={}] - Optional overrides for handler factories.
+   */
   constructor(
     c: Context<Env<SS>>,
     sessionSchemas: SS,

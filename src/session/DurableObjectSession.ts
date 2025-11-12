@@ -14,6 +14,11 @@ import { getSessionId } from './getSessionId';
 /** Default session expiration time in seconds (24 hours) */
 const EXPIRATION_TTL = 24 * 60 * 60;
 
+/**
+ * Session implementation using Cloudflare Durable Objects for storage.
+ * Provides persistent session storage with automatic expiration handling.
+ * @template T - The session schemas type.
+ */
 export class DurableObjectSession<T extends SessionSchemas>
   implements Session<T>
 {
@@ -24,6 +29,13 @@ export class DurableObjectSession<T extends SessionSchemas>
   #expirationTtl: number;
   #loaded = false;
 
+  /**
+   * Creates a new DurableObjectSession instance.
+   * @param {T} schemas - The session schemas for validation.
+   * @param {string} sessionId - The unique session identifier.
+   * @param {DurableObjectStub<DurableObject<string>>} stub - The Durable Object stub for storage operations.
+   * @param {number} [expirationTtl=EXPIRATION_TTL] - The expiration time-to-live in seconds.
+   */
   constructor(
     schemas: T,
     sessionId: string,
@@ -53,7 +65,7 @@ export class DurableObjectSession<T extends SessionSchemas>
   }
 
   /**
-   * Loads session data from the KV store.
+   * Loads session data from the Durable Object storage.
    * If the data is already loaded, it does nothing.
    * @returns {Promise<void>} A promise that resolves when the data is loaded.
    */
@@ -73,7 +85,7 @@ export class DurableObjectSession<T extends SessionSchemas>
   }
 
   /**
-   * Saves session data to the KV store.
+   * Saves session data to the Durable Object storage.
    * @returns {Promise<void>} A promise that resolves when the data is saved.
    */
   private async saveData() {
@@ -212,6 +224,14 @@ export class DurableObjectSession<T extends SessionSchemas>
   }
 }
 
+/**
+ * Creates a session factory function for Durable Object-based sessions.
+ * @param {SS} sessionSchemas - The session schemas to use.
+ * @returns A function that creates a DurableObjectSession instance from a context.
+ * @example
+ * const sessionFactory = createDOSession(unifiedIdSessionSchemas);
+ * const session = sessionFactory(context);
+ */
 export const createDOSession: SessionFactory = <SS extends SessionSchemas>(
   sessionSchemas: SS,
 ) => {
