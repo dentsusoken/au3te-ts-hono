@@ -1,28 +1,109 @@
 import {
   GetByCredentials,
+  GetBySubject,
+  GetMdocClaimsBySubjectAndDoctype,
   UserHandlerConfiguration,
-  UserHandlerConfigurationImpl,
 } from '@vecrea/au3te-ts-common/handler.user';
-import { UnifiedIdUser } from '../../schemas/User';
-import { mockGetByCredentials } from './mockGetByCredentials';
-import { mockGetMdocClaimsBySubjectAndDoctype } from './mockGetMdocClaimsBySubjectAndDoctype';
-import { mockGetBySubject } from './mockGetBySubject';
+import { SessionSchemas } from '@vecrea/au3te-ts-server/session';
+import { Context } from 'hono';
 import { UserHandlerFactory } from '../../../../di/DIContainer';
+import { Env } from '../../../../env';
+import { UnifiedIdAllocator, UnifiedIdAllocatorDurableObjects } from '../../allocator';
+import { UnifiedIdUser } from '../../schemas/User';
+import { createGetByCredentials } from './getByCredentials';
+import { getBySubject } from './getBySubject';
+import { createGetMdocClaimsBySubjectAndDoctype } from './getMdocClaimsBySubjectAndDoctype';
 
-export interface UnifiedIdUserHandlerConfiguration
-  extends UserHandlerConfiguration {
-  getByCredentials: GetByCredentials<UnifiedIdUser, 'serviceId'>;
+/** Union type representing the keys for unified ID options */
+type UnifiedIdOptionsKeys = 'serviceId' | 'unifiedId';
+
+/**
+ * Extended user handler configuration interface for unified ID functionality.
+ * Adds unified ID allocator support to the base user handler configuration.
+ *
+ * @template U - The user type, must extend UnifiedIdUser (defaults to UnifiedIdUser)
+ * @template T - Union of User property keys (excluding 'loginId' and 'password') to require in options parameter (defaults to never)
+ *
+ * @extends {UserHandlerConfiguration<U, T>}
+ */
+export interface UnifiedIdUserHandlerConfiguration<
+  U extends UnifiedIdUser = UnifiedIdUser,
+  T extends keyof Omit<U, 'loginId' | 'password'> = never,
+> extends UserHandlerConfiguration<U, T> {
+  /** The unified ID allocator instance for managing unified IDs */
+  unifiedIdAllocator: UnifiedIdAllocator;
 }
 
-export class UnifiedIdUserHandlerConfigurationImpl
-  extends UserHandlerConfigurationImpl
-  implements UnifiedIdUserHandlerConfiguration
+/**
+ * Implementation of UnifiedIdUserHandlerConfiguration.
+ * Provides user authentication, lookup, and mdoc claims retrieval with unified ID support.
+ *
+ * @template SS - The session schemas type
+ *
+ * @implements {UnifiedIdUserHandlerConfiguration<UnifiedIdUser, UnifiedIdOptionsKeys>}
+ *
+ * @example
+ * ```typescript
+ * const handler = new UnifiedIdUserHandlerConfigurationImpl(context);
+ * const user = await handler.getByCredentials('inga', 'inga', { serviceId: 'shopvc' });
+ * ```
+ */
+export class UnifiedIdUserHandlerConfigurationImpl<SS extends SessionSchemas>
+  implements
+    UnifiedIdUserHandlerConfiguration<UnifiedIdUser, UnifiedIdOptionsKeys>
 {
-  getBySubject = mockGetBySubject;
-  getByCredentials = mockGetByCredentials;
-  getMdocClaimsBySubjectAndDoctype = mockGetMdocClaimsBySubjectAndDoctype;
+  /** Function to retrieve a user by subject identifier */
+  getBySubject: GetBySubject<UnifiedIdUser>;
+  /** Function to authenticate a user using login credentials with unified ID support */
+  getByCredentials: GetByCredentials<UnifiedIdUser, UnifiedIdOptionsKeys>;
+  /** Function to retrieve mobile document (mdoc) claims by subject and document type */
+  getMdocClaimsBySubjectAndDoctype: GetMdocClaimsBySubjectAndDoctype;
+
+  /** The unified ID allocator instance for managing unified IDs */
+  unifiedIdAllocator: UnifiedIdAllocator;
+
+  /**
+   * Creates a new instance of UnifiedIdUserHandlerConfigurationImpl.
+   * Initializes the unified ID allocator and sets up user handler functions.
+   *
+   * @param {Context<Env<SS>>} c - The Hono context containing environment configuration
+   */
+  constructor(c: Context<Env<SS>>) {
+    this.unifiedIdAllocator = new UnifiedIdAllocatorDurableObjects(
+      c.env.DURABLE_OBJECT.get(
+        c.env.DURABLE_OBJECT.idFromName('unifiedIdAllocator'),
+      ),
+    );
+    this.getBySubject = getBySubject;
+    this.getByCredentials = createGetByCredentials(this.unifiedIdAllocator);
+    this.getMdocClaimsBySubjectAndDoctype =
+      createGetMdocClaimsBySubjectAndDoctype(
+        this.unifiedIdAllocator,
+        this.getBySubject,
+      );
+  }
 }
 
-export const createUnifiedIdUserHandler: UserHandlerFactory = () => {
-  return new UnifiedIdUserHandlerConfigurationImpl();
+/**
+ * Factory function for creating a unified ID user handler configuration.
+ * This function is used by the DI container to create user handler instances.
+ *
+ * @template SS - The session schemas type
+ * @param {Context<Env<SS>>} c - The Hono context containing environment configuration
+ * @returns {UserHandlerConfiguration} A user handler configuration instance with unified ID support
+ *
+ * @example
+ * ```typescript
+ * const factory: UserHandlerFactory = createUnifiedIdUserHandler;
+ * const handler = factory(context);
+ * ```
+ */
+export const createUnifiedIdUserHandler: UserHandlerFactory = <
+  SS extends SessionSchemas,
+>(
+  c: Context<Env<SS>>,
+): UserHandlerConfiguration => {
+  return new UnifiedIdUserHandlerConfigurationImpl<SS>(
+    c,
+  ) as UserHandlerConfiguration;
 };
