@@ -1,6 +1,5 @@
 import { Context } from 'hono';
 import { Env } from '../env';
-import { getDI } from '../di';
 
 /**
  * Controller handling the credential issuance endpoint.

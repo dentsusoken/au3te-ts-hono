@@ -18,7 +18,6 @@ import { Hono } from 'hono';
 import { handle } from 'hono/aws-lambda';
 import { jsxRenderer } from 'hono/jsx-renderer';
 import { Env } from './env';
-import { sessionLambdaMiddleware } from './middleware/lambdaSession';
 import { EndpointPath } from './config/EndpointPath';
 import { PARController } from './controllers/PARController';
 import { AuthorizationController } from './controllers/AuthorizationController';
@@ -38,20 +37,22 @@ import { createGetDI } from './di';
 import { createUnifiedIdAuthorizationHandler } from './extensions/unified-id/handler/authorization';
 import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/handler/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
 import { createUnifiedIdUserHandler } from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
+import { createDynamoSession } from './session';
+import { sessionSchemas } from '@vecrea/au3te-ts-server/session';
 
 const app = new Hono<Env & S3Env>();
 app.use(dynamoDBMiddleware());
 app.use(secretsManagerMiddleware());
 app.use('/css/*', s3Middleware());
 app.use(setupLambdaMiddleware);
-app.use(sessionLambdaMiddleware);
 app.use(async (c, next) => {
   c.set(
     'getDI',
-    createGetDI({
+    createGetDI(sessionSchemas, {
       authorizationHandler: createUnifiedIdAuthorizationHandler,
       authorizationDecisionHandler: createUnifiedIdAuthorizationDecisionHandler,
       userHandler: createUnifiedIdUserHandler,
+      session: createDynamoSession,
     })
   );
   await next();

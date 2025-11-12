@@ -6,7 +6,11 @@ import {
 } from '@vecrea/au3te-ts-server/session';
 import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
+import { sessionSchemas } from '@vecrea/au3te-ts-server/session';
+import { Context } from 'hono';
 import { Env } from '../env';
+import { SessionFactory } from '../di/DIContainer';
+import { getSessionId } from './getSessionId';
 
 /** Default session expiration time in seconds (24 hours) */
 const EXPIRATION_TTL = 24 * 60 * 60;
@@ -280,3 +284,21 @@ export class DurableObjectSession<T extends SessionSchemas>
     await this.saveData();
   }
 }
+
+export const createDOSession: SessionFactory = <
+  SS extends SessionSchemas = typeof sessionSchemas
+>(
+  sessionSchemas: SS
+) => {
+  return (c: Context<Env<SS>>) => {
+    const sessionId = getSessionId(c);
+    const stub = c.env.SESSION.get(c.env.SESSION.idFromName(sessionId));
+
+    return new DurableObjectSession<SS>(
+      sessionSchemas,
+      sessionId,
+      stub,
+      EXPIRATION_TTL
+    );
+  };
+};

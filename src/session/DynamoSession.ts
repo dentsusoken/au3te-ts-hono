@@ -6,6 +6,12 @@ import {
 } from '@vecrea/au3te-ts-server/session';
 import { z } from 'zod';
 import { DynamoDB } from '@vecrea/oid4vc-core/dynamodb';
+import { SessionFactory } from '../di';
+import { Context } from 'hono';
+import { Env } from '../env';
+import { getSessionId } from './getSessionId';
+import { sessionSchemas } from '@vecrea/au3te-ts-server/session';
+import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 
 /** Default session expiration time in seconds (24 hours) */
 const EXPIRATION_TTL = 24 * 60 * 60;
@@ -210,3 +216,24 @@ export class DynamoSession<T extends SessionSchemas> implements Session<T> {
     await this.saveData();
   }
 }
+
+export const createDynamoSession: SessionFactory = <
+  SS extends SessionSchemas = typeof sessionSchemas
+>(
+  sessionSchemas: SS
+) => {
+  return (c: Context<Env<SS>>) => {
+    const sessionId = getSessionId(c);
+    const dynamo = new DynamoDB(
+      DynamoDBDocumentClient.from(c.get('DynamoDB')),
+      c.env.ISSUER_SESSION_DYNAMODB
+    );
+
+    return new DynamoSession<SS>(
+      sessionSchemas,
+      sessionId,
+      dynamo,
+      EXPIRATION_TTL
+    );
+  };
+};

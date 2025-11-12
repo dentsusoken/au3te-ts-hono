@@ -5,6 +5,7 @@ import {
 } from '@vecrea/au3te-ts-server/handler.authorization';
 import { ServerHandlerConfiguration } from '@vecrea/au3te-ts-server/handler.core';
 import {
+  Session,
   sessionSchemas,
   SessionSchemas,
 } from '@vecrea/au3te-ts-server/session';
@@ -32,12 +33,12 @@ import { Context } from 'hono';
 export interface DIContainer<
   SS extends SessionSchemas = typeof sessionSchemas
 > {
+  session(c: Context<Env<SS>>): Session<SS>;
   serverHandlerConfiguration(): ServerHandlerConfiguration<SS>;
   extractorConfiguration(): ExtractorConfiguration;
-  authorizationHandler<OPTS extends object>(): AuthorizationHandlerConfiguration<
-    SS,
-    OPTS
-  >;
+  authorizationHandler<
+    OPTS extends object
+  >(): AuthorizationHandlerConfiguration<SS, OPTS>;
   tokenHandler(): TokenHandlerConfiguration;
   credentialHandler(): CredentialSingleIssueHandlerConfiguration;
   authorizationDecisionHandler(): AuthorizationDecisionHandlerConfiguration;
@@ -127,9 +128,13 @@ export interface ServiceJwksHandlerFactory {
 }
 
 export interface UserHandlerFactory {
-  <SS extends SessionSchemas>(
+  <SS extends SessionSchemas>(c: Context<Env<SS>>): UserHandlerConfiguration;
+}
+
+export interface SessionFactory {
+  <SS extends SessionSchemas>(sessionSchemas: SS): (
     c: Context<Env<SS>>
-  ): UserHandlerConfiguration;
+  ) => Session<SS>;
 }
 
 export interface DIContainerOverrides {
@@ -143,4 +148,5 @@ export interface DIContainerOverrides {
   serviceConfigurationHandler?: ServiceConfigurationHandlerFactory;
   serviceJwksHandler?: ServiceJwksHandlerFactory;
   userHandler?: UserHandlerFactory;
+  session?: SessionFactory;
 }

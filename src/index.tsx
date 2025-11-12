@@ -17,7 +17,6 @@
 import { Hono } from 'hono';
 import { jsxRenderer } from 'hono/jsx-renderer';
 import { Env } from './env';
-import { sessionMiddleware } from './middleware/session';
 import { EndpointPath } from './config/EndpointPath';
 import { PARController } from './controllers/PARController';
 import { AuthorizationController } from './controllers/AuthorizationController';
@@ -33,13 +32,17 @@ import { createGetDI } from './di';
 import { createUnifiedIdAuthorizationHandler } from './extensions/unified-id/handler/authorization';
 import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/handler/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
 import { createUnifiedIdUserHandler } from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
+import {
+  UnifiedIdSessionSchemas,
+  unifiedIdSessionSchemas,
+} from './extensions/unified-id/session';
 
-const app = new Hono<Env>();
+const app = new Hono<Env<UnifiedIdSessionSchemas>>();
 
 app.use(async (c, next) => {
   c.set(
     'getDI',
-    createGetDI({
+    createGetDI<UnifiedIdSessionSchemas>(unifiedIdSessionSchemas, {
       authorizationHandler: createUnifiedIdAuthorizationHandler,
       authorizationDecisionHandler: createUnifiedIdAuthorizationDecisionHandler,
       userHandler: createUnifiedIdUserHandler,
@@ -47,7 +50,6 @@ app.use(async (c, next) => {
   );
   await next();
 });
-app.use(sessionMiddleware);
 app.use(
   '*',
   jsxRenderer(({ children }) => <>{children}</>)

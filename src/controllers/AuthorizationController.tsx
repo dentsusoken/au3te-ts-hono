@@ -2,7 +2,6 @@ import { Context } from 'hono';
 import { AuthorizationPageModel } from '@vecrea/au3te-ts-common/handler.authorization-page';
 import { Env } from '../env';
 import { AuthorizationPage } from '../view/AuthorizationPage';
-import { getDI } from '../di';
 
 /**
  * Controller handling OAuth 2.0 authorization endpoint requests.

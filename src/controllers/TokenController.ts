@@ -1,6 +1,5 @@
 import { Context } from 'hono';
 import { Env } from '../env';
-import { getDI } from '../di';
 
 /**
  * Controller handling the OAuth 2.0 token endpoint.

@@ -1,33 +1,25 @@
 import { Env } from '../env';
 import { Context } from 'hono';
 import { DIContainer, DIContainerOverrides } from './DIContainer';
-import {
-  SessionSchemas,
-  sessionSchemas,
-} from '@vecrea/au3te-ts-server/session';
+import { SessionSchemas } from '@vecrea/au3te-ts-server/session';
 import { DIContainerImpl } from './DIContainerImpl';
 
-export interface GetDI {
-  <SS extends SessionSchemas = typeof sessionSchemas>(
-    c: Context<Env<SS>>,
-    overrides?: DIContainerOverrides
-  ): DIContainer<SS>;
+export interface GetDI<SS extends SessionSchemas> {
+  (c: Context<Env<SS>>): DIContainer<SS>;
 }
 
 export interface CreateGetDI {
-  (overrides?: DIContainerOverrides): GetDI;
+  <SS extends SessionSchemas>(
+    sessionSchemas: SS,
+    overrides?: DIContainerOverrides
+  ): GetDI<SS>;
 }
 
-export const getDI: GetDI = <SS extends SessionSchemas = typeof sessionSchemas>(
-  c: Context<Env<SS>>,
+export const createGetDI: CreateGetDI = <SS extends SessionSchemas>(
+  sessionSchemas: SS,
   overrides: DIContainerOverrides = {}
-): DIContainer<SS> => {
-  return new DIContainerImpl<SS>(c, overrides);
-};
-
-export const createGetDI: CreateGetDI = (
-  overrides: DIContainerOverrides = {}
-) => {
-  return <SS extends SessionSchemas>(c: Context<Env<SS>>) =>
-    getDI<SS>(c, overrides);
+): GetDI<SS> => {
+  return (c: Context<Env<SS>>): DIContainer<SS> => {
+    return new DIContainerImpl<SS>(c, sessionSchemas, overrides);
+  };
 };

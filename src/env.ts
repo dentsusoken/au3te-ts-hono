@@ -1,55 +1,61 @@
-import { Session, SessionSchemas, sessionSchemas } from '@vecrea/au3te-ts-server/session';
-import { ExtractorConfiguration } from '@vecrea/au3te-ts-server/extractor';
-import { ServerHandlerConfiguration } from '@vecrea/au3te-ts-server/handler.core';
+import {
+  Session,
+  SessionSchemas,
+  sessionSchemas,
+} from '@vecrea/au3te-ts-server/session';
 import { DurableObjectBase } from './session/DurableObjectSession';
 import { GetDI } from './di';
+import { Env as DynamoDBEnv } from '@squilla/hono-aws-middlewares/dynamodb';
 
 /**
  * Environment configuration interface for the application.
  * Defines the structure of environment bindings and runtime variables.
  */
-export interface Env<SS extends SessionSchemas = typeof sessionSchemas> {
-  /**
-   * External bindings configuration for the application.
-   * Contains API credentials and KV namespace configurations.
-   */
-  Bindings: {
-    /** API version string for the Authlete API */
-    API_VERSION: string;
-    /** Base URL for the Authlete API */
-    API_BASE_URL: string;
-    /** API key for authentication with Authlete */
-    API_KEY: string;
-    /** Access token for authorization with Authlete */
-    ACCESS_TOKEN: string;
-    /** Public URL for the application */
-    PUBLIC_URL?: string;
-    /** KV namespace for session storage */
-    SESSION_KV: KVNamespace;
-    /** KV namespace for user storage */
-    USER_KV: KVNamespace;
-    /** KV namespace for mdoc storage */
-    MDOC_KV: KVNamespace;
-    /** AWS access key ID */
-    AWS_ACCESS_KEY_ID: string;
-    /** AWS secret access key */
-    AWS_SECRET_ACCESS_KEY: string;
-    /** DynamoDB table name for session storage */
-    ISSUER_SESSION_DYNAMODB: string;
-    /** Where to deploy ('local' or none) */
-    DEPLOY_ENV: string;
+export type Env<SS extends SessionSchemas = typeof sessionSchemas> =
+  DynamoDBEnv & {
+    /**
+     * External bindings configuration for the application.
+     * Contains API credentials and KV namespace configurations.
+     */
+    Bindings: {
+      /** API version string for the Authlete API */
+      API_VERSION: string;
+      /** Base URL for the Authlete API */
+      API_BASE_URL: string;
+      /** API key for authentication with Authlete */
+      API_KEY: string;
+      /** Access token for authorization with Authlete */
+      ACCESS_TOKEN: string;
+      /** Public URL for the application */
+      PUBLIC_URL?: string;
+      /** KV namespace for session storage */
+      SESSION_KV: KVNamespace;
+      /** KV namespace for user storage */
+      USER_KV: KVNamespace;
+      /** KV namespace for mdoc storage */
+      MDOC_KV: KVNamespace;
+      /** AWS access key ID */
+      AWS_ACCESS_KEY_ID: string;
+      /** AWS secret access key */
+      AWS_SECRET_ACCESS_KEY: string;
+      /** DynamoDB table name for session storage */
+      ISSUER_SESSION_DYNAMODB: string;
+      /** Where to deploy ('local' or none) */
+      DEPLOY_ENV: string;
 
-    SESSION: DurableObjectNamespace<DurableObjectBase>;
+      SESSION: DurableObjectNamespace<DurableObjectBase>;
+    };
+
+    /**
+     * Runtime variables used throughout the application.
+     * Contains session, extractor, and handler configurations.
+     */
+    Variables: {
+      /** Current session instance with schema validation */
+      session: Session<SS>;
+      /** Session ID for creating session instances */
+      sessionId?: string;
+
+      getDI: GetDI<SS>;
+    };
   };
-
-  /**
-   * Runtime variables used throughout the application.
-   * Contains session, extractor, and handler configurations.
-   */
-  Variables: {
-    /** Current session instance with schema validation */
-    session: Session<SS>;
-
-    getDI: GetDI
-  };
-}

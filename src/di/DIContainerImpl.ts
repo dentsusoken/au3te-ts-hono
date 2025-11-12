@@ -71,20 +71,34 @@ import {
   ServiceJwksHandlerConfiguration,
   ServiceJwksHandlerConfigurationImpl,
 } from '@vecrea/au3te-ts-server/handler.service-jwks';
-import { UserHandlerConfiguration, UserHandlerConfigurationImpl } from '@vecrea/au3te-ts-common/handler.user';
+import {
+  UserHandlerConfiguration,
+  UserHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-common/handler.user';
 // import { UserHandlerKV } from '../extensions/kv-user/handler/user/UserHandlerKV';
+import { createDOSession } from '../session/DurableObjectSession';
 
-export class DIContainerImpl<SS extends SessionSchemas = typeof sessionSchemas>
+export class DIContainerImpl<SS extends SessionSchemas>
   implements DIContainer<SS>
 {
   readonly #c: Context<Env<SS>>;
-  readonly #session: Session<SS>;
   readonly #overrides: DIContainerOverrides;
 
-  constructor(c: Context<Env<SS>>, overrides: DIContainerOverrides = {}) {
+  session: (c: Context<Env<SS>>) => Session<SS>;
+
+  constructor(
+    c: Context<Env<SS>>,
+    sessionSchemas: SS,
+    overrides: DIContainerOverrides = {}
+  ) {
     this.#c = c;
-    this.#session = c.get('session');
     this.#overrides = overrides;
+
+    if (this.#overrides.session) {
+      this.session = this.#overrides.session(sessionSchemas);
+    } else {
+      this.session = createDOSession(sessionSchemas);
+    }
   }
 
   #apiClient(): ApiClient {
@@ -97,7 +111,8 @@ export class DIContainerImpl<SS extends SessionSchemas = typeof sessionSchemas>
   }
 
   serverHandlerConfiguration(): ServerHandlerConfiguration<SS> {
-    return new ServerHandlerConfigurationImpl(this.#apiClient(), this.#session);
+    const session = this.session(this.#c);
+    return new ServerHandlerConfigurationImpl(this.#apiClient(), session);
   }
 
   extractorConfiguration(): ExtractorConfiguration {
@@ -130,10 +145,9 @@ export class DIContainerImpl<SS extends SessionSchemas = typeof sessionSchemas>
     };
   }
 
-  authorizationHandler<OPTS extends object>(): AuthorizationHandlerConfiguration<
-    SS,
-    OPTS
-  > {
+  authorizationHandler<
+    OPTS extends object
+  >(): AuthorizationHandlerConfiguration<SS, OPTS> {
     const params = this.#buildAuthorizationHandlerParams<OPTS>();
     if (this.#overrides.authorizationHandler) {
       return this.#overrides.authorizationHandler<SS, OPTS>(params);
