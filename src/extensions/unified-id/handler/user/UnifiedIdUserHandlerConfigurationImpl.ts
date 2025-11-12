@@ -23,13 +23,6 @@ export class UnifiedIdUserHandlerConfigurationImpl
   getMdocClaimsBySubjectAndDoctype = mockGetMdocClaimsBySubjectAndDoctype;
 }
 
-export const createUnifiedIdUserHandler: UserHandlerFactory = ({
-  users: _users,
-  mdocs: _mdocs,
-}: {
-  users: KVNamespace;
-  mdocs: KVNamespace;
-}) => {
-  // Mock実装のため、KVNamespaceパラメータは使用しないが、型の整合性のために受け取る
+export const createUnifiedIdUserHandler: UserHandlerFactory = () => {
   return new UnifiedIdUserHandlerConfigurationImpl();
 };

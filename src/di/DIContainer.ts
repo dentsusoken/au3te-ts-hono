@@ -26,6 +26,8 @@ import { CredentialMetadataHandlerConfiguration } from '@vecrea/au3te-ts-server/
 import { ServiceConfigurationHandlerConfiguration } from '@vecrea/au3te-ts-server/handler.service-configuration';
 import { ServiceJwksHandlerConfiguration } from '@vecrea/au3te-ts-server/handler.service-jwks';
 import { UserHandlerConfiguration } from '@vecrea/au3te-ts-common/handler.user';
+import { Env } from '../env';
+import { Context } from 'hono';
 
 export interface DIContainer<
   SS extends SessionSchemas = typeof sessionSchemas
@@ -125,10 +127,9 @@ export interface ServiceJwksHandlerFactory {
 }
 
 export interface UserHandlerFactory {
-  (params: {
-    users: KVNamespace;
-    mdocs: KVNamespace;
-  }): UserHandlerConfiguration;
+  <SS extends SessionSchemas>(
+    c: Context<Env<SS>>
+  ): UserHandlerConfiguration;
 }
 
 export interface DIContainerOverrides {

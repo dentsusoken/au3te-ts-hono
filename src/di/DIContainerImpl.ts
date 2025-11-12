@@ -71,8 +71,8 @@ import {
   ServiceJwksHandlerConfiguration,
   ServiceJwksHandlerConfigurationImpl,
 } from '@vecrea/au3te-ts-server/handler.service-jwks';
-import { UserHandlerConfiguration } from '@vecrea/au3te-ts-common/handler.user';
-import { UserHandlerKV } from '../extensions/kv-user/handler/user/UserHandlerKV';
+import { UserHandlerConfiguration, UserHandlerConfigurationImpl } from '@vecrea/au3te-ts-common/handler.user';
+// import { UserHandlerKV } from '../extensions/kv-user/handler/user/UserHandlerKV';
 
 export class DIContainerImpl<SS extends SessionSchemas = typeof sessionSchemas>
   implements DIContainer<SS>
@@ -143,12 +143,9 @@ export class DIContainerImpl<SS extends SessionSchemas = typeof sessionSchemas>
 
   userHandler(): UserHandlerConfiguration {
     if (this.#overrides.userHandler) {
-      return this.#overrides.userHandler({
-        users: this.#c.env.USER_KV,
-        mdocs: this.#c.env.MDOC_KV,
-      });
+      return this.#overrides.userHandler(this.#c);
     }
-    return new UserHandlerKV(this.#c.env.USER_KV, this.#c.env.MDOC_KV);
+    return new UserHandlerConfigurationImpl();
   }
 
   #buildTokenHandlerDependencies() {

@@ -5,6 +5,10 @@ import {
   GetMdocClaimsBySubjectAndDoctype,
 } from '@vecrea/au3te-ts-common/handler.user';
 import { User } from '@vecrea/au3te-ts-common/schemas.common';
+import { UserHandlerFactory } from '../../../../di';
+import { Env } from '../../../../env';
+import { Context } from 'hono';
+import { SessionSchemas } from '@vecrea/au3te-ts-server/session';
 
 /**
  * Creates a function to retrieve a user by their subject from a KV store.
@@ -91,3 +95,11 @@ export class UserHandlerKV implements UserHandlerConfiguration {
       createGetMdocClaimsBySubjectAndDoctypeKV(this.#mdocs);
   }
 }
+
+export const createUserHandlerKV: UserHandlerFactory = <
+  SS extends SessionSchemas
+>(
+  c: Context<Env<SS>>
+) => {
+  return new UserHandlerKV(c.env.USER_KV, c.env.MDOC_KV);
+};
