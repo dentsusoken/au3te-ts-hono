@@ -1,6 +1,6 @@
 import { Context } from 'hono';
-import { CredentialIssuerJwksHandlerConfigurationImpl } from '@vecrea/au3te-ts-server/handler.credential-issuer-jwks';
 import { Env } from '../env';
+import { getDI } from '../di';
 
 /**
  * Controller handling the credential issuer jwks endpoint.
@@ -14,10 +14,8 @@ export class CredentialIssuerJwksController {
    * @returns {Promise<Response>} A promise that resolves to the credential issuer jwks response.
    */
   static async handle(c: Context<Env>) {
-    const endpointConfiguration =
-      new CredentialIssuerJwksHandlerConfigurationImpl(
-        c.get('serverHandlerConfiguration')
-      );
+    const di = c.get('getDI')(c);
+    const endpointConfiguration = di.credentialIssuerJwksHandler();
     return await endpointConfiguration.processRequest(c.req.raw);
   }
 }

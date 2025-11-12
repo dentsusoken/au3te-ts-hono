@@ -1,6 +1,6 @@
 import { Context } from 'hono';
-import { CredentialMetadataHandlerConfigurationImpl } from '@vecrea/au3te-ts-server/handler.credential-metadata';
 import { Env } from '../env';
+import { getDI } from '../di';
 
 /**
  * Controller handling the credential issuer metadata endpoint.
@@ -14,10 +14,8 @@ export class CredentialMetadataController {
    * @returns {Promise<Response>} A promise that resolves to the credential issuer metadata response.
    */
   static async handle(c: Context<Env>) {
-    const endpointConfiguration =
-      new CredentialMetadataHandlerConfigurationImpl(
-        c.get('serverHandlerConfiguration')
-      );
+    const di = c.get('getDI')(c);
+    const endpointConfiguration = di.credentialMetadataHandler();
     return await endpointConfiguration.processRequest(c.req.raw);
   }
 }

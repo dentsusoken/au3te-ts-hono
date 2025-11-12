@@ -1,6 +1,6 @@
 import { Context } from 'hono';
-import { ServiceConfigurationHandlerConfigurationImpl } from '@vecrea/au3te-ts-server/handler.service-configuration';
 import { Env } from '../env';
+import { getDI } from '../di';
 
 /**
  * Controller handling the OpenID Connect service configuration endpoint.
@@ -14,10 +14,8 @@ export class ServiceConfigurationController {
    * @returns {Promise<Response>} A promise that resolves to the service configuration response.
    */
   static async handle(c: Context<Env>) {
-    const endpointConfiguration =
-      new ServiceConfigurationHandlerConfigurationImpl(
-        c.get('serverHandlerConfiguration')
-      );
+    const di = c.get('getDI')(c);
+    const endpointConfiguration = di.serviceConfigurationHandler();
     return await endpointConfiguration.processRequest(c.req.raw);
   }
 }

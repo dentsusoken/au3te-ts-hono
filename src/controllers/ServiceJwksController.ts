@@ -1,6 +1,6 @@
 import { Context } from 'hono';
-import { ServiceJwksHandlerConfigurationImpl } from '@vecrea/au3te-ts-server/handler.service-jwks';
 import { Env } from '../env';
+import { getDI } from '../di';
 
 /**
  * Controller handling the OpenID Connect service jwks endpoint.
@@ -14,9 +14,8 @@ export class ServiceJwksController {
    * @returns {Promise<Response>} A promise that resolves to the service jwks response.
    */
   static async handle(c: Context<Env>) {
-    const endpointConfiguration = new ServiceJwksHandlerConfigurationImpl(
-      c.get('serverHandlerConfiguration')
-    );
+    const di = c.get('getDI')(c);
+    const endpointConfiguration = di.serviceJwksHandler();
     return await endpointConfiguration.processRequest(c.req.raw);
   }
 }
