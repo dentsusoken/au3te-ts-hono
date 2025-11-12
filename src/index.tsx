@@ -30,9 +30,24 @@ import { CredentialController } from './controllers/CredentialController';
 import { CredentialIssuerJwksController } from './controllers/CredentialIssuerJwksController';
 import { ServiceJwksController } from './controllers/ServiceJwksController';
 import { TopPage } from './view/TopPage';
+import { createGetDI } from './di';
+import { createUnifiedIdAuthorizationHandler } from './extensions/unified-id/authorization';
+import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
+import { createUnifiedIdUserHandler } from './extensions/unified-id/user/UnifiedIdUserHandlerConfigurationImpl';
 
 const app = new Hono<Env>();
 
+app.use(async (c, next) => {
+  c.set(
+    'getDI',
+    createGetDI({
+      authorizationHandler: createUnifiedIdAuthorizationHandler,
+      authorizationDecisionHandler: createUnifiedIdAuthorizationDecisionHandler,
+      userHandler: createUnifiedIdUserHandler,
+    })
+  );
+  await next();
+});
 app.use(sessionMiddleware);
 app.use(setupMiddleware);
 app.use(
