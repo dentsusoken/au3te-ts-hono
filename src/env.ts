@@ -43,7 +43,7 @@ export type Env<SS extends SessionSchemas = typeof sessionSchemas> =
       /** Where to deploy ('local' or none) */
       DEPLOY_ENV: string;
 
-      DURABLE_OBJECT: DurableObjectNamespace<DurableObjectImpl<string>>;
+      DURABLE_OBJECT: DurableObjectNamespace<DurableObjectImpl<unknown>>;
     };
 
     /**
