@@ -1,0 +1,314 @@
+import { DIContainer, DIContainerOverrides } from './DIContainer';
+import {
+  Session,
+  SessionSchemas,
+  sessionSchemas,
+} from '@vecrea/au3te-ts-server/session';
+import {
+  AuthorizationHandlerConfiguration,
+  AuthorizationHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.authorization';
+import { Env } from '../env';
+import { Context } from 'hono';
+import { ApiClient } from '@vecrea/au3te-ts-common';
+import {
+  ServerHandlerConfiguration,
+  ServerHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.core';
+import { ApiClientImpl } from '@vecrea/au3te-ts-server/api';
+import {
+  ExtractorConfiguration,
+  ExtractorConfigurationImpl,
+} from '@vecrea/au3te-ts-server/extractor';
+import {
+  AuthorizationIssueHandlerConfiguration,
+  AuthorizationIssueHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.authorization-issue';
+import {
+  AuthorizationFailHandlerConfiguration,
+  AuthorizationFailHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.authorization-fail';
+import {
+  AuthorizationPageHandlerConfiguration,
+  AuthorizationPageHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-common/handler.authorization-page';
+import {
+  TokenHandlerConfiguration,
+  TokenHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.token';
+import { TokenIssueHandlerConfigurationImpl } from '@vecrea/au3te-ts-server/handler.token-issue';
+import { TokenFailHandlerConfigurationImpl } from '@vecrea/au3te-ts-server/handler.token-fail';
+import { TokenCreateHandlerConfigurationImpl } from '@vecrea/au3te-ts-server/handler.token-create';
+import {
+  CredentialSingleIssueHandlerConfiguration,
+  CredentialSingleIssueHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.credential-single-issue';
+import { CredentialSingleParseHandlerConfigurationImpl } from '@vecrea/au3te-ts-server/handler.credential-single-parse';
+import { ServerCredentialHandlerConfigurationImpl } from '@vecrea/au3te-ts-server/handler.credential';
+import { IntrospectionHandlerConfigurationImpl } from '@vecrea/au3te-ts-server/handler.introspection';
+import { CommonCredentialHandlerConfigurationImpl } from '@vecrea/au3te-ts-common/handler.credential';
+import {
+  CredentialMetadataHandlerConfiguration,
+  CredentialMetadataHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.credential-metadata';
+import {
+  AuthorizationDecisionHandlerConfiguration,
+  AuthorizationDecisionHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.authorization-decision';
+import {
+  ParHandlerConfiguration,
+  ParHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.par';
+import {
+  CredentialIssuerJwksHandlerConfiguration,
+  CredentialIssuerJwksHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.credential-issuer-jwks';
+import {
+  ServiceConfigurationHandlerConfiguration,
+  ServiceConfigurationHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.service-configuration';
+import {
+  ServiceJwksHandlerConfiguration,
+  ServiceJwksHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.service-jwks';
+import { UserHandlerConfiguration } from '@vecrea/au3te-ts-common/handler.user';
+import { UserHandlerKV } from '../user/UserHandlerKV';
+
+export class DIContainerImpl<SS extends SessionSchemas = typeof sessionSchemas>
+  implements DIContainer<SS>
+{
+  readonly #c: Context<Env<SS>>;
+  readonly #session: Session<SS>;
+  readonly #overrides: DIContainerOverrides;
+
+  constructor(c: Context<Env<SS>>, overrides: DIContainerOverrides = {}) {
+    this.#c = c;
+    this.#session = c.get('session');
+    this.#overrides = overrides;
+  }
+
+  #apiClient(): ApiClient {
+    return new ApiClientImpl({
+      apiVersion: this.#c.env.API_VERSION,
+      baseUrl: this.#c.env.API_BASE_URL,
+      serviceApiKey: this.#c.env.API_KEY,
+      serviceAccessToken: this.#c.env.ACCESS_TOKEN,
+    });
+  }
+
+  serverHandlerConfiguration(): ServerHandlerConfiguration<SS> {
+    return new ServerHandlerConfigurationImpl(this.#apiClient(), this.#session);
+  }
+
+  extractorConfiguration(): ExtractorConfiguration {
+    return new ExtractorConfigurationImpl();
+  }
+  authorizationIssueHandlerConfiguration(): AuthorizationIssueHandlerConfiguration {
+    return new AuthorizationIssueHandlerConfigurationImpl(
+      this.serverHandlerConfiguration()
+    );
+  }
+  authorizationFailHandlerConfiguration(): AuthorizationFailHandlerConfiguration {
+    return new AuthorizationFailHandlerConfigurationImpl(
+      this.serverHandlerConfiguration()
+    );
+  }
+  authorizationPageHandlerConfiguration(): AuthorizationPageHandlerConfiguration {
+    return new AuthorizationPageHandlerConfigurationImpl();
+  }
+
+  #buildAuthorizationHandlerParams<OPTS = undefined>() {
+    return {
+      serverHandlerConfiguration: this.serverHandlerConfiguration(),
+      authorizationIssueHandlerConfiguration:
+        this.authorizationIssueHandlerConfiguration(),
+      authorizationFailHandlerConfiguration:
+        this.authorizationFailHandlerConfiguration(),
+      authorizationPageHandlerConfiguration:
+        this.authorizationPageHandlerConfiguration(),
+      extractorConfiguration: this.extractorConfiguration(),
+    };
+  }
+
+  authorizationHandler<OPTS extends object>(): AuthorizationHandlerConfiguration<
+    SS,
+    OPTS
+  > {
+    const params = this.#buildAuthorizationHandlerParams<OPTS>();
+    if (this.#overrides.authorizationHandler) {
+      return this.#overrides.authorizationHandler<SS, OPTS>(params);
+    }
+    return new AuthorizationHandlerConfigurationImpl(params);
+  }
+
+  userHandler(): UserHandlerConfiguration {
+    if (this.#overrides.userHandler) {
+      return this.#overrides.userHandler({
+        users: this.#c.env.USER_KV,
+        mdocs: this.#c.env.MDOC_KV,
+      });
+    }
+    return new UserHandlerKV(this.#c.env.USER_KV, this.#c.env.MDOC_KV);
+  }
+
+  #buildTokenHandlerDependencies() {
+    const serverHandlerConfiguration = this.serverHandlerConfiguration();
+    const extractorConfiguration = this.extractorConfiguration();
+    const userHandlerConfiguration = this.userHandler();
+    const tokenFailHandlerConfiguration = new TokenFailHandlerConfigurationImpl(
+      serverHandlerConfiguration
+    );
+    const tokenIssueHandlerConfiguration =
+      new TokenIssueHandlerConfigurationImpl(serverHandlerConfiguration);
+    const tokenCreateHandlerConfiguration =
+      new TokenCreateHandlerConfigurationImpl(serverHandlerConfiguration);
+
+    return {
+      serverHandlerConfiguration,
+      extractorConfiguration,
+      userHandlerConfiguration,
+      tokenFailHandlerConfiguration,
+      tokenIssueHandlerConfiguration,
+      tokenCreateHandlerConfiguration,
+    };
+  }
+
+  tokenHandler(): TokenHandlerConfiguration {
+    const dependencies = this.#buildTokenHandlerDependencies();
+    if (this.#overrides.tokenHandler) {
+      return this.#overrides.tokenHandler(dependencies);
+    }
+
+    return new TokenHandlerConfigurationImpl(dependencies);
+  }
+
+  #buildCredentialHandlerDependencies() {
+    const serverHandlerConfiguration = this.serverHandlerConfiguration();
+    const extractorConfiguration = this.extractorConfiguration();
+    const introspectionHandlerConfiguration =
+      new IntrospectionHandlerConfigurationImpl(serverHandlerConfiguration);
+    const credentialSingleParseHandlerConfiguration =
+      new CredentialSingleParseHandlerConfigurationImpl(
+        serverHandlerConfiguration
+      );
+    const userHandlerConfiguration = this.userHandler();
+    const commonCredentialHandlerConfiguration =
+      new CommonCredentialHandlerConfigurationImpl({
+        userHandlerConfiguration,
+      });
+    const credentialMetadataHandlerConfiguration =
+      new CredentialMetadataHandlerConfigurationImpl(
+        serverHandlerConfiguration
+      );
+    const serverCredentialHandlerConfiguration =
+      new ServerCredentialHandlerConfigurationImpl({
+        credentialMetadataHandlerConfiguration,
+      });
+
+    return {
+      serverHandlerConfiguration,
+      extractorConfiguration,
+      introspectionHandlerConfiguration,
+      credentialSingleParseHandlerConfiguration,
+      commonCredentialHandlerConfiguration,
+      serverCredentialHandlerConfiguration,
+    };
+  }
+
+  credentialHandler(): CredentialSingleIssueHandlerConfiguration {
+    const dependencies = this.#buildCredentialHandlerDependencies();
+    if (this.#overrides.credentialHandler) {
+      return this.#overrides.credentialHandler(dependencies);
+    }
+
+    return new CredentialSingleIssueHandlerConfigurationImpl<SS>(dependencies);
+  }
+
+  #buildAuthorizationDecisionHandlerDependencies() {
+    const serverHandlerConfiguration = this.serverHandlerConfiguration();
+    const extractorConfiguration = this.extractorConfiguration();
+    const userHandlerConfiguration = this.userHandler();
+    const authorizationIssueHandlerConfiguration =
+      this.authorizationIssueHandlerConfiguration();
+    const authorizationFailHandlerConfiguration =
+      this.authorizationFailHandlerConfiguration();
+    const authorizationHandlerConfiguration = this.authorizationHandler();
+
+    return {
+      serverHandlerConfiguration,
+      extractorConfiguration,
+      userHandlerConfiguration,
+      authorizationHandlerConfiguration,
+      authorizationIssueHandlerConfiguration,
+      authorizationFailHandlerConfiguration,
+    };
+  }
+
+  authorizationDecisionHandler(): AuthorizationDecisionHandlerConfiguration {
+    const dependencies = this.#buildAuthorizationDecisionHandlerDependencies();
+    if (this.#overrides.authorizationDecisionHandler) {
+      return this.#overrides.authorizationDecisionHandler<SS, object>(
+        dependencies
+      );
+    }
+
+    return new AuthorizationDecisionHandlerConfigurationImpl(dependencies);
+  }
+
+  parHandler(): ParHandlerConfiguration {
+    const params = {
+      serverHandlerConfiguration: this.serverHandlerConfiguration(),
+      extractorConfiguration: this.extractorConfiguration(),
+    };
+    if (this.#overrides.parHandler) {
+      return this.#overrides.parHandler(params);
+    }
+    return new ParHandlerConfigurationImpl(params);
+  }
+
+  credentialIssuerJwksHandler(): CredentialIssuerJwksHandlerConfiguration {
+    const serverHandlerConfiguration = this.serverHandlerConfiguration();
+    if (this.#overrides.credentialIssuerJwksHandler) {
+      return this.#overrides.credentialIssuerJwksHandler({
+        serverHandlerConfiguration,
+      });
+    }
+    return new CredentialIssuerJwksHandlerConfigurationImpl(
+      serverHandlerConfiguration
+    );
+  }
+
+  credentialMetadataHandler(): CredentialMetadataHandlerConfiguration {
+    const serverHandlerConfiguration = this.serverHandlerConfiguration();
+    if (this.#overrides.credentialMetadataHandler) {
+      return this.#overrides.credentialMetadataHandler({
+        serverHandlerConfiguration,
+      });
+    }
+    return new CredentialMetadataHandlerConfigurationImpl(
+      serverHandlerConfiguration
+    );
+  }
+
+  serviceConfigurationHandler(): ServiceConfigurationHandlerConfiguration {
+    const serverHandlerConfiguration = this.serverHandlerConfiguration();
+    if (this.#overrides.serviceConfigurationHandler) {
+      return this.#overrides.serviceConfigurationHandler({
+        serverHandlerConfiguration,
+      });
+    }
+    return new ServiceConfigurationHandlerConfigurationImpl(
+      serverHandlerConfiguration
+    );
+  }
+
+  serviceJwksHandler(): ServiceJwksHandlerConfiguration {
+    const serverHandlerConfiguration = this.serverHandlerConfiguration();
+    if (this.#overrides.serviceJwksHandler) {
+      return this.#overrides.serviceJwksHandler({
+        serverHandlerConfiguration,
+      });
+    }
+    return new ServiceJwksHandlerConfigurationImpl(serverHandlerConfiguration);
+  }
+}
