@@ -4,7 +4,7 @@ import {
   ParsedSessionData,
   SessionSchemas,
 } from '@vecrea/au3te-ts-server/session';
-import { DurableObject } from 'cloudflare:workers';
+import { DurableObject } from '../database';
 import { z } from 'zod';
 import { Context } from 'hono';
 import { Env } from '../env';
@@ -14,95 +14,20 @@ import { getSessionId } from './getSessionId';
 /** Default session expiration time in seconds (24 hours) */
 const EXPIRATION_TTL = 24 * 60 * 60;
 
-/**
- * Presentation information stored within the Durable Object
- *
- * @interface StoredSession
- */
-interface StoredSession {
-  /** Presentation JSON data or string format */
-  data: string;
-
-  /** Expiration timestamp in milliseconds */
-  expiresAt: number;
-}
-
-export class DurableObjectBase extends DurableObject {
-  /**
-   * Creates a new PresentationDurableObject instance
-   *
-   * @param ctx - Durable Object state context
-   * @param env - Environment variables and bindings
-   */
-  constructor(ctx: DurableObjectState, env: Env) {
-    super(ctx, env);
-  }
-
-  /**
-   * Saves presentation data
-   *
-   * @param key - The key to store under
-   * @param data - Presentation JSON data or string
-   * @returns Promise that resolves when save is complete
-   *
-   * @example
-   * ```typescript
-   * await durableObject.save('presentation:123', presentationJson);
-   * ```
-   */
-  async save(key: string, data: string): Promise<void> {
-    // Store data with expiration timestamp
-    await this.ctx.storage.put<StoredSession>(key, {
-      data,
-      expiresAt: Date.now() + EXPIRATION_TTL,
-    });
-
-    // Ensure garbage collection alarm is set
-    // await this.setNextAlarm();
-  }
-
-  /**
-   * Retrieves presentation data for the specified key
-   *
-   * @param key - The key to retrieve
-   * @returns Presentation data or undefined if not found
-   *
-   * @example
-   * ```typescript
-   * const data = await durableObject.get('presentation:123');
-   * if (data) {
-   *   // Handle data if it exists
-   * }
-   * ```
-   */
-  async get(key: string): Promise<string | undefined> {
-    // Retrieve stored data from Durable Object storage
-    const storedData = await this.ctx.storage.get<StoredSession>(key);
-
-    // Return undefined if data doesn't exist
-    if (!storedData) {
-      return undefined;
-    }
-
-    // Return the actual presentation data
-    return storedData.data;
-  }
-}
-
 export class DurableObjectSession<T extends SessionSchemas>
   implements Session<T>
 {
   #data: StoredSessionData<T> = {};
   #schemas: T;
   #sessionId: string;
-  #stub: DurableObjectStub<DurableObjectBase>;
+  #stub: DurableObjectStub<DurableObject<string>>;
   #expirationTtl: number;
   #loaded = false;
 
   constructor(
     schemas: T,
     sessionId: string,
-    stub: DurableObjectStub<DurableObjectBase>,
+    stub: DurableObjectStub<DurableObject<string>>,
     expirationTtl: number = EXPIRATION_TTL,
   ) {
     this.#schemas = schemas;
@@ -152,7 +77,10 @@ export class DurableObjectSession<T extends SessionSchemas>
    * @returns {Promise<void>} A promise that resolves when the data is saved.
    */
   private async saveData() {
-    await this.#stub.save(this.sessionId, JSON.stringify(this.#data));
+    await this.#stub.save(this.sessionId, {
+      data: JSON.stringify(this.#data),
+      expiresAt: Date.now() + this.#expirationTtl,
+    });
   }
 
   /**
@@ -289,7 +217,9 @@ export const createDOSession: SessionFactory = <SS extends SessionSchemas>(
 ) => {
   return (c: Context<Env<SS>>) => {
     const sessionId = getSessionId(c);
-    const stub = c.env.SESSION.get(c.env.SESSION.idFromName(sessionId));
+    const stub = c.env.DURABLE_OBJECT.get(
+      c.env.DURABLE_OBJECT.idFromName(sessionId),
+    );
 
     return new DurableObjectSession<SS>(
       sessionSchemas,

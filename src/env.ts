@@ -3,9 +3,9 @@ import {
   SessionSchemas,
   sessionSchemas,
 } from '@vecrea/au3te-ts-server/session';
-import { DurableObjectBase } from './session/DurableObjectSession';
 import { GetDI } from './di';
 import { Env as DynamoDBEnv } from '@squilla/hono-aws-middlewares/dynamodb';
+import { DurableObjectImpl } from './database';
 
 /**
  * Environment configuration interface for the application.
@@ -43,7 +43,7 @@ export type Env<SS extends SessionSchemas = typeof sessionSchemas> =
       /** Where to deploy ('local' or none) */
       DEPLOY_ENV: string;
 
-      SESSION: DurableObjectNamespace<DurableObjectBase>;
+      DURABLE_OBJECT: DurableObjectNamespace<DurableObjectImpl<string>>;
     };
 
     /**
