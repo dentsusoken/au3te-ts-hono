@@ -72,7 +72,7 @@ import {
   ServiceJwksHandlerConfigurationImpl,
 } from '@vecrea/au3te-ts-server/handler.service-jwks';
 import { UserHandlerConfiguration } from '@vecrea/au3te-ts-common/handler.user';
-import { UserHandlerKV } from '../user/UserHandlerKV';
+import { UserHandlerKV } from '../extensions/kv-user/handler/user/UserHandlerKV';
 
 export class DIContainerImpl<SS extends SessionSchemas = typeof sessionSchemas>
   implements DIContainer<SS>
