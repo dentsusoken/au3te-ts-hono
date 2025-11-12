@@ -22,7 +22,7 @@ const emptyAuthenticationResult = { user: undefined, authTime: undefined };
 
 export const createGetOrAuthenticateUser: GetOrAuthenticateUserFactory<
   UnifiedIdUser,
-  'serviceId'
+  'serviceId' | 'unifiedId'
 > = (getByCredentials) => async (session, parameters) => {
   const { user, authTime, unifiedIdParams } = await session.getBatch(
     'user',
@@ -34,15 +34,15 @@ export const createGetOrAuthenticateUser: GetOrAuthenticateUserFactory<
     return { user, authTime };
   }
 
-  if (!unifiedIdParams) {
-    return { ...emptyAuthenticationResult };
-  }
+  // if (!unifiedIdParams) {
+  //   return { ...emptyAuthenticationResult };
+  // }
 
-  const { serviceId } = unifiedIdParams;
+  // const { serviceId, unifiedId } = unifiedIdParams;
 
-  if (!serviceId) {
-    return { ...emptyAuthenticationResult };
-  }
+  // if (!serviceId) {
+  //   return { ...emptyAuthenticationResult };
+  // }
 
   const { loginId, password } = parameters;
 
@@ -50,7 +50,7 @@ export const createGetOrAuthenticateUser: GetOrAuthenticateUserFactory<
     return { ...emptyAuthenticationResult };
   }
 
-  const loginUser = await getByCredentials(loginId, password, { serviceId });
+  const loginUser = await getByCredentials(loginId, password, unifiedIdParams);
 
   if (loginUser) {
     const authTime = Math.floor(Date.now() / 1000);
