@@ -47,7 +47,6 @@ export const createProcessApiResponse =
    */
   async (
     apiResponseWithOptions: ApiResponseWithOptions<AuthorizationResponse, OPTS>,
-    _?: OPTS
   ): Promise<Response> => {
     const { apiResponse, options } = apiResponseWithOptions;
 
@@ -56,7 +55,7 @@ export const createProcessApiResponse =
     switch (action) {
       case 'INTERNAL_SERVER_ERROR':
         throw responseErrorFactory.internalServerErrorResponseError(
-          responseContent
+          responseContent,
         );
       case 'BAD_REQUEST':
         throw responseErrorFactory.badRequestResponseError(responseContent);
@@ -70,7 +69,7 @@ export const createProcessApiResponse =
         return await handleNoInteraction(apiResponse, session);
       default:
         throw responseErrorFactory.internalServerErrorResponseError(
-          buildUnknownActionMessage(path, action)
+          buildUnknownActionMessage(path, action),
         );
     }
   };

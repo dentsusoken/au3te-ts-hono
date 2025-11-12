@@ -97,9 +97,9 @@ export class UserHandlerKV implements UserHandlerConfiguration {
 }
 
 export const createUserHandlerKV: UserHandlerFactory = <
-  SS extends SessionSchemas
+  SS extends SessionSchemas,
 >(
-  c: Context<Env<SS>>
+  c: Context<Env<SS>>,
 ) => {
   return new UserHandlerKV(c.env.USER_KV, c.env.MDOC_KV);
 };

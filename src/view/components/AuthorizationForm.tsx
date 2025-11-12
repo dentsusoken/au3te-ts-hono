@@ -27,7 +27,7 @@ type AuthorizationFormProps = {
   loginId: string | undefined | null;
   /** Read-only login ID value */
   loginIdReadOnly: string | undefined | null;
-  publicUrl: string;  
+  publicUrl: string;
 };
 
 /**

@@ -32,7 +32,10 @@ import { AuthorizationPageModel } from '@vecrea/au3te-ts-common/handler.authoriz
  * @returns {GenerateAuthorizationPage<SS>} A function that generates an authorization page
  */
 export const createGenerateAuthorizationPage =
-  <SS extends SessionSchemas = UnifiedIdSessionSchemas, OPTS extends UnifiedIdParams = UnifiedIdParams>({
+  <
+    SS extends SessionSchemas = UnifiedIdSessionSchemas,
+    OPTS extends UnifiedIdParams = UnifiedIdParams,
+  >({
     responseToDecisionParams,
     clearCurrentUserInfoInSessionIfNecessary,
     buildAuthorizationPageModel,

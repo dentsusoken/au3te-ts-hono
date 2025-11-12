@@ -10,7 +10,6 @@ import { SessionFactory } from '../di';
 import { Context } from 'hono';
 import { Env } from '../env';
 import { getSessionId } from './getSessionId';
-import { sessionSchemas } from '@vecrea/au3te-ts-server/session';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 
 /** Default session expiration time in seconds (24 hours) */
@@ -34,7 +33,7 @@ export class DynamoSession<T extends SessionSchemas> implements Session<T> {
     schemas: T,
     sessionId: string,
     dynamo: DynamoDB,
-    expirationTtl: number = EXPIRATION_TTL
+    expirationTtl: number = EXPIRATION_TTL,
   ) {
     this.#schemas = schemas;
     this.#sessionId = sessionId;
@@ -160,7 +159,7 @@ export class DynamoSession<T extends SessionSchemas> implements Session<T> {
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
   async setBatch<K extends keyof T>(
-    batch: ParsedSessionData<T, K>
+    batch: ParsedSessionData<T, K>,
   ): Promise<void> {
     await this.loadData();
     Object.entries(batch).forEach(([key, value]) => {
@@ -217,23 +216,21 @@ export class DynamoSession<T extends SessionSchemas> implements Session<T> {
   }
 }
 
-export const createDynamoSession: SessionFactory = <
-  SS extends SessionSchemas = typeof sessionSchemas
->(
-  sessionSchemas: SS
+export const createDynamoSession: SessionFactory = <SS extends SessionSchemas>(
+  sessionSchemas: SS,
 ) => {
   return (c: Context<Env<SS>>) => {
     const sessionId = getSessionId(c);
     const dynamo = new DynamoDB(
       DynamoDBDocumentClient.from(c.get('DynamoDB')),
-      c.env.ISSUER_SESSION_DYNAMODB
+      c.env.ISSUER_SESSION_DYNAMODB,
     );
 
     return new DynamoSession<SS>(
       sessionSchemas,
       sessionId,
       dynamo,
-      EXPIRATION_TTL
+      EXPIRATION_TTL,
     );
   };
 };

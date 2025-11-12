@@ -1,9 +1,5 @@
 import { DIContainer, DIContainerOverrides } from './DIContainer';
-import {
-  Session,
-  SessionSchemas,
-  sessionSchemas,
-} from '@vecrea/au3te-ts-server/session';
+import { Session, SessionSchemas } from '@vecrea/au3te-ts-server/session';
 import {
   AuthorizationHandlerConfiguration,
   AuthorizationHandlerConfigurationImpl,
@@ -89,7 +85,7 @@ export class DIContainerImpl<SS extends SessionSchemas>
   constructor(
     c: Context<Env<SS>>,
     sessionSchemas: SS,
-    overrides: DIContainerOverrides = {}
+    overrides: DIContainerOverrides = {},
   ) {
     this.#c = c;
     this.#overrides = overrides;
@@ -120,19 +116,19 @@ export class DIContainerImpl<SS extends SessionSchemas>
   }
   authorizationIssueHandlerConfiguration(): AuthorizationIssueHandlerConfiguration {
     return new AuthorizationIssueHandlerConfigurationImpl(
-      this.serverHandlerConfiguration()
+      this.serverHandlerConfiguration(),
     );
   }
   authorizationFailHandlerConfiguration(): AuthorizationFailHandlerConfiguration {
     return new AuthorizationFailHandlerConfigurationImpl(
-      this.serverHandlerConfiguration()
+      this.serverHandlerConfiguration(),
     );
   }
   authorizationPageHandlerConfiguration(): AuthorizationPageHandlerConfiguration {
     return new AuthorizationPageHandlerConfigurationImpl();
   }
 
-  #buildAuthorizationHandlerParams<OPTS = undefined>() {
+  #buildAuthorizationHandlerParams() {
     return {
       serverHandlerConfiguration: this.serverHandlerConfiguration(),
       authorizationIssueHandlerConfiguration:
@@ -146,9 +142,9 @@ export class DIContainerImpl<SS extends SessionSchemas>
   }
 
   authorizationHandler<
-    OPTS extends object
+    OPTS extends object,
   >(): AuthorizationHandlerConfiguration<SS, OPTS> {
-    const params = this.#buildAuthorizationHandlerParams<OPTS>();
+    const params = this.#buildAuthorizationHandlerParams();
     if (this.#overrides.authorizationHandler) {
       return this.#overrides.authorizationHandler<SS, OPTS>(params);
     }
@@ -167,7 +163,7 @@ export class DIContainerImpl<SS extends SessionSchemas>
     const extractorConfiguration = this.extractorConfiguration();
     const userHandlerConfiguration = this.userHandler();
     const tokenFailHandlerConfiguration = new TokenFailHandlerConfigurationImpl(
-      serverHandlerConfiguration
+      serverHandlerConfiguration,
     );
     const tokenIssueHandlerConfiguration =
       new TokenIssueHandlerConfigurationImpl(serverHandlerConfiguration);
@@ -200,7 +196,7 @@ export class DIContainerImpl<SS extends SessionSchemas>
       new IntrospectionHandlerConfigurationImpl(serverHandlerConfiguration);
     const credentialSingleParseHandlerConfiguration =
       new CredentialSingleParseHandlerConfigurationImpl(
-        serverHandlerConfiguration
+        serverHandlerConfiguration,
       );
     const userHandlerConfiguration = this.userHandler();
     const commonCredentialHandlerConfiguration =
@@ -209,7 +205,7 @@ export class DIContainerImpl<SS extends SessionSchemas>
       });
     const credentialMetadataHandlerConfiguration =
       new CredentialMetadataHandlerConfigurationImpl(
-        serverHandlerConfiguration
+        serverHandlerConfiguration,
       );
     const serverCredentialHandlerConfiguration =
       new ServerCredentialHandlerConfigurationImpl({
@@ -259,7 +255,7 @@ export class DIContainerImpl<SS extends SessionSchemas>
     const dependencies = this.#buildAuthorizationDecisionHandlerDependencies();
     if (this.#overrides.authorizationDecisionHandler) {
       return this.#overrides.authorizationDecisionHandler<SS, object>(
-        dependencies
+        dependencies,
       );
     }
 
@@ -285,7 +281,7 @@ export class DIContainerImpl<SS extends SessionSchemas>
       });
     }
     return new CredentialIssuerJwksHandlerConfigurationImpl(
-      serverHandlerConfiguration
+      serverHandlerConfiguration,
     );
   }
 
@@ -297,7 +293,7 @@ export class DIContainerImpl<SS extends SessionSchemas>
       });
     }
     return new CredentialMetadataHandlerConfigurationImpl(
-      serverHandlerConfiguration
+      serverHandlerConfiguration,
     );
   }
 
@@ -309,7 +305,7 @@ export class DIContainerImpl<SS extends SessionSchemas>
       });
     }
     return new ServiceConfigurationHandlerConfigurationImpl(
-      serverHandlerConfiguration
+      serverHandlerConfiguration,
     );
   }
 

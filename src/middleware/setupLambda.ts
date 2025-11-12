@@ -24,5 +24,5 @@ export const setupLambdaMiddleware = createMiddleware<SecretsManagerEnv & Env>(
       ISSUER_SESSION_DYNAMODB: process.env.ISSUER_SESSION_DYNAMODB || '',
     };
     return next();
-  }
+  },
 );

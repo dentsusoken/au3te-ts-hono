@@ -39,11 +39,10 @@ export const createProcessRequest =
     AuthorizationRequest,
     OPTS
   >): ProcessRequestWithOptions<OPTS> =>
-  async (request: Request, _?: OPTS): Promise<Response> => {
+  async (request: Request): Promise<Response> => {
     const responseResult = await runAsyncCatching(async () => {
-      const { apiRequest, options: requestOptions } = await toApiRequest(
-        request
-      );
+      const { apiRequest, options: requestOptions } =
+        await toApiRequest(request);
 
       return handle({ apiRequest, options: requestOptions });
     });

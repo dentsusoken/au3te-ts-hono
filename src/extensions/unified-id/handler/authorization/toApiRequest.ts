@@ -13,10 +13,10 @@ export const createToApiRequest =
     ApiRequestWithOptions<AuthorizationRequest, OPTS>
   > =>
   async (
-    request: Request
+    request: Request,
   ): Promise<ApiRequestWithOptions<AuthorizationRequest, OPTS>> => {
     const { parameters, context } = JSON.parse(
-      await extractParameters(request)
+      await extractParameters(request),
     ) as { parameters: string; context: string };
 
     const searchParams = new URLSearchParams(context);

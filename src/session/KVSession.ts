@@ -27,7 +27,7 @@ export class KVSession<T extends SessionSchemas> implements Session<T> {
     schemas: T,
     sessionId: string,
     kv: KVNamespace,
-    expirationTtl: number = EXPIRATION_TTL
+    expirationTtl: number = EXPIRATION_TTL,
   ) {
     this.#schemas = schemas;
     this.#sessionId = sessionId;
@@ -153,7 +153,7 @@ export class KVSession<T extends SessionSchemas> implements Session<T> {
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
   async setBatch<K extends keyof T>(
-    batch: ParsedSessionData<T, K>
+    batch: ParsedSessionData<T, K>,
   ): Promise<void> {
     await this.loadData();
     Object.entries(batch).forEach(([key, value]) => {

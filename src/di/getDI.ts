@@ -11,13 +11,13 @@ export interface GetDI<SS extends SessionSchemas> {
 export interface CreateGetDI {
   <SS extends SessionSchemas>(
     sessionSchemas: SS,
-    overrides?: DIContainerOverrides
+    overrides?: DIContainerOverrides,
   ): GetDI<SS>;
 }
 
 export const createGetDI: CreateGetDI = <SS extends SessionSchemas>(
   sessionSchemas: SS,
-  overrides: DIContainerOverrides = {}
+  overrides: DIContainerOverrides = {},
 ): GetDI<SS> => {
   return (c: Context<Env<SS>>): DIContainer<SS> => {
     return new DIContainerImpl<SS>(c, sessionSchemas, overrides);

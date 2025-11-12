@@ -36,12 +36,14 @@ import { UnifiedIdUser } from '../../schemas/User';
  *   console.log('Authentication successful:', user.name);
  * }
  */
-export const mockGetByCredentials: GetByCredentials<UnifiedIdUser, 'serviceId'> = async (
-  loginId,
-  password,
-  options
-) => {
+export const mockGetByCredentials: GetByCredentials<
+  UnifiedIdUser,
+  'serviceId'
+> = async (loginId, password, options) => {
   return mockUsers.find(
-    (user) => user.loginId === loginId && user.password === password && user.serviceId === options?.serviceId
+    (user) =>
+      user.loginId === loginId &&
+      user.password === password &&
+      user.serviceId === options?.serviceId,
   );
 };

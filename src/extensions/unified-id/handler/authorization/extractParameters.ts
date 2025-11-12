@@ -20,7 +20,7 @@ const splitParameters = (params: URLSearchParams) => {
 };
 
 export const ExtractUnifiedIdParameters: ExtractParameters = async (
-  request
+  request,
 ) => {
   const contentType = request.headers.get('Content-Type') || undefined;
 

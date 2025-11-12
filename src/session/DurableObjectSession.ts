@@ -6,7 +6,6 @@ import {
 } from '@vecrea/au3te-ts-server/session';
 import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
-import { sessionSchemas } from '@vecrea/au3te-ts-server/session';
 import { Context } from 'hono';
 import { Env } from '../env';
 import { SessionFactory } from '../di/DIContainer';
@@ -104,7 +103,7 @@ export class DurableObjectSession<T extends SessionSchemas>
     schemas: T,
     sessionId: string,
     stub: DurableObjectStub<DurableObjectBase>,
-    expirationTtl: number = EXPIRATION_TTL
+    expirationTtl: number = EXPIRATION_TTL,
   ) {
     this.#schemas = schemas;
     this.#sessionId = sessionId;
@@ -228,7 +227,7 @@ export class DurableObjectSession<T extends SessionSchemas>
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
   async setBatch<K extends keyof T>(
-    batch: ParsedSessionData<T, K>
+    batch: ParsedSessionData<T, K>,
   ): Promise<void> {
     await this.loadData();
     Object.entries(batch).forEach(([key, value]) => {
@@ -285,10 +284,8 @@ export class DurableObjectSession<T extends SessionSchemas>
   }
 }
 
-export const createDOSession: SessionFactory = <
-  SS extends SessionSchemas = typeof sessionSchemas
->(
-  sessionSchemas: SS
+export const createDOSession: SessionFactory = <SS extends SessionSchemas>(
+  sessionSchemas: SS,
 ) => {
   return (c: Context<Env<SS>>) => {
     const sessionId = getSessionId(c);
@@ -298,7 +295,7 @@ export const createDOSession: SessionFactory = <
       sessionSchemas,
       sessionId,
       stub,
-      EXPIRATION_TTL
+      EXPIRATION_TTL,
     );
   };
 };

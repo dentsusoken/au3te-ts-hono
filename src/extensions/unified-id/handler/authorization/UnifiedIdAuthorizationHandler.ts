@@ -15,18 +15,21 @@ import { createToApiRequest } from './toApiRequest';
 
 export class UnifiedIdAuthorizationHandler<
   SS extends SessionSchemas = UnifiedIdSessionSchemas,
-  OPTS = UnifiedIdParams
+  OPTS = UnifiedIdParams,
 > extends AuthorizationHandlerConfigurationImpl<SS, OPTS> {
   constructor(
-    params: AuthorizationHandlerConfigurationImplConstructorParams<SS, OPTS>
+    params: AuthorizationHandlerConfigurationImplConstructorParams<SS, OPTS>,
   ) {
     super(params);
   }
 }
 
 export const createUnifiedIdAuthorizationHandler: AuthorizationHandlerFactory =
-  <SS extends SessionSchemas = UnifiedIdSessionSchemas, OPTS extends UnifiedIdParams = UnifiedIdParams>(
-    params: AuthorizationHandlerConfigurationImplConstructorParams<SS, OPTS>
+  <
+    SS extends SessionSchemas = UnifiedIdSessionSchemas,
+    OPTS extends UnifiedIdParams = UnifiedIdParams,
+  >(
+    params: AuthorizationHandlerConfigurationImplConstructorParams<SS, OPTS>,
   ): AuthorizationHandlerConfiguration<SS, OPTS> => {
     const unifiedIdParams: AuthorizationHandlerConfigurationImplConstructorParams<
       SS,

@@ -53,34 +53,34 @@ app.use(async (c, next) => {
       authorizationDecisionHandler: createUnifiedIdAuthorizationDecisionHandler,
       userHandler: createUnifiedIdUserHandler,
       session: createDynamoSession,
-    })
+    }),
   );
   await next();
 });
 app.use(
   '*',
-  jsxRenderer(({ children }) => <>{children}</>)
+  jsxRenderer(({ children }) => <>{children}</>),
 );
 app.get('/', (c) => c.render(<TopPage publicUrl={c.env.PUBLIC_URL} />));
 app.post(EndpointPath.parPath, PARController.handle);
 app.get(EndpointPath.authorizationPath, AuthorizationController.handle);
 app.post(
   EndpointPath.authorizationDecisionPath,
-  AuthorizationDecisionController.handle
+  AuthorizationDecisionController.handle,
 );
 app.post(EndpointPath.tokenPath, TokenController.handle);
 app.post(EndpointPath.credentialPath, CredentialController.handle);
 app.get(
   EndpointPath.serviceConfigurationPath,
-  ServiceConfigurationController.handle
+  ServiceConfigurationController.handle,
 );
 app.get(
   EndpointPath.credentialIssuerMetadataPath,
-  CredentialMetadataController.handle
+  CredentialMetadataController.handle,
 );
 app.get(
   EndpointPath.credentialIssuerJwksPath,
-  CredentialIssuerJwksController.handle
+  CredentialIssuerJwksController.handle,
 );
 app.get(EndpointPath.serviceJwksPath, ServiceJwksController.handle);
 
@@ -97,7 +97,7 @@ app.get('/css/index.css', async (c) => {
   return c.text(
     (await bucket.Body?.transformToString()) ?? '',
     200,
-    CSS_HEADERS
+    CSS_HEADERS,
   );
 });
 app.get('/css/authorization.css', async (c) => {
@@ -109,7 +109,7 @@ app.get('/css/authorization.css', async (c) => {
   return c.text(
     (await bucket.Body?.transformToString()) ?? '',
     200,
-    CSS_HEADERS
+    CSS_HEADERS,
   );
 });
 

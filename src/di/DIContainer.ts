@@ -31,13 +31,13 @@ import { Env } from '../env';
 import { Context } from 'hono';
 
 export interface DIContainer<
-  SS extends SessionSchemas = typeof sessionSchemas
+  SS extends SessionSchemas = typeof sessionSchemas,
 > {
   session(c: Context<Env<SS>>): Session<SS>;
   serverHandlerConfiguration(): ServerHandlerConfiguration<SS>;
   extractorConfiguration(): ExtractorConfiguration;
   authorizationHandler<
-    OPTS extends object
+    OPTS extends object,
   >(): AuthorizationHandlerConfiguration<SS, OPTS>;
   tokenHandler(): TokenHandlerConfiguration;
   credentialHandler(): CredentialSingleIssueHandlerConfiguration;
@@ -52,9 +52,9 @@ export interface DIContainer<
 
 export type AuthorizationHandlerFactory = <
   SS extends SessionSchemas,
-  OPTS extends object
+  OPTS extends object,
 >(
-  params: AuthorizationHandlerConfigurationImplConstructorParams<SS, OPTS>
+  params: AuthorizationHandlerConfigurationImplConstructorParams<SS, OPTS>,
 ) => AuthorizationHandlerConfiguration<SS, OPTS>;
 
 export interface TokenHandlerFactory {
@@ -82,7 +82,7 @@ export interface CredentialHandlerFactory {
 export interface AuthorizationDecisionHandlerFactory {
   <
     SS extends SessionSchemas = typeof sessionSchemas,
-    OPTS = undefined
+    OPTS = undefined,
   >(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
     extractorConfiguration: ExtractorConfiguration;
@@ -132,9 +132,9 @@ export interface UserHandlerFactory {
 }
 
 export interface SessionFactory {
-  <SS extends SessionSchemas>(sessionSchemas: SS): (
-    c: Context<Env<SS>>
-  ) => Session<SS>;
+  <SS extends SessionSchemas>(
+    sessionSchemas: SS,
+  ): (c: Context<Env<SS>>) => Session<SS>;
 }
 
 export interface DIContainerOverrides {

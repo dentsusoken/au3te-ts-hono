@@ -21,7 +21,7 @@ export class AuthorizationController {
     if (result.ok) {
       const pageModel = (await result.json()) as AuthorizationPageModel;
       return c.render(
-        <AuthorizationPage {...pageModel} publicUrl={c.env.PUBLIC_URL} />
+        <AuthorizationPage {...pageModel} publicUrl={c.env.PUBLIC_URL} />,
       );
     }
     return result;
