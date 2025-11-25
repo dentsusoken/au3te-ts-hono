@@ -16,6 +16,7 @@
  */
 import { Context } from 'hono';
 import { Env } from '../env';
+import { DefaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
 
 /**
  * Controller handling the authorization decision endpoint.
@@ -28,7 +29,7 @@ export class AuthorizationDecisionController {
    * @param {Context<Env>} c - The Hono context containing environment and request information.
    * @returns {Promise<Response>} A promise that resolves to the authorization decision response.
    */
-  static async handle(c: Context<Env>) {
+  static async handle(c: Context<Env<DefaultSessionSchemas>>) {
     const di = c.get('getDI')(c);
     const endpointConfiguration = di.authorizationDecisionHandler();
     return await endpointConfiguration.processRequest(c.req.raw);

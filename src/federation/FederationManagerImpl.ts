@@ -26,14 +26,14 @@ import {
 } from '@vecrea/au3te-ts-common/schemas.federation';
 import { Context } from 'hono';
 import { Env } from '../env';
-import { SessionSchemas } from '@vecrea/au3te-ts-server/session';
+import { DefaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
 
 /**
  * Implementation of FederationManager that manages federation configurations.
  * Handles federation registry parsing, validation, and federation instance creation.
  * @template SS - Session schemas type extending SessionSchemas
  */
-export class FederationManagerImpl<SS extends SessionSchemas>
+export class FederationManagerImpl<SS extends DefaultSessionSchemas>
   implements FederationManager
 {
   #configs: FederationRegistry;

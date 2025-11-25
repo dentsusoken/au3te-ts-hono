@@ -2,7 +2,7 @@ import {
   Session,
   StoredSessionData,
   ParsedSessionData,
-  SessionSchemas,
+  DefaultSessionSchemas,
 } from '@vecrea/au3te-ts-server/session';
 import { z } from 'zod';
 import { DynamoDB } from '@vecrea/oid4vc-core/dynamodb';
@@ -18,7 +18,7 @@ const EXPIRATION_TTL = 24 * 60 * 60;
 /**
  * KV implementation of the Session interface.
  */
-export class DynamoSession<T extends SessionSchemas> implements Session<T> {
+export class DynamoSession<T extends DefaultSessionSchemas> implements Session<T> {
   #data: StoredSessionData<T> = {};
   #schemas: T;
   #sessionId: string;
@@ -216,7 +216,7 @@ export class DynamoSession<T extends SessionSchemas> implements Session<T> {
   }
 }
 
-export const createDynamoSession: SessionFactory = <SS extends SessionSchemas>(
+export const createDynamoSession: SessionFactory = <SS extends DefaultSessionSchemas>(
   sessionSchemas: SS,
 ) => {
   return (c: Context<Env<SS>>) => {

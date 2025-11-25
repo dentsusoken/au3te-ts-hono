@@ -17,14 +17,14 @@
 import { Env } from '../env';
 import { Context } from 'hono';
 import { DIContainer, DIContainerOverrides } from './DIContainer';
-import { SessionSchemas } from '@vecrea/au3te-ts-server/session';
+import { DefaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
 import { DIContainerImpl } from './DIContainerImpl';
 
 /**
  * Function type that creates a DI container instance from a context.
  * @template SS - The session schemas type.
  */
-export interface GetDI<SS extends SessionSchemas> {
+export interface GetDI<SS extends DefaultSessionSchemas> {
   /**
    * Creates a DI container instance for the given context.
    * @param {Context<Env<SS>>} c - The Hono context.
@@ -44,7 +44,7 @@ export interface CreateGetDI {
    * @param {DIContainerOverrides} [overrides={}] - Optional overrides for handler factories.
    * @returns {GetDI<SS>} A function that creates DI container instances.
    */
-  <SS extends SessionSchemas>(
+  <SS extends DefaultSessionSchemas>(
     sessionSchemas: SS,
     overrides?: DIContainerOverrides,
   ): GetDI<SS>;
@@ -61,7 +61,7 @@ export interface CreateGetDI {
  * });
  * const di = getDI(context);
  */
-export const createGetDI: CreateGetDI = <SS extends SessionSchemas>(
+export const createGetDI: CreateGetDI = <SS extends DefaultSessionSchemas>(
   sessionSchemas: SS,
   overrides: DIContainerOverrides = {},
 ): GetDI<SS> => {

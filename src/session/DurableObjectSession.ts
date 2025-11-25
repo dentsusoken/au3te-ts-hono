@@ -2,7 +2,7 @@ import {
   Session,
   StoredSessionData,
   ParsedSessionData,
-  SessionSchemas,
+  DefaultSessionSchemas,
 } from '@vecrea/au3te-ts-server/session';
 import { DurableObject } from '../database';
 import { z } from 'zod';
@@ -19,7 +19,7 @@ const EXPIRATION_TTL = 24 * 60 * 60;
  * Provides persistent session storage with automatic expiration handling.
  * @template T - The session schemas type.
  */
-export class DurableObjectSession<T extends SessionSchemas>
+export class DurableObjectSession<T extends DefaultSessionSchemas>
   implements Session<T>
 {
   #data: StoredSessionData<T> = {};
@@ -232,7 +232,9 @@ export class DurableObjectSession<T extends SessionSchemas>
  * const sessionFactory = createDOSession(unifiedIdSessionSchemas);
  * const session = sessionFactory(context);
  */
-export const createDOSession: SessionFactory = <SS extends SessionSchemas>(
+export const createDOSession: SessionFactory = <
+  SS extends DefaultSessionSchemas,
+>(
   sessionSchemas: SS,
 ) => {
   return (c: Context<Env<SS>>) => {

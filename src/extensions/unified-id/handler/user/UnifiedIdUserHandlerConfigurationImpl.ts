@@ -20,11 +20,14 @@ import {
   GetMdocClaimsBySubjectAndDoctype,
   UserHandlerConfiguration,
 } from '@vecrea/au3te-ts-common/handler.user';
-import { SessionSchemas } from '@vecrea/au3te-ts-server/session';
+import { DefaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
 import { Context } from 'hono';
 import { UserHandlerFactory } from '../../../../di/DIContainer';
 import { Env } from '../../../../env';
-import { UnifiedIdAllocator, UnifiedIdAllocatorDurableObjects } from '../../allocator';
+import {
+  UnifiedIdAllocator,
+  UnifiedIdAllocatorDurableObjects,
+} from '../../allocator';
 import { UnifiedIdUser } from '../../schemas/User';
 import { createGetByCredentials } from './getByCredentials';
 import { getBySubject } from './getBySubject';
@@ -64,8 +67,9 @@ export interface UnifiedIdUserHandlerConfiguration<
  * const user = await handler.getByCredentials('inga', 'inga', { serviceId: 'shopvc' });
  * ```
  */
-export class UnifiedIdUserHandlerConfigurationImpl<SS extends SessionSchemas>
-  implements
+export class UnifiedIdUserHandlerConfigurationImpl<
+  SS extends DefaultSessionSchemas,
+> implements
     UnifiedIdUserHandlerConfiguration<UnifiedIdUser, UnifiedIdOptionsKeys>
 {
   /** Function to retrieve a user by subject identifier */
@@ -115,7 +119,7 @@ export class UnifiedIdUserHandlerConfigurationImpl<SS extends SessionSchemas>
  * ```
  */
 export const createUnifiedIdUserHandler: UserHandlerFactory = <
-  SS extends SessionSchemas,
+  SS extends DefaultSessionSchemas,
 >(
   c: Context<Env<SS>>,
 ): UserHandlerConfiguration => {

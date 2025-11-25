@@ -16,6 +16,7 @@
  */
 import { Context } from 'hono';
 import { Env } from '../env';
+import { DefaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
 
 /**
  * Controller handling federation initiation endpoint requests.
@@ -29,7 +30,7 @@ export class FederationInitiationController {
    * @param {Context<Env>} c - The Hono context containing environment and request information.
    * @returns {Promise<Response>} A promise that resolves to the federation initiation response.
    */
-  static async handle(c: Context<Env>) {
+  static async handle(c: Context<Env<DefaultSessionSchemas>>) {
     const di = c.get('getDI')(c);
     const endpointConfiguration = di.federationInitiationHandler();
     return await endpointConfiguration.processRequest(c.req.raw);

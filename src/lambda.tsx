@@ -17,7 +17,7 @@
 import { dynamoDBMiddleware } from '@squilla/hono-aws-middlewares/dynamodb';
 import { Env as S3Env, s3Middleware } from '@squilla/hono-aws-middlewares/s3';
 import { secretsManagerMiddleware } from '@squilla/hono-aws-middlewares/secrets-manager';
-import { sessionSchemas } from '@vecrea/au3te-ts-server/session';
+import { DefaultSessionSchemas,defaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
 import { Hono } from 'hono';
 import { handle } from 'hono/aws-lambda';
 import { jsxRenderer } from 'hono/jsx-renderer';
@@ -44,7 +44,7 @@ import { setupLambdaMiddleware } from './middleware/setupLambda';
 import { createDynamoSession } from './session';
 import { TopPage } from './view/TopPage';
 
-const app = new Hono<Env & S3Env>();
+const app = new Hono<Env<DefaultSessionSchemas> & S3Env>();
 app.use(dynamoDBMiddleware());
 app.use(secretsManagerMiddleware());
 app.use('/css/*', s3Middleware());
@@ -52,7 +52,7 @@ app.use(setupLambdaMiddleware);
 app.use(async (c, next) => {
   c.set(
     'getDI',
-    createGetDI(sessionSchemas, {
+    createGetDI(defaultSessionSchemas, {
       authorizationHandler: createUnifiedIdAuthorizationHandler,
       authorizationDecisionHandler: createUnifiedIdAuthorizationDecisionHandler,
       userHandler: createUnifiedIdUserHandler,

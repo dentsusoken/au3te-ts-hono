@@ -24,7 +24,7 @@ import { User } from '@vecrea/au3te-ts-common/schemas.common';
 import { UserHandlerFactory } from '../../../../di';
 import { Env } from '../../../../env';
 import { Context } from 'hono';
-import { SessionSchemas } from '@vecrea/au3te-ts-server/session';
+import { DefaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
 
 /**
  * Creates a function to retrieve a user by their subject from a KV store.
@@ -113,7 +113,7 @@ export class UserHandlerKV implements UserHandlerConfiguration {
 }
 
 export const createUserHandlerKV: UserHandlerFactory = <
-  SS extends SessionSchemas,
+  SS extends DefaultSessionSchemas,
 >(
   c: Context<Env<SS>>,
 ) => {

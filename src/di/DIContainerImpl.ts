@@ -15,7 +15,10 @@
  * License.
  */
 import { DIContainer, DIContainerOverrides } from './DIContainer';
-import { Session, SessionSchemas } from '@vecrea/au3te-ts-server/session';
+import {
+  Session,
+  DefaultSessionSchemas,
+} from '@vecrea/au3te-ts-server/session';
 import {
   AuthorizationHandlerConfiguration,
   AuthorizationHandlerConfigurationImpl,
@@ -104,7 +107,7 @@ import {
  * Provides factory methods for creating handler configurations with dependency injection.
  * @template SS - The session schemas type.
  */
-export class DIContainerImpl<SS extends SessionSchemas>
+export class DIContainerImpl<SS extends DefaultSessionSchemas>
   implements DIContainer<SS>
 {
   readonly #c: Context<Env<SS>>;
@@ -163,7 +166,9 @@ export class DIContainerImpl<SS extends SessionSchemas>
   }
   authorizationPageHandlerConfiguration(): AuthorizationPageHandlerConfiguration {
     return new AuthorizationPageHandlerConfigurationImpl({
-      federationRegistry: new FederationManagerImpl(this.#c).getConfigurations(),
+      federationRegistry: new FederationManagerImpl(
+        this.#c,
+      ).getConfigurations(),
     });
   }
 
