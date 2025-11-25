@@ -3,6 +3,7 @@ import {
   StoredSessionData,
   ParsedSessionData,
   DefaultSessionSchemas,
+  SessionSchemas,
 } from '@vecrea/au3te-ts-server/session';
 import { z } from 'zod';
 import { DynamoDB } from '@vecrea/oid4vc-core/dynamodb';
@@ -16,9 +17,11 @@ import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 const EXPIRATION_TTL = 24 * 60 * 60;
 
 /**
- * KV implementation of the Session interface.
+ * Session implementation using AWS DynamoDB for storage.
+ * Provides persistent session storage with automatic expiration handling.
+ * @template T - The session schemas type.
  */
-export class DynamoSession<T extends DefaultSessionSchemas> implements Session<T> {
+export class DynamoSession<T extends DefaultSessionSchemas & SessionSchemas> implements Session<T> {
   #data: StoredSessionData<T> = {};
   #schemas: T;
   #sessionId: string;
@@ -27,7 +30,11 @@ export class DynamoSession<T extends DefaultSessionSchemas> implements Session<T
   #loaded = false;
 
   /**
-   * Creates an instance of KVSession.
+   * Creates a new DynamoSession instance.
+   * @param {T} schemas - The session schemas for validation.
+   * @param {string} sessionId - The unique session identifier.
+   * @param {DynamoDB} dynamo - The DynamoDB instance for storage operations.
+   * @param {number} [expirationTtl=EXPIRATION_TTL] - The expiration time-to-live in seconds.
    */
   constructor(
     schemas: T,
@@ -58,7 +65,7 @@ export class DynamoSession<T extends DefaultSessionSchemas> implements Session<T
   }
 
   /**
-   * Loads session data from the KV store.
+   * Loads session data from DynamoDB.
    * If the data is already loaded, it does nothing.
    * @returns {Promise<void>} A promise that resolves when the data is loaded.
    */
@@ -78,7 +85,7 @@ export class DynamoSession<T extends DefaultSessionSchemas> implements Session<T
   }
 
   /**
-   * Saves session data to the KV store.
+   * Saves session data to DynamoDB.
    * @returns {Promise<void>} A promise that resolves when the data is saved.
    */
   private async saveData() {
@@ -96,7 +103,6 @@ export class DynamoSession<T extends DefaultSessionSchemas> implements Session<T
    */
   parseValue<K extends keyof T>(key: K): z.infer<T[K]> | undefined {
     const value = this.#data[key];
-
     if (!value) {
       return undefined;
     }
@@ -216,6 +222,14 @@ export class DynamoSession<T extends DefaultSessionSchemas> implements Session<T
   }
 }
 
+/**
+ * Creates a session factory function for DynamoDB-based sessions.
+ * @param {SS} sessionSchemas - The session schemas to use.
+ * @returns A function that creates a DynamoSession instance from a context.
+ * @example
+ * const sessionFactory = createDynamoSession(unifiedIdSessionSchemas);
+ * const session = sessionFactory(context);
+ */
 export const createDynamoSession: SessionFactory = <SS extends DefaultSessionSchemas>(
   sessionSchemas: SS,
 ) => {
