@@ -36,6 +36,8 @@ import {
   UnifiedIdSessionSchemas,
   unifiedIdSessionSchemas,
 } from './extensions/unified-id/session';
+import { FederationInitiationController } from './controllers/FederationInitiationController';
+import { FederationCallbackController } from './controllers/FederationCallbackController';
 
 const app = new Hono<Env<UnifiedIdSessionSchemas>>();
 
@@ -76,6 +78,13 @@ app.get(
   CredentialIssuerJwksController.handle,
 );
 app.get(EndpointPath.serviceJwksPath, ServiceJwksController.handle);
-
+app.get(
+  EndpointPath.federationInitiationPath,
+  FederationInitiationController.handle,
+);
+app.get(
+  EndpointPath.federationCallbackPath,
+  FederationCallbackController.handle,
+);
 export { DurableObjectImpl } from './database';
 export default app;

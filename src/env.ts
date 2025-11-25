@@ -10,6 +10,7 @@ import { DurableObjectImpl } from './database';
 /**
  * Environment configuration interface for the application.
  * Defines the structure of environment bindings and runtime variables.
+ * @template SS - Session schemas type extending SessionSchemas, defaults to the base sessionSchemas.
  */
 export type Env<SS extends SessionSchemas = typeof sessionSchemas> =
   DynamoDBEnv & {
@@ -43,7 +44,11 @@ export type Env<SS extends SessionSchemas = typeof sessionSchemas> =
       /** Where to deploy ('local' or none) */
       DEPLOY_ENV: string;
 
+      /** Durable Object namespace for distributed state management */
       DURABLE_OBJECT: DurableObjectNamespace<DurableObjectImpl<unknown>>;
+
+      /** JSON string containing federation registry configuration for external identity providers */
+      FEDERATTION_CONFIGS: string;
     };
 
     /**
@@ -56,6 +61,7 @@ export type Env<SS extends SessionSchemas = typeof sessionSchemas> =
       /** Session ID for creating session instances */
       sessionId?: string;
 
+      /** Dependency injection container factory function that creates configured DI containers */
       getDI: GetDI<SS>;
     };
   };

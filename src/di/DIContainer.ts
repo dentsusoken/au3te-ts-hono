@@ -29,7 +29,8 @@ import { ServiceJwksHandlerConfiguration } from '@vecrea/au3te-ts-server/handler
 import { UserHandlerConfiguration } from '@vecrea/au3te-ts-common/handler.user';
 import { Env } from '../env';
 import { Context } from 'hono';
-
+import { FederationInitiationHandlerConfiguration } from '@vecrea/au3te-ts-server/handler.federation-initiation';
+import { FederationCallbackHandlerConfiguration } from '@vecrea/au3te-ts-server/handler.federation-callback';
 /**
  * Dependency Injection Container interface.
  * Provides factory methods for creating handler configurations.
@@ -119,6 +120,17 @@ export interface DIContainer<
    * @returns {UserHandlerConfiguration} The user handler configuration.
    */
   userHandler(): UserHandlerConfiguration;
+
+  /**
+   * Creates a federation initiation handler configuration.
+   * @returns {FederationInitiationHandlerConfiguration} The federation initiation handler configuration.
+   */
+  federationInitiationHandler(): FederationInitiationHandlerConfiguration;
+  /**
+   * Creates a federation callback handler configuration.
+   * @returns {FederationCallbackHandlerConfiguration} The federation callback handler configuration.
+   */
+  federationCallbackHandler(): FederationCallbackHandlerConfiguration;
 }
 
 /**
@@ -256,6 +268,22 @@ export interface SessionFactory {
 }
 
 /**
+ * Factory interface for creating federation initiation handler configurations.
+ */
+export interface FederationInitiationHandlerFactory {
+  <SS extends SessionSchemas>(params: {
+    serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
+  }): FederationInitiationHandlerConfiguration;
+}
+/**
+ * Factory interface for creating federation callback handler configurations.
+ */
+export interface FederationCallbackHandlerFactory {
+  <SS extends SessionSchemas>(params: {
+    serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
+  }): FederationCallbackHandlerConfiguration;
+}
+/**
  * Override configuration for DI container.
  * Allows custom implementations to be injected for specific handlers.
  */
@@ -271,4 +299,6 @@ export interface DIContainerOverrides {
   serviceJwksHandler?: ServiceJwksHandlerFactory;
   userHandler?: UserHandlerFactory;
   session?: SessionFactory;
+  federationInitiationHandler?: FederationInitiationHandlerFactory;
+  federationCallbackHandler?: FederationCallbackHandlerFactory;
 }
