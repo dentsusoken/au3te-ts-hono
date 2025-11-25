@@ -93,6 +93,7 @@ import {
 // import { UserHandlerKV } from '../extensions/kv-user/handler/user/UserHandlerKV';
 import { createDOSession } from '../session/DurableObjectSession';
 import { FederationManagerImpl } from '../federation/FederationManagerImpl';
+import { FederationManager } from '@vecrea/au3te-ts-server/federation';
 import {
   FederationInitiationHandlerConfiguration,
   FederationInitiationHandlerConfigurationImpl,
@@ -116,6 +117,15 @@ export class DIContainerImpl<SS extends DefaultSessionSchemas>
   /** Session factory function that creates session instances from contexts */
   session: (c: Context<Env<SS>>) => Session<SS>;
 
+  /** FederationManager instance cached for the request scope */
+  readonly #federationManager: FederationManager;
+
+  /** Cached server handler configuration for the request scope */
+  #cachedServerHandlerConfiguration?: ServerHandlerConfiguration<SS>;
+
+  /** Cached extractor configuration for the request scope */
+  #cachedExtractorConfiguration?: ExtractorConfiguration;
+
   /**
    * Creates a new DIContainerImpl instance.
    * @param {Context<Env<SS>>} c - The Hono context.
@@ -135,6 +145,9 @@ export class DIContainerImpl<SS extends DefaultSessionSchemas>
     } else {
       this.session = createDOSession(sessionSchemas);
     }
+
+    // Initialize FederationManager once per request scope
+    this.#federationManager = new FederationManagerImpl(this.#c);
   }
 
   #apiClient(): ApiClient {
@@ -147,12 +160,23 @@ export class DIContainerImpl<SS extends DefaultSessionSchemas>
   }
 
   serverHandlerConfiguration(): ServerHandlerConfiguration<SS> {
+    if (this.#cachedServerHandlerConfiguration) {
+      return this.#cachedServerHandlerConfiguration;
+    }
     const session = this.session(this.#c);
-    return new ServerHandlerConfigurationImpl(this.#apiClient(), session);
+    this.#cachedServerHandlerConfiguration = new ServerHandlerConfigurationImpl(
+      this.#apiClient(),
+      session,
+    );
+    return this.#cachedServerHandlerConfiguration;
   }
 
   extractorConfiguration(): ExtractorConfiguration {
-    return new ExtractorConfigurationImpl();
+    if (this.#cachedExtractorConfiguration) {
+      return this.#cachedExtractorConfiguration;
+    }
+    this.#cachedExtractorConfiguration = new ExtractorConfigurationImpl();
+    return this.#cachedExtractorConfiguration;
   }
   authorizationIssueHandlerConfiguration(): AuthorizationIssueHandlerConfiguration {
     return new AuthorizationIssueHandlerConfigurationImpl(
@@ -166,9 +190,7 @@ export class DIContainerImpl<SS extends DefaultSessionSchemas>
   }
   authorizationPageHandlerConfiguration(): AuthorizationPageHandlerConfiguration {
     return new AuthorizationPageHandlerConfigurationImpl({
-      federationRegistry: new FederationManagerImpl(
-        this.#c,
-      ).getConfigurations(),
+      federationRegistry: this.#federationManager.getConfigurations(),
     });
   }
 
@@ -182,7 +204,7 @@ export class DIContainerImpl<SS extends DefaultSessionSchemas>
       authorizationPageHandlerConfiguration:
         this.authorizationPageHandlerConfiguration(),
       extractorConfiguration: this.extractorConfiguration(),
-      federationManager: new FederationManagerImpl(this.#c),
+      federationManager: this.#federationManager,
     };
   }
 
@@ -365,24 +387,18 @@ export class DIContainerImpl<SS extends DefaultSessionSchemas>
   }
 
   federationInitiationHandler(): FederationInitiationHandlerConfiguration {
-    const serverHandlerConfiguration = this.serverHandlerConfiguration();
-    const extractorConfiguration = this.extractorConfiguration();
-    const federationManager = new FederationManagerImpl(this.#c);
     return new FederationInitiationHandlerConfigurationImpl({
-      serverHandlerConfiguration,
-      extractorConfiguration,
-      federationManager,
+      serverHandlerConfiguration: this.serverHandlerConfiguration(),
+      extractorConfiguration: this.extractorConfiguration(),
+      federationManager: this.#federationManager,
     });
   }
 
   federationCallbackHandler(): FederationCallbackHandlerConfiguration {
-    const serverHandlerConfiguration = this.serverHandlerConfiguration();
-    const extractorConfiguration = this.extractorConfiguration();
-    const federationManager = new FederationManagerImpl(this.#c);
     return new FederationCallbackHandlerConfigurationImpl({
-      serverHandlerConfiguration,
-      extractorConfiguration,
-      federationManager,
+      serverHandlerConfiguration: this.serverHandlerConfiguration(),
+      extractorConfiguration: this.extractorConfiguration(),
+      federationManager: this.#federationManager,
     });
   }
 }
