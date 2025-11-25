@@ -16,19 +16,22 @@
  */
 import { Hono } from 'hono';
 import { jsxRenderer } from 'hono/jsx-renderer';
-import { Env } from './env';
 import { EndpointPath } from './config/EndpointPath';
-import { PARController } from './controllers/PARController';
-import { AuthorizationController } from './controllers/AuthorizationController';
-import { AuthorizationDecisionController } from './controllers/AuthorizationDecisionController';
-import { ServiceConfigurationController } from './controllers/ServiceConfigurationController';
-import { CredentialMetadataController } from './controllers/CredentialMetadataController';
-import { TokenController } from './controllers/TokenController';
-import { CredentialController } from './controllers/CredentialController';
-import { CredentialIssuerJwksController } from './controllers/CredentialIssuerJwksController';
-import { ServiceJwksController } from './controllers/ServiceJwksController';
-import { TopPage } from './view/TopPage';
+import {
+  AuthorizationController,
+  AuthorizationDecisionController,
+  CredentialController,
+  CredentialIssuerJwksController,
+  CredentialMetadataController,
+  FederationCallbackController,
+  FederationInitiationController,
+  PARController,
+  ServiceConfigurationController,
+  ServiceJwksController,
+  TokenController,
+} from './controllers';
 import { createGetDI } from './di';
+import { Env } from './env';
 import { createUnifiedIdAuthorizationHandler } from './extensions/unified-id/handler/authorization';
 import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/handler/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
 import { createUnifiedIdUserHandler } from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
@@ -36,8 +39,7 @@ import {
   UnifiedIdSessionSchemas,
   unifiedIdSessionSchemas,
 } from './extensions/unified-id/session';
-import { FederationInitiationController } from './controllers/FederationInitiationController';
-import { FederationCallbackController } from './controllers/FederationCallbackController';
+import { TopPage } from './view/TopPage';
 
 const app = new Hono<Env<UnifiedIdSessionSchemas>>();
 
