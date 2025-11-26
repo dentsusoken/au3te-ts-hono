@@ -92,7 +92,7 @@ import {
 } from '@vecrea/au3te-ts-common/handler.user';
 // import { UserHandlerKV } from '../extensions/kv-user/handler/user/UserHandlerKV';
 import { createDOSession } from '../session/DurableObjectSession';
-import { FederationManagerImpl } from '../federation/FederationManagerImpl';
+import { FederationManagerHono } from '../federation/FederationManagerImpl';
 import { FederationManager } from '@vecrea/au3te-ts-server/federation';
 import {
   FederationInitiationHandlerConfiguration,
@@ -147,7 +147,7 @@ export class DIContainerImpl<SS extends DefaultSessionSchemas>
     }
 
     // Initialize FederationManager once per request scope
-    this.#federationManager = new FederationManagerImpl(this.#c);
+    this.#federationManager = new FederationManagerHono(this.#c);
   }
 
   #apiClient(): ApiClient {
