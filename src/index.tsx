@@ -34,23 +34,35 @@ import { createGetDI } from './di';
 import { Env } from './env';
 import { createUnifiedIdAuthorizationHandler } from './extensions/unified-id/handler/authorization';
 import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/handler/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
-import { createUnifiedIdUserHandler } from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
+import {
+  createUnifiedIdUserHandler,
+  UnifiedIdOptionsKeys,
+} from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
 import {
   UnifiedIdSessionSchemas,
   unifiedIdSessionSchemas,
 } from './extensions/unified-id/session';
 import { TopPage } from './view/TopPage';
+import { createUnifiedIdFederationCallbackHandler } from './extensions/unified-id/handler/federation-callback/UnifiedIdFederationCallbackHandler';
+import { UnifiedIdUser } from './extensions/unified-id/schemas/User';
 
-const app = new Hono<Env<UnifiedIdSessionSchemas>>();
+const app = new Hono<
+  Env<UnifiedIdSessionSchemas, UnifiedIdUser, UnifiedIdOptionsKeys>
+>();
 
 app.use(async (c, next) => {
   c.set(
     'getDI',
-    createGetDI<UnifiedIdSessionSchemas>(unifiedIdSessionSchemas, {
-      authorizationHandler: createUnifiedIdAuthorizationHandler,
-      authorizationDecisionHandler: createUnifiedIdAuthorizationDecisionHandler,
-      userHandler: createUnifiedIdUserHandler,
-    }),
+    createGetDI<UnifiedIdSessionSchemas, UnifiedIdUser, UnifiedIdOptionsKeys>(
+      unifiedIdSessionSchemas,
+      {
+        authorizationHandler: createUnifiedIdAuthorizationHandler,
+        authorizationDecisionHandler:
+          createUnifiedIdAuthorizationDecisionHandler,
+        userHandler: createUnifiedIdUserHandler,
+        federationCallbackHandler: createUnifiedIdFederationCallbackHandler,
+      },
+    ),
   );
   await next();
 });

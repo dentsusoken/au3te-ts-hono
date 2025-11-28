@@ -17,13 +17,12 @@
 import { FC } from 'hono/jsx';
 import { FederationRegistry } from '@vecrea/au3te-ts-common/schemas.federation';
 
-
 /**
  * Props for the Federations component.
  */
 type FederationsProps = {
   /** Array of available federation configurations */
-  federationRegistry: FederationRegistry
+  federationRegistry: FederationRegistry;
   /** Optional message to display about federation */
   federationMessage?: string;
 };
@@ -47,7 +46,9 @@ export const Federations: FC<FederationsProps> = (props) => (
       {props.federationRegistry?.federations.map((config, index) => (
         <li key={index}>
           <a href={`/api/federation/initiation/${config.id}`}>
-            {config.server.name}
+            {config.protocol === 'oidc'
+              ? config.server.name
+              : config.server.entityId}
           </a>
         </li>
       ))}

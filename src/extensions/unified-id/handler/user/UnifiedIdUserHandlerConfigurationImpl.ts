@@ -15,8 +15,6 @@
  * License.
  */
 import {
-  GetByCredentials,
-  GetBySubject,
   GetMdocClaimsBySubjectAndDoctype,
   UserHandlerConfiguration,
 } from '@vecrea/au3te-ts-common/handler.user';
@@ -29,12 +27,12 @@ import {
   UnifiedIdAllocatorDurableObjects,
 } from '../../allocator';
 import { UnifiedIdUser } from '../../schemas/User';
-import { createGetByCredentials } from './getByCredentials';
-import { getBySubject } from './getBySubject';
 import { createGetMdocClaimsBySubjectAndDoctype } from './getMdocClaimsBySubjectAndDoctype';
+import { UserHandlerKV } from '../../../kv-user/handler/user/UserHandlerKV';
+import { UnifiedIdSessionSchemas } from '../../session';
 
 /** Union type representing the keys for unified ID options */
-type UnifiedIdOptionsKeys = 'serviceId' | 'unifiedId';
+export type UnifiedIdOptionsKeys = 'serviceId' | 'unifiedId';
 
 /**
  * Extended user handler configuration interface for unified ID functionality.
@@ -67,35 +65,69 @@ export interface UnifiedIdUserHandlerConfiguration<
  * const user = await handler.getByCredentials('inga', 'inga', { serviceId: 'shopvc' });
  * ```
  */
+// export class UnifiedIdUserHandlerConfigurationImpl<
+//   SS extends DefaultSessionSchemas,
+// > implements
+//     UnifiedIdUserHandlerConfiguration<UnifiedIdUser, UnifiedIdOptionsKeys>
+// {
+//   /** Function to retrieve a user by subject identifier */
+//   getBySubject: GetBySubject<UnifiedIdUser>;
+//   /** Function to authenticate a user using login credentials with unified ID support */
+//   getByCredentials: GetByCredentials<UnifiedIdUser, UnifiedIdOptionsKeys>;
+//   /** Function to retrieve mobile document (mdoc) claims by subject and document type */
+//   getMdocClaimsBySubjectAndDoctype: GetMdocClaimsBySubjectAndDoctype;
+
+//   /** The unified ID allocator instance for managing unified IDs */
+//   unifiedIdAllocator: UnifiedIdAllocator;
+
+//   /**
+//    * Creates a new instance of UnifiedIdUserHandlerConfigurationImpl.
+//    * Initializes the unified ID allocator and sets up user handler functions.
+//    *
+//    * @param {Context<Env<SS>>} c - The Hono context containing environment configuration
+//    */
+//   constructor(c: Context<Env<SS>>) {
+//     this.unifiedIdAllocator = new UnifiedIdAllocatorDurableObjects(
+//       c.env.DURABLE_OBJECT.get(
+//         c.env.DURABLE_OBJECT.idFromName('unifiedIdAllocator'),
+//       ),
+//     );
+//     this.getBySubject = getBySubject;
+//     this.getByCredentials = createGetByCredentials(this.unifiedIdAllocator);
+//     this.getMdocClaimsBySubjectAndDoctype =
+//       createGetMdocClaimsBySubjectAndDoctype(
+//         this.unifiedIdAllocator,
+//         this.getBySubject,
+//       );
+//   }
+// }
+
 export class UnifiedIdUserHandlerConfigurationImpl<
-  SS extends DefaultSessionSchemas,
-> implements
+    SS extends DefaultSessionSchemas,
+  >
+  extends UserHandlerKV<UnifiedIdUser, UnifiedIdOptionsKeys>
+  implements
     UnifiedIdUserHandlerConfiguration<UnifiedIdUser, UnifiedIdOptionsKeys>
 {
-  /** Function to retrieve a user by subject identifier */
-  getBySubject: GetBySubject<UnifiedIdUser>;
-  /** Function to authenticate a user using login credentials with unified ID support */
-  getByCredentials: GetByCredentials<UnifiedIdUser, UnifiedIdOptionsKeys>;
+  // /** Function to retrieve a user by subject identifier */
+  // getBySubject: GetBySubject<UnifiedIdUser>;
+  // /** Function to authenticate a user using login credentials with unified ID support */
+  // getByCredentials: GetByCredentials<UnifiedIdUser, UnifiedIdOptionsKeys>;
   /** Function to retrieve mobile document (mdoc) claims by subject and document type */
   getMdocClaimsBySubjectAndDoctype: GetMdocClaimsBySubjectAndDoctype;
 
   /** The unified ID allocator instance for managing unified IDs */
   unifiedIdAllocator: UnifiedIdAllocator;
 
-  /**
-   * Creates a new instance of UnifiedIdUserHandlerConfigurationImpl.
-   * Initializes the unified ID allocator and sets up user handler functions.
-   *
-   * @param {Context<Env<SS>>} c - The Hono context containing environment configuration
-   */
   constructor(c: Context<Env<SS>>) {
+    super(c.env.USER_KV, c.env.MDOC_KV);
     this.unifiedIdAllocator = new UnifiedIdAllocatorDurableObjects(
       c.env.DURABLE_OBJECT.get(
         c.env.DURABLE_OBJECT.idFromName('unifiedIdAllocator'),
       ),
     );
-    this.getBySubject = getBySubject;
-    this.getByCredentials = createGetByCredentials(this.unifiedIdAllocator);
+    // this.getBySubject = getBySubject;
+    // this.getByCredentials = createGetByCredentials(this.unifiedIdAllocator);
     this.getMdocClaimsBySubjectAndDoctype =
       createGetMdocClaimsBySubjectAndDoctype(
         this.unifiedIdAllocator,
@@ -118,12 +150,10 @@ export class UnifiedIdUserHandlerConfigurationImpl<
  * const handler = factory(context);
  * ```
  */
-export const createUnifiedIdUserHandler: UserHandlerFactory = <
-  SS extends DefaultSessionSchemas,
->(
-  c: Context<Env<SS>>,
-): UserHandlerConfiguration => {
-  return new UnifiedIdUserHandlerConfigurationImpl<SS>(
-    c,
-  ) as UserHandlerConfiguration;
+export const createUnifiedIdUserHandler: UserHandlerFactory<
+  UnifiedIdSessionSchemas,
+  UnifiedIdUser,
+  UnifiedIdOptionsKeys
+> = (c) => {
+  return new UnifiedIdUserHandlerConfigurationImpl(c);
 };

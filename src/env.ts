@@ -5,13 +5,20 @@ import {
 import { GetDI } from './di';
 import { Env as DynamoDBEnv } from '@squilla/hono-aws-middlewares/dynamodb';
 import { DurableObjectImpl } from './database';
+import { User } from '@vecrea/au3te-ts-common/schemas.common';
 
 /**
  * Environment configuration interface for the application.
  * Defines the structure of environment bindings and runtime variables.
  * @template SS - Session schemas type extending SessionSchemas, defaults to the base sessionSchemas.
+ * @template U - User type extending User, defaults to the base User.
+ * @template T - User credential fields type extending keyof Omit<U, 'loginId' | 'password'>, defaults to never.
  */
-export type Env<SS extends DefaultSessionSchemas> = DynamoDBEnv & {
+export type Env<
+  SS extends DefaultSessionSchemas,
+  U extends User = User,
+  T extends keyof Omit<U, 'loginId' | 'password'> = never,
+> = DynamoDBEnv & {
   /**
    * External bindings configuration for the application.
    * Contains API credentials and KV namespace configurations.
@@ -60,6 +67,6 @@ export type Env<SS extends DefaultSessionSchemas> = DynamoDBEnv & {
     sessionId?: string;
 
     /** Dependency injection container factory function that creates configured DI containers */
-    getDI: GetDI<SS>;
+    getDI: GetDI<SS, U, T>;
   };
 };

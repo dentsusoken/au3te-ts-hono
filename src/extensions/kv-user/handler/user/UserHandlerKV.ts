@@ -19,11 +19,10 @@ import {
   GetBySubject,
   GetByCredentials,
   GetMdocClaimsBySubjectAndDoctype,
+  AddUser,
 } from '@vecrea/au3te-ts-common/handler.user';
 import { User } from '@vecrea/au3te-ts-common/schemas.common';
 import { UserHandlerFactory } from '../../../../di';
-import { Env } from '../../../../env';
-import { Context } from 'hono';
 import { DefaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
 
 /**
@@ -33,7 +32,7 @@ import { DefaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
  * @returns {GetBySubject} A function that takes a subject and returns a user.
  */
 const createGetBySubjectKV =
-  (kv: KVNamespace): GetBySubject =>
+  <U extends User = User>(kv: KVNamespace): GetBySubject<U> =>
   async (subject) => {
     const { keys } = await kv.list();
 
@@ -42,7 +41,7 @@ const createGetBySubjectKV =
       const strUser = await kv.get(key);
       if (!strUser) continue;
 
-      const user = JSON.parse(strUser) as User;
+      const user = JSON.parse(strUser) as U;
       if (user.subject === subject) {
         return user;
       }
@@ -58,7 +57,12 @@ const createGetBySubjectKV =
  * @returns {GetByCredentials} A function that takes loginId and password and returns a user.
  */
 const createGetByCredentialsKV =
-  (kv: KVNamespace): GetByCredentials =>
+  <
+    U extends User = User,
+    T extends keyof Omit<U, 'loginId' | 'password'> = never,
+  >(
+    kv: KVNamespace,
+  ): GetByCredentials<U, T> =>
   async (loginId, password) => {
     const { keys } = await kv.list();
 
@@ -67,7 +71,7 @@ const createGetByCredentialsKV =
       const strUser = await kv.get(key);
       if (!strUser) continue;
 
-      const user = JSON.parse(strUser) as User;
+      const user = JSON.parse(strUser) as U;
       if (user.loginId === loginId && user.password === password) {
         return user;
       }
@@ -93,29 +97,41 @@ const createGetMdocClaimsBySubjectAndDoctypeKV =
     return mdoc[doctype];
   };
 
-export class UserHandlerKV implements UserHandlerConfiguration {
+const createAddUserKV =
+  (kv: KVNamespace): AddUser =>
+  async (user) => {
+    await kv.put(user.subject, JSON.stringify(user));
+  };
+
+export class UserHandlerKV<
+  U extends User = User,
+  T extends keyof Omit<U, 'loginId' | 'password'> = never,
+> implements UserHandlerConfiguration<U, T>
+{
   #users: KVNamespace;
   #mdocs: KVNamespace;
 
-  getByCredentials: GetByCredentials;
-  getBySubject: GetBySubject;
+  getByCredentials: GetByCredentials<U, T>;
+  getBySubject: GetBySubject<U>;
   getMdocClaimsBySubjectAndDoctype: GetMdocClaimsBySubjectAndDoctype;
+  addUser: AddUser;
 
   constructor(users: KVNamespace, mdocs: KVNamespace) {
     this.#users = users;
     this.#mdocs = mdocs;
 
     this.getBySubject = createGetBySubjectKV(this.#users);
-    this.getByCredentials = createGetByCredentialsKV(this.#users);
+    this.getByCredentials = createGetByCredentialsKV<U, T>(this.#users);
     this.getMdocClaimsBySubjectAndDoctype =
       createGetMdocClaimsBySubjectAndDoctypeKV(this.#mdocs);
+    this.addUser = createAddUserKV(this.#users);
   }
 }
 
-export const createUserHandlerKV: UserHandlerFactory = <
-  SS extends DefaultSessionSchemas,
->(
-  c: Context<Env<SS>>,
-) => {
+export const createUserHandlerKV: UserHandlerFactory<
+  DefaultSessionSchemas,
+  User,
+  never
+> = (c) => {
   return new UserHandlerKV(c.env.USER_KV, c.env.MDOC_KV);
 };

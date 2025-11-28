@@ -102,17 +102,21 @@ import {
   FederationCallbackHandlerConfiguration,
   FederationCallbackHandlerConfigurationImpl,
 } from '@vecrea/au3te-ts-server/handler.federation-callback';
+import { User } from '@vecrea/au3te-ts-common/schemas.common';
 
 /**
  * Default implementation of the DI container.
  * Provides factory methods for creating handler configurations with dependency injection.
  * @template SS - The session schemas type.
  */
-export class DIContainerImpl<SS extends DefaultSessionSchemas>
-  implements DIContainer<SS>
+export class DIContainerImpl<
+  SS extends DefaultSessionSchemas,
+  U extends User = User,
+  T extends keyof Omit<U, 'loginId' | 'password'> = never,
+> implements DIContainer<SS, U, T>
 {
   readonly #c: Context<Env<SS>>;
-  readonly #overrides: DIContainerOverrides;
+  readonly #overrides: DIContainerOverrides<SS, U, T>;
 
   /** Session factory function that creates session instances from contexts */
   session: (c: Context<Env<SS>>) => Session<SS>;
@@ -135,7 +139,7 @@ export class DIContainerImpl<SS extends DefaultSessionSchemas>
   constructor(
     c: Context<Env<SS>>,
     sessionSchemas: SS,
-    overrides: DIContainerOverrides = {},
+    overrides: DIContainerOverrides<SS, U, T> = {},
   ) {
     this.#c = c;
     this.#overrides = overrides;
@@ -218,11 +222,11 @@ export class DIContainerImpl<SS extends DefaultSessionSchemas>
     return new AuthorizationHandlerConfigurationImpl(params);
   }
 
-  userHandler(): UserHandlerConfiguration {
+  userHandler(): UserHandlerConfiguration<U, T> {
     if (this.#overrides.userHandler) {
       return this.#overrides.userHandler(this.#c);
     }
-    return new UserHandlerConfigurationImpl();
+    return new UserHandlerConfigurationImpl<U, T>();
   }
 
   #buildTokenHandlerDependencies() {
@@ -321,9 +325,7 @@ export class DIContainerImpl<SS extends DefaultSessionSchemas>
   authorizationDecisionHandler(): AuthorizationDecisionHandlerConfiguration {
     const dependencies = this.#buildAuthorizationDecisionHandlerDependencies();
     if (this.#overrides.authorizationDecisionHandler) {
-      return this.#overrides.authorizationDecisionHandler<SS, object>(
-        dependencies,
-      );
+      return this.#overrides.authorizationDecisionHandler<object>(dependencies);
     }
 
     return new AuthorizationDecisionHandlerConfigurationImpl(dependencies);
@@ -387,6 +389,13 @@ export class DIContainerImpl<SS extends DefaultSessionSchemas>
   }
 
   federationInitiationHandler(): FederationInitiationHandlerConfiguration {
+    if (this.#overrides.federationInitiationHandler) {
+      return this.#overrides.federationInitiationHandler({
+        serverHandlerConfiguration: this.serverHandlerConfiguration(),
+        extractorConfiguration: this.extractorConfiguration(),
+        federationManager: this.#federationManager,
+      });
+    }
     return new FederationInitiationHandlerConfigurationImpl({
       serverHandlerConfiguration: this.serverHandlerConfiguration(),
       extractorConfiguration: this.extractorConfiguration(),
@@ -395,10 +404,19 @@ export class DIContainerImpl<SS extends DefaultSessionSchemas>
   }
 
   federationCallbackHandler(): FederationCallbackHandlerConfiguration {
+    if (this.#overrides.federationCallbackHandler) {
+      return this.#overrides.federationCallbackHandler({
+        serverHandlerConfiguration: this.serverHandlerConfiguration(),
+        extractorConfiguration: this.extractorConfiguration(),
+        federationManager: this.#federationManager,
+        userHandler: this.userHandler(),
+      });
+    }
     return new FederationCallbackHandlerConfigurationImpl({
       serverHandlerConfiguration: this.serverHandlerConfiguration(),
       extractorConfiguration: this.extractorConfiguration(),
       federationManager: this.#federationManager,
+      userHandler: this.userHandler(),
     });
   }
 }

@@ -21,37 +21,40 @@ import {
 import { UnifiedIdSessionSchemas } from '../../session';
 import { AuthorizationDecisionHandlerFactory } from '../../../../di/DIContainer';
 import { createGetOrAuthenticateUser } from './getOrAuthenticateUser';
-import { SessionSchemas } from '@vecrea/au3te-ts-server/session';
 import { UnifiedIdUser } from '../../schemas/User';
+import { UnifiedIdOptionsKeys } from '../user/UnifiedIdUserHandlerConfigurationImpl';
 
-export const createUnifiedIdAuthorizationDecisionHandler: AuthorizationDecisionHandlerFactory =
-  <SS extends SessionSchemas = UnifiedIdSessionSchemas, OPTS = unknown>({
+export const createUnifiedIdAuthorizationDecisionHandler: AuthorizationDecisionHandlerFactory<
+  UnifiedIdSessionSchemas,
+  UnifiedIdUser,
+  UnifiedIdOptionsKeys
+> = <OPTS = unknown>({
+  serverHandlerConfiguration,
+  extractorConfiguration,
+  userHandlerConfiguration,
+  authorizationHandlerConfiguration,
+  authorizationIssueHandlerConfiguration,
+  authorizationFailHandlerConfiguration,
+}: CreateAuthorizationDecisionHandlerConfigurationImplConstructorParams<
+  UnifiedIdSessionSchemas,
+  UnifiedIdUser,
+  UnifiedIdOptionsKeys,
+  OPTS
+>) => {
+  return new AuthorizationDecisionHandlerConfigurationImpl<
+    UnifiedIdSessionSchemas,
+    UnifiedIdUser,
+    UnifiedIdOptionsKeys,
+    OPTS
+  >({
     serverHandlerConfiguration,
     extractorConfiguration,
     userHandlerConfiguration,
-    authorizationHandlerConfiguration,
+    authorizationHandlerConfiguration: authorizationHandlerConfiguration,
     authorizationIssueHandlerConfiguration,
     authorizationFailHandlerConfiguration,
-  }: CreateAuthorizationDecisionHandlerConfigurationImplConstructorParams<
-    SS,
-    UnifiedIdUser,
-    'serviceId',
-    OPTS
-  >) => {
-    return new AuthorizationDecisionHandlerConfigurationImpl<
-      SS,
-      UnifiedIdUser,
-      'serviceId',
-      OPTS
-    >({
-      serverHandlerConfiguration,
-      extractorConfiguration,
-      userHandlerConfiguration,
-      authorizationHandlerConfiguration: authorizationHandlerConfiguration,
-      authorizationIssueHandlerConfiguration,
-      authorizationFailHandlerConfiguration,
-      overrides: {
-        createGetOrAuthenticateUser: createGetOrAuthenticateUser,
-      },
-    });
-  };
+    overrides: {
+      createGetOrAuthenticateUser: createGetOrAuthenticateUser,
+    },
+  });
+};

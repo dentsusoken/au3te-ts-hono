@@ -17,7 +17,10 @@
 import { dynamoDBMiddleware } from '@squilla/hono-aws-middlewares/dynamodb';
 import { Env as S3Env, s3Middleware } from '@squilla/hono-aws-middlewares/s3';
 import { secretsManagerMiddleware } from '@squilla/hono-aws-middlewares/secrets-manager';
-import { DefaultSessionSchemas,defaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
+import {
+  DefaultSessionSchemas,
+  defaultSessionSchemas,
+} from '@vecrea/au3te-ts-server/session';
 import { Hono } from 'hono';
 import { handle } from 'hono/aws-lambda';
 import { jsxRenderer } from 'hono/jsx-renderer';
@@ -38,13 +41,14 @@ import {
 import { createGetDI } from './di';
 import { Env } from './env';
 import { createUnifiedIdAuthorizationHandler } from './extensions/unified-id/handler/authorization';
-import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/handler/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
-import { createUnifiedIdUserHandler } from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
+// import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/handler/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
+// import { createUnifiedIdUserHandler } from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
 import { setupLambdaMiddleware } from './middleware/setupLambda';
 import { createDynamoSession } from './session';
 import { TopPage } from './view/TopPage';
+import { User } from '@vecrea/au3te-ts-common/schemas.common';
 
-const app = new Hono<Env<DefaultSessionSchemas> & S3Env>();
+const app = new Hono<Env<DefaultSessionSchemas, User, never> & S3Env>();
 app.use(dynamoDBMiddleware());
 app.use(secretsManagerMiddleware());
 app.use('/css/*', s3Middleware());
@@ -54,8 +58,8 @@ app.use(async (c, next) => {
     'getDI',
     createGetDI(defaultSessionSchemas, {
       authorizationHandler: createUnifiedIdAuthorizationHandler,
-      authorizationDecisionHandler: createUnifiedIdAuthorizationDecisionHandler,
-      userHandler: createUnifiedIdUserHandler,
+      // authorizationDecisionHandler: createUnifiedIdAuthorizationDecisionHandler,
+      // userHandler: createUnifiedIdUserHandler,
       session: createDynamoSession,
     }),
   );
