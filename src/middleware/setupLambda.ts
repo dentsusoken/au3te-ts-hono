@@ -1,12 +1,13 @@
 import { createMiddleware } from 'hono/factory';
 import { Env as SecretsManagerEnv } from '@squilla/hono-aws-middlewares/secrets-manager';
 import { Env } from '../env';
+import { DefaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
 
 /**
  * Middleware that sets up environment variables for AWS Lambda.
  * Retrieves secrets and sets them in the context environment.
  */
-export const setupLambdaMiddleware = createMiddleware<SecretsManagerEnv & Env>(
+export const setupLambdaMiddleware = createMiddleware<SecretsManagerEnv & Env<DefaultSessionSchemas>>(
   async (c, next) => {
     const secretsManager = c.get('SecretsManager');
     const response = await secretsManager.getSecretValue({

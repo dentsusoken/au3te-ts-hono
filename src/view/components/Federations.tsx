@@ -15,27 +15,14 @@
  * License.
  */
 import { FC } from 'hono/jsx';
-
-/**
- * Represents a federation configuration with an external OpenID Provider.
- * @todo define Federation type at au3te-ts-common
- */
-type Federation = {
-  /** Unique identifier for the federation */
-  id: string;
-  /** Server configuration for the federation */
-  server: {
-    /** Name of the federation server */
-    name: string;
-  };
-};
+import { FederationRegistry } from '@vecrea/au3te-ts-common/schemas.federation';
 
 /**
  * Props for the Federations component.
  */
 type FederationsProps = {
   /** Array of available federation configurations */
-  federations: Federation[];
+  federationRegistry: FederationRegistry;
   /** Optional message to display about federation */
   federationMessage?: string;
 };
@@ -56,10 +43,12 @@ export const Federations: FC<FederationsProps> = (props) => (
       <div id="federation-message">{props.federationMessage}</div>
     )}
     <ul>
-      {props.federations.map((federation, index) => (
+      {props.federationRegistry?.federations.map((config, index) => (
         <li key={index}>
-          <a href={`/api/federation/initiation/${federation.id}`}>
-            {federation.server.name}
+          <a href={`/api/federation/initiation/${config.id}`}>
+            {config.protocol === 'oidc'
+              ? config.server.name
+              : config.server.entityId}
           </a>
         </li>
       ))}

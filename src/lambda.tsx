@@ -14,33 +14,41 @@
  * language governing permissions and limitations under the
  * License.
  */
+import { dynamoDBMiddleware } from '@squilla/hono-aws-middlewares/dynamodb';
+import { Env as S3Env, s3Middleware } from '@squilla/hono-aws-middlewares/s3';
+import { secretsManagerMiddleware } from '@squilla/hono-aws-middlewares/secrets-manager';
+import {
+  DefaultSessionSchemas,
+  defaultSessionSchemas,
+} from '@vecrea/au3te-ts-server/session';
 import { Hono } from 'hono';
 import { handle } from 'hono/aws-lambda';
 import { jsxRenderer } from 'hono/jsx-renderer';
-import { Env } from './env';
 import { EndpointPath } from './config/EndpointPath';
-import { PARController } from './controllers/PARController';
-import { AuthorizationController } from './controllers/AuthorizationController';
-import { AuthorizationDecisionController } from './controllers/AuthorizationDecisionController';
-import { ServiceConfigurationController } from './controllers/ServiceConfigurationController';
-import { CredentialMetadataController } from './controllers/CredentialMetadataController';
-import { setupLambdaMiddleware } from './middleware/setupLambda';
-import { TokenController } from './controllers/TokenController';
-import { CredentialController } from './controllers/CredentialController';
-import { CredentialIssuerJwksController } from './controllers/CredentialIssuerJwksController';
-import { ServiceJwksController } from './controllers/ServiceJwksController';
-import { TopPage } from './view/TopPage';
-import { dynamoDBMiddleware } from '@squilla/hono-aws-middlewares/dynamodb';
-import { s3Middleware, Env as S3Env } from '@squilla/hono-aws-middlewares/s3';
-import { secretsManagerMiddleware } from '@squilla/hono-aws-middlewares/secrets-manager';
+import {
+  AuthorizationController,
+  AuthorizationDecisionController,
+  CredentialController,
+  CredentialIssuerJwksController,
+  CredentialMetadataController,
+  FederationCallbackController,
+  FederationInitiationController,
+  PARController,
+  ServiceConfigurationController,
+  ServiceJwksController,
+  TokenController,
+} from './controllers';
 import { createGetDI } from './di';
+import { Env } from './env';
 import { createUnifiedIdAuthorizationHandler } from './extensions/unified-id/handler/authorization';
-import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/handler/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
-import { createUnifiedIdUserHandler } from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
+// import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/handler/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
+// import { createUnifiedIdUserHandler } from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
+import { setupLambdaMiddleware } from './middleware/setupLambda';
 import { createDynamoSession } from './session';
-import { sessionSchemas } from '@vecrea/au3te-ts-server/session';
+import { TopPage } from './view/TopPage';
+import { User } from '@vecrea/au3te-ts-common/schemas.common';
 
-const app = new Hono<Env & S3Env>();
+const app = new Hono<Env<DefaultSessionSchemas, User, never> & S3Env>();
 app.use(dynamoDBMiddleware());
 app.use(secretsManagerMiddleware());
 app.use('/css/*', s3Middleware());
@@ -48,10 +56,10 @@ app.use(setupLambdaMiddleware);
 app.use(async (c, next) => {
   c.set(
     'getDI',
-    createGetDI(sessionSchemas, {
+    createGetDI(defaultSessionSchemas, {
       authorizationHandler: createUnifiedIdAuthorizationHandler,
-      authorizationDecisionHandler: createUnifiedIdAuthorizationDecisionHandler,
-      userHandler: createUnifiedIdUserHandler,
+      // authorizationDecisionHandler: createUnifiedIdAuthorizationDecisionHandler,
+      // userHandler: createUnifiedIdUserHandler,
       session: createDynamoSession,
     }),
   );
@@ -83,6 +91,14 @@ app.get(
   CredentialIssuerJwksController.handle,
 );
 app.get(EndpointPath.serviceJwksPath, ServiceJwksController.handle);
+app.get(
+  EndpointPath.federationInitiationPath,
+  FederationInitiationController.handle,
+);
+app.get(
+  EndpointPath.federationCallbackPath,
+  FederationCallbackController.handle,
+);
 
 // Routes for CSS files
 const CSS_HEADERS = {

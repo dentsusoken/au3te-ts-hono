@@ -19,19 +19,20 @@ import { Env } from '../env';
 import { DefaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
 
 /**
- * Controller handling the Pushed Authorization Request (PAR) endpoint.
- * Processes PAR requests according to OAuth 2.0 PAR specification.
+ * Controller handling federation initiation endpoint requests.
+ * Processes federation initiation requests and initiates the federation flow
+ * with external identity providers.
  */
-export class PARController {
+export class FederationInitiationController {
   /**
-   * Handles the PAR request.
-   * Creates and returns a request URI for a pushed authorization request.
+   * Handles the federation initiation request.
+   * Validates the request, performs necessary checks, and initiates federation.
    * @param {Context<Env>} c - The Hono context containing environment and request information.
-   * @returns {Promise<Response>} A promise that resolves to the PAR response containing the request URI.
+   * @returns {Promise<Response>} A promise that resolves to the federation initiation response.
    */
   static async handle(c: Context<Env<DefaultSessionSchemas>>) {
     const di = c.get('getDI')(c);
-    const endpointConfiguration = di.parHandler();
+    const endpointConfiguration = di.federationInitiationHandler();
     return await endpointConfiguration.processRequest(c.req.raw);
   }
 }

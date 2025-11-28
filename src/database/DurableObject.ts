@@ -1,6 +1,7 @@
 import { DurableObject as Base } from 'cloudflare:workers';
 import { Env } from '../env';
 import { StoreItem, Database } from './Database';
+import { DefaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
 
 /**
  * Durable Object interface that extends Database with alarm-based expiration.
@@ -34,7 +35,7 @@ export class DurableObjectImpl<T> extends Base implements DurableObject<T> {
    * @param {DurableObjectState} ctx - The Durable Object state context.
    * @param {Env} env - The environment variables and bindings.
    */
-  constructor(ctx: DurableObjectState, env: Env) {
+  constructor(ctx: DurableObjectState, env: Env<DefaultSessionSchemas>) {
     super(ctx, env);
   }
 

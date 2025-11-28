@@ -65,5 +65,7 @@ export const createGenerateAuthorizationPage =
       model = buildAuthorizationPageModel(response, user);
     }
 
+    await session.set('authorizationPageModel', model);
+
     return buildResponse(model);
   };

@@ -1,5 +1,24 @@
+/*
+ * Copyright (C) 2014-2024 Authlete, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the
+ * License.
+ */
 import { DIContainer, DIContainerOverrides } from './DIContainer';
-import { Session, SessionSchemas } from '@vecrea/au3te-ts-server/session';
+import {
+  Session,
+  DefaultSessionSchemas,
+} from '@vecrea/au3te-ts-server/session';
 import {
   AuthorizationHandlerConfiguration,
   AuthorizationHandlerConfigurationImpl,
@@ -73,20 +92,43 @@ import {
 } from '@vecrea/au3te-ts-common/handler.user';
 // import { UserHandlerKV } from '../extensions/kv-user/handler/user/UserHandlerKV';
 import { createDOSession } from '../session/DurableObjectSession';
+import { FederationManagerHono } from '../federation/FederationManagerImpl';
+import { FederationManager } from '@vecrea/au3te-ts-server/federation';
+import {
+  FederationInitiationHandlerConfiguration,
+  FederationInitiationHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.federation-initiation';
+import {
+  FederationCallbackHandlerConfiguration,
+  FederationCallbackHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.federation-callback';
+import { User } from '@vecrea/au3te-ts-common/schemas.common';
 
 /**
  * Default implementation of the DI container.
  * Provides factory methods for creating handler configurations with dependency injection.
  * @template SS - The session schemas type.
  */
-export class DIContainerImpl<SS extends SessionSchemas>
-  implements DIContainer<SS>
+export class DIContainerImpl<
+  SS extends DefaultSessionSchemas,
+  U extends User = User,
+  T extends keyof Omit<U, 'loginId' | 'password'> = never,
+> implements DIContainer<SS, U, T>
 {
   readonly #c: Context<Env<SS>>;
-  readonly #overrides: DIContainerOverrides;
+  readonly #overrides: DIContainerOverrides<SS, U, T>;
 
   /** Session factory function that creates session instances from contexts */
   session: (c: Context<Env<SS>>) => Session<SS>;
+
+  /** FederationManager instance cached for the request scope */
+  readonly #federationManager: FederationManager;
+
+  /** Cached server handler configuration for the request scope */
+  #cachedServerHandlerConfiguration?: ServerHandlerConfiguration<SS>;
+
+  /** Cached extractor configuration for the request scope */
+  #cachedExtractorConfiguration?: ExtractorConfiguration;
 
   /**
    * Creates a new DIContainerImpl instance.
@@ -97,7 +139,7 @@ export class DIContainerImpl<SS extends SessionSchemas>
   constructor(
     c: Context<Env<SS>>,
     sessionSchemas: SS,
-    overrides: DIContainerOverrides = {},
+    overrides: DIContainerOverrides<SS, U, T> = {},
   ) {
     this.#c = c;
     this.#overrides = overrides;
@@ -107,6 +149,9 @@ export class DIContainerImpl<SS extends SessionSchemas>
     } else {
       this.session = createDOSession(sessionSchemas);
     }
+
+    // Initialize FederationManager once per request scope
+    this.#federationManager = new FederationManagerHono(this.#c);
   }
 
   #apiClient(): ApiClient {
@@ -119,12 +164,23 @@ export class DIContainerImpl<SS extends SessionSchemas>
   }
 
   serverHandlerConfiguration(): ServerHandlerConfiguration<SS> {
+    if (this.#cachedServerHandlerConfiguration) {
+      return this.#cachedServerHandlerConfiguration;
+    }
     const session = this.session(this.#c);
-    return new ServerHandlerConfigurationImpl(this.#apiClient(), session);
+    this.#cachedServerHandlerConfiguration = new ServerHandlerConfigurationImpl(
+      this.#apiClient(),
+      session,
+    );
+    return this.#cachedServerHandlerConfiguration;
   }
 
   extractorConfiguration(): ExtractorConfiguration {
-    return new ExtractorConfigurationImpl();
+    if (this.#cachedExtractorConfiguration) {
+      return this.#cachedExtractorConfiguration;
+    }
+    this.#cachedExtractorConfiguration = new ExtractorConfigurationImpl();
+    return this.#cachedExtractorConfiguration;
   }
   authorizationIssueHandlerConfiguration(): AuthorizationIssueHandlerConfiguration {
     return new AuthorizationIssueHandlerConfigurationImpl(
@@ -137,7 +193,9 @@ export class DIContainerImpl<SS extends SessionSchemas>
     );
   }
   authorizationPageHandlerConfiguration(): AuthorizationPageHandlerConfiguration {
-    return new AuthorizationPageHandlerConfigurationImpl();
+    return new AuthorizationPageHandlerConfigurationImpl({
+      federationRegistry: this.#federationManager.getConfigurations(),
+    });
   }
 
   #buildAuthorizationHandlerParams() {
@@ -150,6 +208,7 @@ export class DIContainerImpl<SS extends SessionSchemas>
       authorizationPageHandlerConfiguration:
         this.authorizationPageHandlerConfiguration(),
       extractorConfiguration: this.extractorConfiguration(),
+      federationManager: this.#federationManager,
     };
   }
 
@@ -163,11 +222,11 @@ export class DIContainerImpl<SS extends SessionSchemas>
     return new AuthorizationHandlerConfigurationImpl(params);
   }
 
-  userHandler(): UserHandlerConfiguration {
+  userHandler(): UserHandlerConfiguration<U, T> {
     if (this.#overrides.userHandler) {
       return this.#overrides.userHandler(this.#c);
     }
-    return new UserHandlerConfigurationImpl();
+    return new UserHandlerConfigurationImpl<U, T>();
   }
 
   #buildTokenHandlerDependencies() {
@@ -266,9 +325,7 @@ export class DIContainerImpl<SS extends SessionSchemas>
   authorizationDecisionHandler(): AuthorizationDecisionHandlerConfiguration {
     const dependencies = this.#buildAuthorizationDecisionHandlerDependencies();
     if (this.#overrides.authorizationDecisionHandler) {
-      return this.#overrides.authorizationDecisionHandler<SS, object>(
-        dependencies,
-      );
+      return this.#overrides.authorizationDecisionHandler<object>(dependencies);
     }
 
     return new AuthorizationDecisionHandlerConfigurationImpl(dependencies);
@@ -329,5 +386,37 @@ export class DIContainerImpl<SS extends SessionSchemas>
       });
     }
     return new ServiceJwksHandlerConfigurationImpl(serverHandlerConfiguration);
+  }
+
+  federationInitiationHandler(): FederationInitiationHandlerConfiguration {
+    if (this.#overrides.federationInitiationHandler) {
+      return this.#overrides.federationInitiationHandler({
+        serverHandlerConfiguration: this.serverHandlerConfiguration(),
+        extractorConfiguration: this.extractorConfiguration(),
+        federationManager: this.#federationManager,
+      });
+    }
+    return new FederationInitiationHandlerConfigurationImpl({
+      serverHandlerConfiguration: this.serverHandlerConfiguration(),
+      extractorConfiguration: this.extractorConfiguration(),
+      federationManager: this.#federationManager,
+    });
+  }
+
+  federationCallbackHandler(): FederationCallbackHandlerConfiguration {
+    if (this.#overrides.federationCallbackHandler) {
+      return this.#overrides.federationCallbackHandler({
+        serverHandlerConfiguration: this.serverHandlerConfiguration(),
+        extractorConfiguration: this.extractorConfiguration(),
+        federationManager: this.#federationManager,
+        userHandler: this.userHandler(),
+      });
+    }
+    return new FederationCallbackHandlerConfigurationImpl({
+      serverHandlerConfiguration: this.serverHandlerConfiguration(),
+      extractorConfiguration: this.extractorConfiguration(),
+      federationManager: this.#federationManager,
+      userHandler: this.userHandler(),
+    });
   }
 }

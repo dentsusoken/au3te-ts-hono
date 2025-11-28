@@ -15,23 +15,33 @@
  * License.
  */
 import { Context } from 'hono';
+import { AuthorizationPageModel } from '@vecrea/au3te-ts-common/handler.authorization-page';
 import { Env } from '../env';
+import { AuthorizationPage } from '../view/AuthorizationPage';
 import { DefaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
 
 /**
- * Controller handling the Pushed Authorization Request (PAR) endpoint.
- * Processes PAR requests according to OAuth 2.0 PAR specification.
+ * Controller handling federation callback endpoint requests.
+ * Processes federation callback requests from external identity providers
+ * and renders the authorization page when successful.
  */
-export class PARController {
+export class FederationCallbackController {
   /**
-   * Handles the PAR request.
-   * Creates and returns a request URI for a pushed authorization request.
+   * Handles the federation callback request.
    * @param {Context<Env>} c - The Hono context containing environment and request information.
-   * @returns {Promise<Response>} A promise that resolves to the PAR response containing the request URI.
+   * @returns {Promise<Response>} A promise that resolves to either the federation callback response or an error response.
    */
   static async handle(c: Context<Env<DefaultSessionSchemas>>) {
     const di = c.get('getDI')(c);
-    const endpointConfiguration = di.parHandler();
-    return await endpointConfiguration.processRequest(c.req.raw);
+
+    const endpointConfiguration = di.federationCallbackHandler();
+    const result = await endpointConfiguration.processRequest(c.req.raw);
+    if (result.ok) {
+      const pageModel = (await result.json()) as AuthorizationPageModel;
+      return c.render(
+        <AuthorizationPage {...pageModel} publicUrl={c.env.PUBLIC_URL} />,
+      );
+    }
+    return result;
   }
 }

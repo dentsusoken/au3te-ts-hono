@@ -1,20 +1,43 @@
+/*
+ * Copyright (C) 2014-2024 Authlete, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the
+ * License.
+ */
 import { Env } from '../env';
 import { Context } from 'hono';
 import { DIContainer, DIContainerOverrides } from './DIContainer';
-import { SessionSchemas } from '@vecrea/au3te-ts-server/session';
+import { DefaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
 import { DIContainerImpl } from './DIContainerImpl';
+import { User } from '@vecrea/au3te-ts-common/schemas.common';
 
 /**
  * Function type that creates a DI container instance from a context.
  * @template SS - The session schemas type.
+ * @template U - The user type.
+ * @template T - The user credential fields type.
  */
-export interface GetDI<SS extends SessionSchemas> {
+export interface GetDI<
+  SS extends DefaultSessionSchemas,
+  U extends User = User,
+  T extends keyof Omit<U, 'loginId' | 'password'> = never,
+> {
   /**
    * Creates a DI container instance for the given context.
    * @param {Context<Env<SS>>} c - The Hono context.
-   * @returns {DIContainer<SS>} A configured DI container instance.
+   * @returns {DIContainer<SS, U, T>} A configured DI container instance.
    */
-  (c: Context<Env<SS>>): DIContainer<SS>;
+  (c: Context<Env<SS>>): DIContainer<SS, U, T>;
 }
 
 /**
@@ -24,14 +47,20 @@ export interface CreateGetDI {
   /**
    * Creates a GetDI function configured with session schemas and optional overrides.
    * @template SS - The session schemas type.
+   * @template U - The user type.
+   * @template T - The user credential fields type.
    * @param {SS} sessionSchemas - The session schemas to use.
    * @param {DIContainerOverrides} [overrides={}] - Optional overrides for handler factories.
-   * @returns {GetDI<SS>} A function that creates DI container instances.
+   * @returns {GetDI<SS, U, T>} A function that creates DI container instances.
    */
-  <SS extends SessionSchemas>(
+  <
+    SS extends DefaultSessionSchemas,
+    U extends User = User,
+    T extends keyof Omit<U, 'loginId' | 'password'> = never,
+  >(
     sessionSchemas: SS,
-    overrides?: DIContainerOverrides,
-  ): GetDI<SS>;
+    overrides?: DIContainerOverrides<SS, U, T>,
+  ): GetDI<SS, U, T>;
 }
 
 /**
@@ -45,11 +74,15 @@ export interface CreateGetDI {
  * });
  * const di = getDI(context);
  */
-export const createGetDI: CreateGetDI = <SS extends SessionSchemas>(
+export const createGetDI: CreateGetDI = <
+  SS extends DefaultSessionSchemas,
+  U extends User = User,
+  T extends keyof Omit<U, 'loginId' | 'password'> = never,
+>(
   sessionSchemas: SS,
-  overrides: DIContainerOverrides = {},
-): GetDI<SS> => {
-  return (c: Context<Env<SS>>): DIContainer<SS> => {
-    return new DIContainerImpl<SS>(c, sessionSchemas, overrides);
+  overrides: DIContainerOverrides<SS, U, T> = {},
+): GetDI<SS, U, T> => {
+  return (c: Context<Env<SS>>): DIContainer<SS, U, T> => {
+    return new DIContainerImpl<SS, U, T>(c, sessionSchemas, overrides);
   };
 };

@@ -16,37 +16,53 @@
  */
 import { Hono } from 'hono';
 import { jsxRenderer } from 'hono/jsx-renderer';
-import { Env } from './env';
 import { EndpointPath } from './config/EndpointPath';
-import { PARController } from './controllers/PARController';
-import { AuthorizationController } from './controllers/AuthorizationController';
-import { AuthorizationDecisionController } from './controllers/AuthorizationDecisionController';
-import { ServiceConfigurationController } from './controllers/ServiceConfigurationController';
-import { CredentialMetadataController } from './controllers/CredentialMetadataController';
-import { TokenController } from './controllers/TokenController';
-import { CredentialController } from './controllers/CredentialController';
-import { CredentialIssuerJwksController } from './controllers/CredentialIssuerJwksController';
-import { ServiceJwksController } from './controllers/ServiceJwksController';
-import { TopPage } from './view/TopPage';
+import {
+  AuthorizationController,
+  AuthorizationDecisionController,
+  CredentialController,
+  CredentialIssuerJwksController,
+  CredentialMetadataController,
+  FederationCallbackController,
+  FederationInitiationController,
+  PARController,
+  ServiceConfigurationController,
+  ServiceJwksController,
+  TokenController,
+} from './controllers';
 import { createGetDI } from './di';
+import { Env } from './env';
 import { createUnifiedIdAuthorizationHandler } from './extensions/unified-id/handler/authorization';
 import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/handler/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
-import { createUnifiedIdUserHandler } from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
+import {
+  createUnifiedIdUserHandler,
+  UnifiedIdOptionsKeys,
+} from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
 import {
   UnifiedIdSessionSchemas,
   unifiedIdSessionSchemas,
 } from './extensions/unified-id/session';
+import { TopPage } from './view/TopPage';
+import { createUnifiedIdFederationCallbackHandler } from './extensions/unified-id/handler/federation-callback/UnifiedIdFederationCallbackHandler';
+import { UnifiedIdUser } from './extensions/unified-id/schemas/User';
 
-const app = new Hono<Env<UnifiedIdSessionSchemas>>();
+const app = new Hono<
+  Env<UnifiedIdSessionSchemas, UnifiedIdUser, UnifiedIdOptionsKeys>
+>();
 
 app.use(async (c, next) => {
   c.set(
     'getDI',
-    createGetDI<UnifiedIdSessionSchemas>(unifiedIdSessionSchemas, {
-      authorizationHandler: createUnifiedIdAuthorizationHandler,
-      authorizationDecisionHandler: createUnifiedIdAuthorizationDecisionHandler,
-      userHandler: createUnifiedIdUserHandler,
-    }),
+    createGetDI<UnifiedIdSessionSchemas, UnifiedIdUser, UnifiedIdOptionsKeys>(
+      unifiedIdSessionSchemas,
+      {
+        authorizationHandler: createUnifiedIdAuthorizationHandler,
+        authorizationDecisionHandler:
+          createUnifiedIdAuthorizationDecisionHandler,
+        userHandler: createUnifiedIdUserHandler,
+        federationCallbackHandler: createUnifiedIdFederationCallbackHandler,
+      },
+    ),
   );
   await next();
 });
@@ -76,6 +92,13 @@ app.get(
   CredentialIssuerJwksController.handle,
 );
 app.get(EndpointPath.serviceJwksPath, ServiceJwksController.handle);
-
+app.get(
+  EndpointPath.federationInitiationPath,
+  FederationInitiationController.handle,
+);
+app.get(
+  EndpointPath.federationCallbackPath,
+  FederationCallbackController.handle,
+);
 export { DurableObjectImpl } from './database';
 export default app;

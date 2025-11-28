@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2014-2024 Authlete, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the
+ * License.
+ */
 import { ExtractorConfiguration } from '@vecrea/au3te-ts-server/extractor';
 import {
   AuthorizationHandlerConfiguration,
@@ -6,8 +22,7 @@ import {
 import { ServerHandlerConfiguration } from '@vecrea/au3te-ts-server/handler.core';
 import {
   Session,
-  sessionSchemas,
-  SessionSchemas,
+  DefaultSessionSchemas,
 } from '@vecrea/au3te-ts-server/session';
 import { TokenHandlerConfiguration } from '@vecrea/au3te-ts-server/handler.token';
 import { TokenFailHandlerConfiguration } from '@vecrea/au3te-ts-server/handler.token-fail';
@@ -29,14 +44,24 @@ import { ServiceJwksHandlerConfiguration } from '@vecrea/au3te-ts-server/handler
 import { UserHandlerConfiguration } from '@vecrea/au3te-ts-common/handler.user';
 import { Env } from '../env';
 import { Context } from 'hono';
-
+import {
+  FederationInitiationHandlerConfiguration,
+  FederationInitiationHandlerConfigurationImplConstructorParams,
+} from '@vecrea/au3te-ts-server/handler.federation-initiation';
+import {
+  FederationCallbackHandlerConfiguration,
+  FederationCallbackHandlerConfigurationImplConstructorParams,
+} from '@vecrea/au3te-ts-server/handler.federation-callback';
+import { User } from '@vecrea/au3te-ts-common/schemas.common';
 /**
  * Dependency Injection Container interface.
  * Provides factory methods for creating handler configurations.
  * @template SS - The session schemas type, defaults to the base sessionSchemas.
  */
 export interface DIContainer<
-  SS extends SessionSchemas = typeof sessionSchemas,
+  SS extends DefaultSessionSchemas,
+  U extends User = User,
+  T extends keyof Omit<U, 'loginId' | 'password'> = never,
 > {
   /**
    * Creates a session instance for the given context.
@@ -118,7 +143,18 @@ export interface DIContainer<
    * Creates a user handler configuration.
    * @returns {UserHandlerConfiguration} The user handler configuration.
    */
-  userHandler(): UserHandlerConfiguration;
+  userHandler(): UserHandlerConfiguration<U, T>;
+
+  /**
+   * Creates a federation initiation handler configuration.
+   * @returns {FederationInitiationHandlerConfiguration} The federation initiation handler configuration.
+   */
+  federationInitiationHandler(): FederationInitiationHandlerConfiguration;
+  /**
+   * Creates a federation callback handler configuration.
+   * @returns {FederationCallbackHandlerConfiguration} The federation callback handler configuration.
+   */
+  federationCallbackHandler(): FederationCallbackHandlerConfiguration;
 }
 
 /**
@@ -127,7 +163,7 @@ export interface DIContainer<
  * @template OPTS - Additional options type for the authorization handler.
  */
 export type AuthorizationHandlerFactory = <
-  SS extends SessionSchemas,
+  SS extends DefaultSessionSchemas,
   OPTS extends object,
 >(
   params: AuthorizationHandlerConfigurationImplConstructorParams<SS, OPTS>,
@@ -137,10 +173,14 @@ export type AuthorizationHandlerFactory = <
  * Factory interface for creating token handler configurations.
  */
 export interface TokenHandlerFactory {
-  <SS extends SessionSchemas = typeof sessionSchemas>(params: {
+  <
+    SS extends DefaultSessionSchemas,
+    U extends User = User,
+    T extends keyof Omit<U, 'loginId' | 'password'> = never,
+  >(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
     extractorConfiguration: ExtractorConfiguration;
-    userHandlerConfiguration: UserHandlerConfiguration;
+    userHandlerConfiguration: UserHandlerConfiguration<U, T>;
     tokenFailHandlerConfiguration: TokenFailHandlerConfiguration;
     tokenIssueHandlerConfiguration: TokenIssueHandlerConfiguration;
     tokenCreateHandlerConfiguration: TokenCreateHandlerConfiguration;
@@ -151,7 +191,7 @@ export interface TokenHandlerFactory {
  * Factory interface for creating credential handler configurations.
  */
 export interface CredentialHandlerFactory {
-  <SS extends SessionSchemas = typeof sessionSchemas>(params: {
+  <SS extends DefaultSessionSchemas>(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
     extractorConfiguration: ExtractorConfiguration;
     introspectionHandlerConfiguration: IntrospectionHandlerConfiguration;
@@ -164,14 +204,15 @@ export interface CredentialHandlerFactory {
 /**
  * Factory interface for creating authorization decision handler configurations.
  */
-export interface AuthorizationDecisionHandlerFactory {
-  <
-    SS extends SessionSchemas = typeof sessionSchemas,
-    OPTS = undefined,
-  >(params: {
+export interface AuthorizationDecisionHandlerFactory<
+  SS extends DefaultSessionSchemas,
+  U extends User = User,
+  T extends keyof Omit<U, 'loginId' | 'password'> = never,
+> {
+  <OPTS = undefined>(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
     extractorConfiguration: ExtractorConfiguration;
-    userHandlerConfiguration: UserHandlerConfiguration;
+    userHandlerConfiguration: UserHandlerConfiguration<U, T>;
     authorizationHandlerConfiguration: AuthorizationHandlerConfiguration<
       SS,
       OPTS
@@ -185,7 +226,7 @@ export interface AuthorizationDecisionHandlerFactory {
  * Factory interface for creating PAR (Pushed Authorization Request) handler configurations.
  */
 export interface PARHandlerFactory {
-  <SS extends SessionSchemas = typeof sessionSchemas>(params: {
+  <SS extends DefaultSessionSchemas>(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
     extractorConfiguration: ExtractorConfiguration;
   }): ParHandlerConfiguration;
@@ -195,7 +236,7 @@ export interface PARHandlerFactory {
  * Factory interface for creating credential issuer JWKS handler configurations.
  */
 export interface CredentialIssuerJwksHandlerFactory {
-  <SS extends SessionSchemas = typeof sessionSchemas>(params: {
+  <SS extends DefaultSessionSchemas>(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
   }): CredentialIssuerJwksHandlerConfiguration;
 }
@@ -204,7 +245,7 @@ export interface CredentialIssuerJwksHandlerFactory {
  * Factory interface for creating credential metadata handler configurations.
  */
 export interface CredentialMetadataHandlerFactory {
-  <SS extends SessionSchemas = typeof sessionSchemas>(params: {
+  <SS extends DefaultSessionSchemas>(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
   }): CredentialMetadataHandlerConfiguration;
 }
@@ -213,7 +254,7 @@ export interface CredentialMetadataHandlerFactory {
  * Factory interface for creating service configuration handler configurations.
  */
 export interface ServiceConfigurationHandlerFactory {
-  <SS extends SessionSchemas = typeof sessionSchemas>(params: {
+  <SS extends DefaultSessionSchemas>(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
   }): ServiceConfigurationHandlerConfiguration;
 }
@@ -222,7 +263,7 @@ export interface ServiceConfigurationHandlerFactory {
  * Factory interface for creating service JWKS handler configurations.
  */
 export interface ServiceJwksHandlerFactory {
-  <SS extends SessionSchemas = typeof sessionSchemas>(params: {
+  <SS extends DefaultSessionSchemas>(params: {
     serverHandlerConfiguration: ServerHandlerConfiguration<SS>;
   }): ServiceJwksHandlerConfiguration;
 }
@@ -230,14 +271,18 @@ export interface ServiceJwksHandlerFactory {
 /**
  * Factory interface for creating user handler configurations.
  */
-export interface UserHandlerFactory {
+export interface UserHandlerFactory<
+  SS extends DefaultSessionSchemas,
+  U extends User = User,
+  T extends keyof Omit<U, 'loginId' | 'password'> = never,
+> {
   /**
    * Creates a user handler configuration.
    * @template SS - The session schemas type.
    * @param {Context<Env<SS>>} c - The Hono context.
    * @returns {UserHandlerConfiguration} The user handler configuration.
    */
-  <SS extends SessionSchemas>(c: Context<Env<SS>>): UserHandlerConfiguration;
+  (c: Context<Env<SS>>): UserHandlerConfiguration<U, T>;
 }
 
 /**
@@ -250,25 +295,55 @@ export interface SessionFactory {
    * @param {SS} sessionSchemas - The session schemas to use.
    * @returns A function that creates a session instance from a context.
    */
-  <SS extends SessionSchemas>(
+  <SS extends DefaultSessionSchemas>(
     sessionSchemas: SS,
   ): (c: Context<Env<SS>>) => Session<SS>;
 }
 
 /**
+ * Factory interface for creating federation initiation handler configurations.
+ */
+export interface FederationInitiationHandlerFactory {
+  <SS extends DefaultSessionSchemas>(
+    params: FederationInitiationHandlerConfigurationImplConstructorParams<SS>,
+  ): FederationInitiationHandlerConfiguration;
+}
+/**
+ * Factory interface for creating federation callback handler configurations.
+ */
+export interface FederationCallbackHandlerFactory<
+  SS extends DefaultSessionSchemas = DefaultSessionSchemas,
+  U extends User = User,
+  T extends keyof Omit<U, 'loginId' | 'password'> = never,
+> {
+  (
+    params: FederationCallbackHandlerConfigurationImplConstructorParams<
+      SS,
+      U,
+      T
+    >,
+  ): FederationCallbackHandlerConfiguration;
+}
+/**
  * Override configuration for DI container.
  * Allows custom implementations to be injected for specific handlers.
  */
-export interface DIContainerOverrides {
+export interface DIContainerOverrides<
+  SS extends DefaultSessionSchemas = DefaultSessionSchemas,
+  U extends User = User,
+  T extends keyof Omit<U, 'loginId' | 'password'> = never,
+> {
   authorizationHandler?: AuthorizationHandlerFactory;
   tokenHandler?: TokenHandlerFactory;
   credentialHandler?: CredentialHandlerFactory;
-  authorizationDecisionHandler?: AuthorizationDecisionHandlerFactory;
+  authorizationDecisionHandler?: AuthorizationDecisionHandlerFactory<SS, U, T>;
   parHandler?: PARHandlerFactory;
   credentialIssuerJwksHandler?: CredentialIssuerJwksHandlerFactory;
   credentialMetadataHandler?: CredentialMetadataHandlerFactory;
   serviceConfigurationHandler?: ServiceConfigurationHandlerFactory;
   serviceJwksHandler?: ServiceJwksHandlerFactory;
-  userHandler?: UserHandlerFactory;
+  userHandler?: UserHandlerFactory<SS, U, T>;
   session?: SessionFactory;
+  federationInitiationHandler?: FederationInitiationHandlerFactory;
+  federationCallbackHandler?: FederationCallbackHandlerFactory<SS, U, T>;
 }

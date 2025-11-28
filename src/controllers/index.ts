@@ -14,4 +14,15 @@
  * language governing permissions and limitations under the
  * License.
  */
-export * from './UnifiedIdAuthorizationHandler';
+
+export * from './AuthorizationController';
+export * from './AuthorizationDecisionController';
+export * from './CredentialController';
+export * from './CredentialIssuerJwksController';
+export * from './CredentialMetadataController';
+export * from './FederationInitiationController';
+export * from './FederationCallbackController';
+export * from './PARController';
+export * from './ServiceConfigurationController';
+export * from './ServiceJwksController';
+export * from './TokenController';

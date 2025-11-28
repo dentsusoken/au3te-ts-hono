@@ -21,6 +21,7 @@ import { Permissions } from './components/Permissions';
 import { Claims } from './components/Claims';
 import { IdentityAssurance } from './components/IdentityAssurance';
 import { AuthorizationForm } from './components/AuthorizationForm';
+import { Federations } from './components/Federations';
 // import { Federations } from './components/Federations';
 
 interface AuthorizationPageProps extends AuthorizationPageModel {
@@ -98,15 +99,9 @@ export const AuthorizationPage: FC<AuthorizationPageProps> = ({
             </>
           )}
 
-          {/*
-          TODO: define Federation type at au3te-ts-common
-          {!props.user && props.federations && (
-            <Federations
-              federations={props.federations}
-              federationMessage={props.federationMessage}
-            />
+          {!props.user && props.federationRegistry && (
+            <Federations federationRegistry={props.federationRegistry} />
           )}
-          */}
 
           <AuthorizationForm
             user={props.user}
