@@ -19,6 +19,7 @@ import { federationRegistrySchema } from '@vecrea/au3te-ts-common/schemas.federa
 import { Context } from 'hono';
 import { Env } from '../env';
 import { DefaultSessionSchemas } from '@vecrea/au3te-ts-server/session';
+import * as validator from 'samlify-validator-js';
 
 /**
  * Implementation of FederationManager that manages federation configurations.
@@ -41,6 +42,7 @@ export class FederationManagerHono<
         JSON.parse(c.env.FEDERATTION_CONFIGS || '{}'),
       ),
       isDev: true,
+      validator,
     });
   }
 }

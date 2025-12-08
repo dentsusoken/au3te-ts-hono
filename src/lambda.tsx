@@ -99,6 +99,10 @@ app.get(
   EndpointPath.federationCallbackPath,
   FederationCallbackController.handle,
 );
+app.post(
+  EndpointPath.federationCallbackPath,
+  FederationCallbackController.handle,
+);
 
 // Routes for CSS files
 const CSS_HEADERS = {

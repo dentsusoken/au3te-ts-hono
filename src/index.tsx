@@ -100,5 +100,9 @@ app.get(
   EndpointPath.federationCallbackPath,
   FederationCallbackController.handle,
 );
+app.post(
+  EndpointPath.federationCallbackPath,
+  FederationCallbackController.handle,
+);
 export { DurableObjectImpl } from './database';
 export default app;
