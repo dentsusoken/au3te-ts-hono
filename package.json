@@ -19,6 +19,8 @@
     "@vecrea/au3te-ts-server": "^0.1.4",
     "@vecrea/oid4vc-core": "^0.1.0",
     "hono": "^4.5.5",
+    "samlify": "^2.10.2",
+    "samlify-validator-js": "^0.0.1",
     "u8a-utils": "^1.0.12",
     "zod": "^3.23.8"
   },

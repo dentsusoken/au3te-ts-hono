@@ -48,7 +48,7 @@ export const Federations: FC<FederationsProps> = (props) => (
           <a href={`/api/federation/initiation/${config.id}`}>
             {config.protocol === 'oidc'
               ? config.server.name
-              : config.server.entityId}
+              : config.name}
           </a>
         </li>
       ))}

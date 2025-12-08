@@ -14,50 +14,27 @@
  * language governing permissions and limitations under the
  * License.
  */
-
 import { simpleBuildResponse } from '@vecrea/au3te-ts-server/handler.authorization';
-import { CreateProcessRequestParams } from '@vecrea/au3te-ts-server/handler.federation-callback';
+import {
+  ProcessSaml2Request,
+  CreateProcessSaml2RequestParams,
+} from '@vecrea/au3te-ts-server/handler.federation-callback';
 import { AuthorizationPageModel } from '@vecrea/au3te-ts-common/handler.authorization-page';
 import { UnifiedIdSessionSchemas } from '../../session';
 import { UnifiedIdUser } from '../../schemas/User';
 import { UnifiedIdOptionsKeys } from '../user/UnifiedIdUserHandlerConfigurationImpl';
 
-export type ProcessRequest = (request: Request) => Promise<Response>;
-
-export const createProcessRequest = ({
-  path,
-  extractPathParameter,
-  federationManager,
+export const createProcessSaml2Request = ({
   responseErrorFactory,
   session,
   userHandler,
-}: CreateProcessRequestParams<
+}: CreateProcessSaml2RequestParams<
   UnifiedIdSessionSchemas,
   UnifiedIdUser,
   UnifiedIdOptionsKeys
->): ProcessRequest => {
-  return async (request: Request): Promise<Response> => {
+>): ProcessSaml2Request => {
+  return async (request, federation): Promise<Response> => {
     try {
-      const { federationId } = extractPathParameter(request, path);
-
-      let federation: ReturnType<typeof federationManager.getFederation>;
-      try {
-        federation = federationManager.getFederation(federationId);
-      } catch {
-        return responseErrorFactory.notFoundResponseError(
-          `Federation with ID '${federationId}' not found`,
-        ).response;
-      }
-
-      const federationCallbackParams = await session.get(
-        'federationCallbackParams',
-      );
-      if (!federationCallbackParams) {
-        return responseErrorFactory.badRequestResponseError(
-          'Federation parameters not found',
-        ).response;
-      }
-
       const model = await session.get('authorizationPageModel');
       if (!model) {
         return responseErrorFactory.badRequestResponseError(
@@ -65,27 +42,9 @@ export const createProcessRequest = ({
         ).response;
       }
 
-      // Only OIDC protocol is supported
-      if (federationCallbackParams.protocol !== 'oidc') {
-        return responseErrorFactory.badRequestResponseError(
-          `Unsupported protocol: ${federationCallbackParams.protocol}. Only 'oidc' protocol is supported.`,
-        ).response;
-      }
-
-      const { state, codeVerifier } = federationCallbackParams;
-
-      if (!state) {
-        return responseErrorFactory.badRequestResponseError('State not found')
-          .response;
-      }
-
       let userinfo;
       try {
-        userinfo = await federation.processFederationResponse(
-          new URL(request.url),
-          state,
-          codeVerifier ?? undefined,
-        );
+        userinfo = await federation.processSaml2Response(request);
       } catch (error) {
         return responseErrorFactory.badRequestResponseError(
           `Failed to process federation response: ${
@@ -94,7 +53,6 @@ export const createProcessRequest = ({
         ).response;
       }
 
-      const { sub, ...userInfoWithoutSub } = userinfo;
       const unifiedIdParams = await session.get('unifiedIdParams');
 
       if (!unifiedIdParams) {
@@ -104,9 +62,9 @@ export const createProcessRequest = ({
       }
       const { serviceId, unifiedId } = unifiedIdParams;
 
+      const { nameID } = userinfo;
       const user = {
-        ...userInfoWithoutSub,
-        subject: `${sub}@${federationId}`,
+        subject: `${nameID}@${federation.id}`,
         serviceId,
         unifiedId,
       };
