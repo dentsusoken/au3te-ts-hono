@@ -43,24 +43,24 @@ mkcertがインストールされていない場合は、以下の手順でイ�
 
     ```yaml
     services:
-        keycloak:
-            image: quay.io/keycloak/keycloak:26.3
-            container_name: keycloak
-            tty: true
-            stdin_open: true
-            ports:
-            - "18080:8443"
-            environment:
-            KEYCLOAK_ADMIN: admin
-            KEYCLOAK_ADMIN_PASSWORD: password
-            KC_HTTPS_CERTIFICATE_FILE: /etc/x509/https/tls.crt
-            KC_HTTPS_CERTIFICATE_KEY_FILE: /etc/x509/https/tls.key
-            command:
-            - start-dev
-            volumes:
-            - ./data:/opt/keycloak/data
-            - ./certs/localhost.pem:/etc/x509/https/tls.crt
-            - ./certs/localhost-key.pem:/etc/x509/https/tls.key
+      keycloak:
+        image: quay.io/keycloak/keycloak:26.3
+        container_name: keycloak
+        tty: true
+        stdin_open: true
+        ports:
+           - "18080:8443"
+        environment:
+          KEYCLOAK_ADMIN: admin
+          KEYCLOAK_ADMIN_PASSWORD: password
+          KC_HTTPS_CERTIFICATE_FILE: /etc/x509/https/tls.crt
+          KC_HTTPS_CERTIFICATE_KEY_FILE: /etc/x509/https/tls.key
+        command:
+          - start-dev
+        volumes:
+          - ./data:/opt/keycloak/data
+          - ./certs/localhost.pem:/etc/x509/https/tls.crt
+          - ./certs/localhost-key.pem:/etc/x509/https/tls.key
     ```
 
 3. 以下のコマンドを実行して、自己証明書を生成します。
