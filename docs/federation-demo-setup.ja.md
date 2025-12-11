@@ -107,7 +107,6 @@ mkcertがインストールされていない場合は、以下の手順でイ�
     ```
 
 3. 開かれたディレクトリにある`rootCA.pem`をiOSシミュレータにドラッグ&ドロップします。
-4. iOSシミュレータのSafariでhttp://localhost:18080 にアクセスし、Keycloakの画面が開くことを確認します。
 
 ### Issuer起動
 
@@ -139,8 +138,17 @@ mkcertがインストールされていない場合は、以下の手順でイ�
     npm install
     ```
 
-6. 以下のコマンドでローカルサーバを起動
+6. 以下のコマンドでローカルサーバを起動。
 
     ```bash
     npm run dev -- --local-protocol="https" --https-key-path="./certs/localhost-key.pem" --https-cert-path="./certs/localhost.pem"
     ```
+
+### VC発行
+
+1. XCodeからiOSシミュレータにWalletアプリをインストール。
+2. アプリが起動したら「VC発行」 > 「mDL」を選択。
+3. Authleteの認可画面が表示されたら「Keycloak SAML Federation」をクリック。
+4. 「送信しようとしている...」というアラートが表示されたら「送信」をクリック。
+5. Keycloakの認証画面が表示されたらKeycloakの設定手順で作成したユーザの認証情報を入力。
+6. Authleteの画面に戻ってきたら、「Authorize」をクリック。

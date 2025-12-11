@@ -632,7 +632,7 @@
       "clientId": "au3te.federation.test",
       "name": "",
       "description": "",
-      "rootUrl": "https://ti6a6vote7.execute-api.ap-northeast-1.amazonaws.com/dev",
+      "rootUrl": "https://localhost:8787",
       "adminUrl": "",
       "baseUrl": "",
       "surrogateAuthRequired": false,
@@ -640,7 +640,7 @@
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "https://ti6a6vote7.execute-api.ap-northeast-1.amazonaws.com/dev/api/federation/callback/keycloak-saml"
+        "https://localhost:8787/api/federation/callback/keycloak-saml"
       ],
       "webOrigins": [
         "http://localhost:8787"

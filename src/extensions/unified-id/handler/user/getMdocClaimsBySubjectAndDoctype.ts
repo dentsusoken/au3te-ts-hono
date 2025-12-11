@@ -66,6 +66,26 @@ export const createGetMdocClaimsBySubjectAndDoctype =
         A_YEAR_TTL,
       );
     }
+
+    if (doctype === 'org.iso.18013.5.1.mDL') {
+      return {
+        'org.iso.18013.5.1': {
+          family_name: 'Silverstone',
+          given_name: 'Inga',
+          birth_date: 'cbor:1004("1991-11-06")',
+          issuing_country: 'US',
+          document_number: '12345678',
+          driving_privileges: [
+            {
+              vehicle_category_code: 'A',
+              issue_date: 'cbor:1004("2023-01-01")',
+              expiry_date: 'cbor:1004("2043-01-01")',
+            },
+          ],
+        },
+      };
+    }
+
     // For other document types, use the default mock implementation
     return mockGetMdocClaimsBySubjectAndDoctype(subject, doctype);
   };
