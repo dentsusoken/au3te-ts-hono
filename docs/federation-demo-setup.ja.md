@@ -32,8 +32,7 @@ mkcertがインストールされていない場合は、以下の手順でイ�
 1. Issuerの向け先を変更します。
 
     ```plaintext
-    VCI_ISSUER_URL = <ISSUER_URL>
-    VCI_CLIENT_ID = <ISSUER_CLIENT_ID>
+    VCI_ISSUER_URL = https:/$()/localhost:8787
     ```
 
 ### Keycloak設定
@@ -49,62 +48,50 @@ mkcertがインストールされていない場合は、以下の手順でイ�
         tty: true
         stdin_open: true
         ports:
-           - "18080:8443"
+           - "18080:8080"
         environment:
           KEYCLOAK_ADMIN: admin
           KEYCLOAK_ADMIN_PASSWORD: password
-          KC_HTTPS_CERTIFICATE_FILE: /etc/x509/https/tls.crt
-          KC_HTTPS_CERTIFICATE_KEY_FILE: /etc/x509/https/tls.key
         command:
           - start-dev
         volumes:
           - ./data:/opt/keycloak/data
-          - ./certs/localhost.pem:/etc/x509/https/tls.crt
-          - ./certs/localhost-key.pem:/etc/x509/https/tls.key
     ```
 
-3. 以下のコマンドを実行して、自己証明書を生成します。
-
-    ```bash
-    mkdir -p certs
-    mkcert -key-file certs/localhost-key.pem -cert-file certs/localhost.pem localhost
-    ```
-
-4. 以下のコマンドでKeycloakを起動します。
+3. 以下のコマンドでKeycloakを起動します。
 
     ```bash
     docker compose up -d
     ```
 
-5. Webブラウザでhttps://localhost:18080 にアクセスします。
-6. 「この接続ではプライバシーが保護されません」の画面が表示された場合は、画面左下の「詳細設定」をクリックし、下部に表示される「localhostにアクセスする」をクリックします。
-7. Keycloakのサインイン画面で以下のIDとパスワードを入力します。
+4. Webブラウザでhttp://localhost:18080 にアクセスします。
+5. Keycloakのサインイン画面で以下のIDとパスワードを入力します。
 
     ```plaintext
     ID: admin
     パスワード: password
     ```
 
-8. 画面左のナビゲーションから「Manage realms」をクリックします。
-9. Realmsの管理画面で「Create realm」をクリックします。
-10. モーダルが表示されたら、「Drag a file here or browse to upload」の入力フィールドで事前準備でダウンロードした`realm-settings.json`を選択し、「Create」ボタンをクリックします。
-11. Realmの作成完了後、「au3te-saml」が「Current realm」になっていることを確認します。もし「Current realm」になっていない場合は「au3te-saml」をクリックします。
-12. 画面左のナビゲーションから「Clients」をクリックします。
-13. クライアントの一覧から「au3te.federation.test」をクリックします。
-14. 「Keys」タブを開き、「Signing keys config > Certificate」の「Import key」ボタンをクリックします。
-15. 以下の通り入力し、「Import」ボタンをクリックします。
+6. 画面左のナビゲーションから「Manage realms」をクリックします。
+7. Realmsの管理画面で「Create realm」をクリックします。
+8. モーダルが表示されたら、「Drag a file here or browse to upload」の入力フィールドで事前準備でダウンロードした`realm-settings.json`を選択し、「Create」ボタンをクリックします。
+9. Realmの作成完了後、「au3te-saml」が「Current realm」になっていることを確認します。もし「Current realm」になっていない場合は「au3te-saml」をクリックします。
+10. 画面左のナビゲーションから「Clients」をクリックします。
+11. クライアントの一覧から「au3te.federation.test」をクリックします。
+12. 「Keys」タブを開き、「Signing keys config > Certificate」の「Import key」ボタンをクリックします。
+13. 以下の通り入力し、「Import」ボタンをクリックします。
 
     ```plaintext
     Archive format: Certificate PEM
     Import file: 事前準備でダウンロードしたsaml-cert.pemファイル
     ```
 
-16. 画面左のナビゲーションから「Users」をクリックします。
-17. User管理画面の「Create new user」ボタンをクリックします。
-18. 適当な値を入力し「Create」ボタンをクリックします。
-19. 作成されたユーザの詳細画面に遷移したら「Credentials」タブを開き、「Set password」ボタンをクリックします。
-20. 適当な値を入力し「Save」ボタンをクリックします。（「Temporary」のOn/Offは任意です）
-21. 以上で設定は完了です。Keycloakを終了する時は以下のコマンドを実行します。
+14. 画面左のナビゲーションから「Users」をクリックします。
+15. User管理画面の「Create new user」ボタンをクリックします。
+16. 適当な値を入力し「Create」ボタンをクリックします。
+17. 作成されたユーザの詳細画面に遷移したら「Credentials」タブを開き、「Set password」ボタンをクリックします。
+18. 適当な値を入力し「Save」ボタンをクリックします。（「Temporary」のOn/Offは任意です）
+19. 以上で設定は完了です。Keycloakを終了する時は以下のコマンドを実行します。
 
     ```bash
     docker compose down
@@ -112,13 +99,48 @@ mkcertがインストールされていない場合は、以下の手順でイ�
 
 ### iOSシミュレータ設定
 
-1. Keycloakを起動しておきます。
-2. iOSシミュレータを起動します。（Walletをインストールする端末と同じ端末を起動してください。Walletのインストールと同時にすでに起動済みのものがあればその端末を利用します）
-3. 以下のコマンドでmkcertの証明書ディレクトリをFinderで開きます。
+1. iOSシミュレータを起動します。（Walletをインストールする端末と同じ端末を起動してください。Walletのインストールと同時にすでに起動済みのものがあればその端末を利用します）
+2. 以下のコマンドでmkcertの証明書ディレクトリをFinderで開きます。
 
     ```bash
     open "$(mkcert -CAROOT)" 
     ```
 
-4. 開かれたディレクトリにある`rootCA.pem`をiOSシミュレータにドラッグ&ドロップします。
-5. iOSシミュレータのSafariでhttps://localhost:18080 にアクセスし、Keycloakの画面が開くことを確認します。
+3. 開かれたディレクトリにある`rootCA.pem`をiOSシミュレータにドラッグ&ドロップします。
+4. iOSシミュレータのSafariでhttp://localhost:18080 にアクセスし、Keycloakの画面が開くことを確認します。
+
+### Issuer起動
+
+1. 以下のコマンドでリポジトリをクローンして下さい。
+
+    ```bash
+    git clone -b saml-demo https://github.com/dentsusoken/au3te-ts-hono.git
+    ```
+
+    すでにクローン済みの場合は以下のコマンドで最新化&ブランチ変更
+
+    ```bash
+    git fetch origin
+    git checkout saml-demo
+    ```
+
+2. リポジトリのルートディレクトに移動。
+3. 以下のコマンドを実行して自己証明書を作成。
+
+   ```bash
+    mkdir -p certs
+    mkcert -key-file certs/localhost-key.pem -cert-file certs/localhost.pem localhost
+   ```
+
+4. `.dev.vars`ファイルを作成し適切な値を設定。
+5. 依存関係をインストール
+
+    ```bash
+    npm install
+    ```
+
+6. 以下のコマンドでローカルサーバを起動
+
+    ```bash
+    npm run dev -- --local-protocol="https" --https-key-path="./certs/localhost-key.pem" --https-cert-path="./certs/localhost.pem"
+    ```
