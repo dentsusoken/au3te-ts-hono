@@ -20,6 +20,10 @@ import {
   GetByCredentials,
   GetMdocClaimsBySubjectAndDoctype,
   AddUser,
+  CacheUserAttributes,
+  MapUserAttributesToMdoc,
+  createMapUserAttributesToMdoc,
+  DeleteUserAttributesCache,
 } from '@vecrea/au3te-ts-common/handler.user';
 import { User } from '@vecrea/au3te-ts-common/schemas.common';
 import { UserHandlerFactory } from '../../../../di';
@@ -103,6 +107,30 @@ const createAddUserKV =
     await kv.put(user.subject, JSON.stringify(user));
   };
 
+const createCacheUserAttributesKV = (
+  kv: KVNamespace,
+  mapUserAttributesToMdoc: MapUserAttributesToMdoc,
+): CacheUserAttributes => {
+  return async (user, protocol, ttl) => {
+    const strMdoc = await kv.get(user.subject);
+    if (strMdoc) {
+      return;
+    }
+    const mdoc = mapUserAttributesToMdoc(user, protocol);
+    await kv.put(user.subject, JSON.stringify(mdoc), {
+      expirationTtl: ttl,
+    });
+  };
+};
+
+const createDeleteUserAttributesCacheKV = (
+  kv: KVNamespace,
+): DeleteUserAttributesCache => {
+  return async (subject) => {
+    await kv.delete(subject);
+  };
+};
+
 export class UserHandlerKV<
   U extends User = User,
   T extends keyof Omit<U, 'loginId' | 'password'> = never,
@@ -114,7 +142,9 @@ export class UserHandlerKV<
   getByCredentials: GetByCredentials<U, T>;
   getBySubject: GetBySubject<U>;
   getMdocClaimsBySubjectAndDoctype: GetMdocClaimsBySubjectAndDoctype;
-  addUser: AddUser;
+  addUser: AddUser<U>;
+  cacheUserAttributes: CacheUserAttributes<U>;
+  deleteUserAttributesCache: DeleteUserAttributesCache;
 
   constructor(users: KVNamespace, mdocs: KVNamespace) {
     this.#users = users;
@@ -125,6 +155,26 @@ export class UserHandlerKV<
     this.getMdocClaimsBySubjectAndDoctype =
       createGetMdocClaimsBySubjectAndDoctypeKV(this.#mdocs);
     this.addUser = createAddUserKV(this.#users);
+
+    const mapUserAttributesToMdoc = createMapUserAttributesToMdoc(
+      {},
+      {
+        'org.iso.18013.5.1.mDL': {
+          'org.iso.18013.5.1': {
+            // family_name: 'surName',
+            // given_name: 'givenName',
+            document_number: 'subject',
+          },
+        },
+      },
+    );
+    this.cacheUserAttributes = createCacheUserAttributesKV(
+      this.#mdocs,
+      mapUserAttributesToMdoc,
+    );
+    this.deleteUserAttributesCache = createDeleteUserAttributesCacheKV(
+      this.#mdocs,
+    );
   }
 }
 
