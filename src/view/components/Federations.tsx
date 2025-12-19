@@ -43,7 +43,7 @@ export const Federations: FC<FederationsProps> = (props) => (
       <div id="federation-message">{props.federationMessage}</div>
     )}
     <ul>
-      {props.federationRegistry?.federations.map((config, index) => (
+      {props.federationRegistry?.federations?.map((config, index) => (
         <li key={index}>
           <a href={`/api/federation/initiation/${config.id}`}>
             {config.protocol === 'oidc'
