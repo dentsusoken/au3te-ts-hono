@@ -78,6 +78,11 @@ export const createProcessSaml2Request = ({
 
       model.user = user;
       await userHandler.addUser(user);
+      await userHandler.cacheUserAttributes(
+        { ...user, ...userinfo.attributes } as UnifiedIdUser,
+        'saml2',
+        300
+      ); // 5 minutes
 
       return simpleBuildResponse(model as AuthorizationPageModel);
     } catch (error) {

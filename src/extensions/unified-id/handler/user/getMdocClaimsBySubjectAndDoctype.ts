@@ -18,7 +18,6 @@
 import {
   GetBySubject,
   GetMdocClaimsBySubjectAndDoctype,
-  mockGetMdocClaimsBySubjectAndDoctype,
 } from '@vecrea/au3te-ts-common/handler.user';
 import { UnifiedIdAllocator } from '../../allocator';
 import { UnifiedIdUser } from '../../schemas/User';
@@ -45,6 +44,7 @@ export const createGetMdocClaimsBySubjectAndDoctype =
   (
     unifiedIdAllocator: UnifiedIdAllocator,
     getBySubject: GetBySubject<UnifiedIdUser>,
+    kv: KVNamespace,
   ): GetMdocClaimsBySubjectAndDoctype =>
   async (subject, doctype) => {
     // Special handling for UnifiedID document type
@@ -67,5 +67,11 @@ export const createGetMdocClaimsBySubjectAndDoctype =
       );
     }
     // For other document types, use the default mock implementation
-    return mockGetMdocClaimsBySubjectAndDoctype(subject, doctype);
+    // return mockGetMdocClaimsBySubjectAndDoctype(subject, doctype);
+    const strMdoc = await kv.get(subject);
+    if (!strMdoc) {
+      return;
+    }
+    const mdoc = JSON.parse(strMdoc);
+    return mdoc[doctype];
   };

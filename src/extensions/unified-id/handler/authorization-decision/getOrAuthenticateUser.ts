@@ -23,7 +23,7 @@ const emptyAuthenticationResult = { user: undefined, authTime: undefined };
 export const createGetOrAuthenticateUser: GetOrAuthenticateUserFactory<
   UnifiedIdUser,
   'serviceId' | 'unifiedId'
-> = (getByCredentials) => async (session, parameters) => {
+> = (getByCredentials, cacheUserAttributes) => async (session, parameters) => {
   const { user, authTime, unifiedIdParams } = await session.getBatch(
     'user',
     'authTime',
@@ -60,6 +60,7 @@ export const createGetOrAuthenticateUser: GetOrAuthenticateUserFactory<
       authTime,
     });
 
+    await cacheUserAttributes(loginUser, 'oidc', 300);
     return { user: loginUser, authTime };
   }
 
