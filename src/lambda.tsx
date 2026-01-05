@@ -34,9 +34,10 @@ import {
   FederationCallbackController,
   FederationInitiationController,
   PARController,
-  ServiceConfigurationController,
   ServiceJwksController,
   TokenController,
+  OpenIDConfigurationController,
+  AuthorizationServerMetadataController,
 } from './controllers';
 import { createGetDI } from './di';
 import { Env } from './env';
@@ -79,8 +80,12 @@ app.post(
 app.post(EndpointPath.tokenPath, TokenController.handle);
 app.post(EndpointPath.credentialPath, CredentialController.handle);
 app.get(
-  EndpointPath.serviceConfigurationPath,
-  ServiceConfigurationController.handle,
+  EndpointPath.openIDConfigurationPath,
+  OpenIDConfigurationController.handle,
+);
+app.get(
+  EndpointPath.authorizationServerMetadataPath,
+  AuthorizationServerMetadataController.handle,
 );
 app.get(
   EndpointPath.credentialIssuerMetadataPath,

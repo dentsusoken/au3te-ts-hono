@@ -366,10 +366,34 @@ export class DIContainerImpl<
     );
   }
 
-  serviceConfigurationHandler(): ServiceConfigurationHandlerConfiguration {
+  // serviceConfigurationHandler(): ServiceConfigurationHandlerConfiguration {
+  //   const serverHandlerConfiguration = this.serverHandlerConfiguration();
+  //   if (this.#overrides.serviceConfigurationHandler) {
+  //     return this.#overrides.serviceConfigurationHandler({
+  //       serverHandlerConfiguration,
+  //     });
+  //   }
+  //   return new ServiceConfigurationHandlerConfigurationImpl(
+  //     serverHandlerConfiguration,
+  //   );
+  // }
+
+  authorizationServerMetadataHandler(): ServiceConfigurationHandlerConfiguration {
     const serverHandlerConfiguration = this.serverHandlerConfiguration();
-    if (this.#overrides.serviceConfigurationHandler) {
-      return this.#overrides.serviceConfigurationHandler({
+    if (this.#overrides.authorizationServerMetadataHandler) {
+      return this.#overrides.authorizationServerMetadataHandler({
+        serverHandlerConfiguration,
+      });
+    }
+    return new ServiceConfigurationHandlerConfigurationImpl(
+      serverHandlerConfiguration,
+    );
+  }
+
+  openIDConfigurationHandler(): ServiceConfigurationHandlerConfiguration {
+    const serverHandlerConfiguration = this.serverHandlerConfiguration();
+    if (this.#overrides.openIDConfigurationHandler) {
+      return this.#overrides.openIDConfigurationHandler({
         serverHandlerConfiguration,
       });
     }

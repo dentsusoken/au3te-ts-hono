@@ -131,7 +131,18 @@ export interface DIContainer<
    * Creates a service configuration handler configuration.
    * @returns {ServiceConfigurationHandlerConfiguration} The service configuration handler configuration.
    */
-  serviceConfigurationHandler(): ServiceConfigurationHandlerConfiguration;
+  // serviceConfigurationHandler(): ServiceConfigurationHandlerConfiguration;
+
+  /**
+   * Creates a service configuration handler configuration.
+   * @returns {ServiceConfigurationHandlerConfiguration} The service configuration handler configuration.
+   */
+  authorizationServerMetadataHandler(): ServiceConfigurationHandlerConfiguration;
+  /**
+   * Creates a service configuration handler configuration.
+   * @returns {ServiceConfigurationHandlerConfiguration} The service configuration handler configuration.
+   */
+  openIDConfigurationHandler(): ServiceConfigurationHandlerConfiguration;
 
   /**
    * Creates a service JWKS handler configuration.
@@ -340,7 +351,9 @@ export interface DIContainerOverrides<
   parHandler?: PARHandlerFactory;
   credentialIssuerJwksHandler?: CredentialIssuerJwksHandlerFactory;
   credentialMetadataHandler?: CredentialMetadataHandlerFactory;
-  serviceConfigurationHandler?: ServiceConfigurationHandlerFactory;
+  // serviceConfigurationHandler?: ServiceConfigurationHandlerFactory;
+  authorizationServerMetadataHandler?: ServiceConfigurationHandlerFactory;
+  openIDConfigurationHandler?: ServiceConfigurationHandlerFactory;
   serviceJwksHandler?: ServiceJwksHandlerFactory;
   userHandler?: UserHandlerFactory<SS, U, T>;
   session?: SessionFactory;

@@ -17,7 +17,7 @@
 import { PAR_PATH } from '@vecrea/au3te-ts-server/handler.par';
 import { AUTHORIZATION_PATH } from '@vecrea/au3te-ts-server/handler.authorization';
 import { TOKEN_PATH } from '@vecrea/au3te-ts-server/handler.token';
-import { SERVICE_CONFIGURATION_PATH } from '@vecrea/au3te-ts-server/handler.service-configuration';
+import { OPENID_CONFIGURATION_PATH, AUTHORIZATION_SERVER_METADATA_PATH } from '@vecrea/au3te-ts-server/handler.service-configuration';
 import { CREDENTIAL_METADATA_PATH } from '@vecrea/au3te-ts-server/handler.credential-metadata';
 import { SERVICE_JWKS_PATH } from '@vecrea/au3te-ts-server/handler.service-jwks';
 import { AUTHORIZATION_DECISION_PATH } from '@vecrea/au3te-ts-server/handler.authorization-decision';
@@ -36,7 +36,8 @@ export class EndpointPath {
   static readonly authorizationDecisionPath = AUTHORIZATION_DECISION_PATH;
   static readonly tokenPath = TOKEN_PATH;
   static readonly credentialPath = CREDENTIAL_SINGLE_ISSUE_PATH;
-  static readonly serviceConfigurationPath = SERVICE_CONFIGURATION_PATH;
+  static readonly openIDConfigurationPath = OPENID_CONFIGURATION_PATH;
+  static readonly authorizationServerMetadataPath = AUTHORIZATION_SERVER_METADATA_PATH;
   static readonly credentialIssuerMetadataPath = CREDENTIAL_METADATA_PATH;
   static readonly credentialIssuerJwksPath = CREDENTIAL_ISSUER_JWKS_PATH;
   static readonly serviceJwksPath = SERVICE_JWKS_PATH;
