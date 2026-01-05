@@ -10,6 +10,7 @@ A Hono-based implementation of the au3te-ts server for OAuth 2.0 and OpenID Conn
 - [AWS Setup](#aws-setup)
 - [LocalStack Deployment](#localstack-deployment)
 - [AWS Deployment](#aws-deployment)
+- [Federation Configuration](#federation-configuration)
 
 ## Setup
 
@@ -316,6 +317,10 @@ Script for deploying to AWS production environment:
 - Build SAM application
 - Deploy to AWS production environment
 - Upload CSS files to S3
+
+## Federation Configuration
+
+For details on how to configure federation with external Identity Providers (OIDC/SAML 2.0), please refer to [Federation Configuration](docs/federation/FederationConfiguration.md).
 
 ## License
 
