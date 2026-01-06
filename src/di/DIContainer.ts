@@ -42,6 +42,10 @@ import { CredentialMetadataHandlerConfiguration } from '@vecrea/au3te-ts-server/
 import { ServiceConfigurationHandlerConfiguration } from '@vecrea/au3te-ts-server/handler.service-configuration';
 import { ServiceJwksHandlerConfiguration } from '@vecrea/au3te-ts-server/handler.service-jwks';
 import { UserHandlerConfiguration } from '@vecrea/au3te-ts-common/handler.user';
+import {
+  StandardIntrospectionHandlerConfiguration,
+  StandardIntrospectionHandlerConfigurationImplConstructorParams,
+} from '@vecrea/au3te-ts-server/handler.standard-introspection';
 import { Env } from '../env';
 import { Context } from 'hono';
 import {
@@ -53,6 +57,7 @@ import {
   FederationCallbackHandlerConfigurationImplConstructorParams,
 } from '@vecrea/au3te-ts-server/handler.federation-callback';
 import { User } from '@vecrea/au3te-ts-common/schemas.common';
+import { ResourceServerHandlerConfiguration } from '@vecrea/au3te-ts-common/handler.resourceServer';
 /**
  * Dependency Injection Container interface.
  * Provides factory methods for creating handler configurations.
@@ -166,6 +171,16 @@ export interface DIContainer<
    * @returns {FederationCallbackHandlerConfiguration} The federation callback handler configuration.
    */
   federationCallbackHandler(): FederationCallbackHandlerConfiguration;
+  /**
+   * Creates a introspection handler configuration.
+   * @returns {StandardIntrospectionHandlerConfiguration} The introspection handler configuration.
+   */
+  standardIntrospectionHandler(): StandardIntrospectionHandlerConfiguration;
+  /**
+   * Creates a resource server handler configuration.
+   * @returns {ResourceServerHandlerConfiguration} The resource server handler configuration.
+   */
+  resourceServerHandlerConfiguration(): ResourceServerHandlerConfiguration;
 }
 
 /**
@@ -335,6 +350,18 @@ export interface FederationCallbackHandlerFactory<
     >,
   ): FederationCallbackHandlerConfiguration;
 }
+
+export interface StandardIntrospectionHandlerFactory<
+  SS extends DefaultSessionSchemas = DefaultSessionSchemas,
+> {
+  (
+    params: StandardIntrospectionHandlerConfigurationImplConstructorParams<SS>,
+  ): StandardIntrospectionHandlerConfiguration;
+}
+
+export interface ResourceServerHandlerFactory {
+  (): ResourceServerHandlerConfiguration;
+}
 /**
  * Override configuration for DI container.
  * Allows custom implementations to be injected for specific handlers.
@@ -359,4 +386,6 @@ export interface DIContainerOverrides<
   session?: SessionFactory;
   federationInitiationHandler?: FederationInitiationHandlerFactory;
   federationCallbackHandler?: FederationCallbackHandlerFactory<SS, U, T>;
+  standardIntrospectionHandler?: StandardIntrospectionHandlerFactory;
+  resourceServerHandler?: ResourceServerHandlerFactory; 
 }

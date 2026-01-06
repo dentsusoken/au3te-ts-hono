@@ -17,7 +17,10 @@
 import { PAR_PATH } from '@vecrea/au3te-ts-server/handler.par';
 import { AUTHORIZATION_PATH } from '@vecrea/au3te-ts-server/handler.authorization';
 import { TOKEN_PATH } from '@vecrea/au3te-ts-server/handler.token';
-import { OPENID_CONFIGURATION_PATH, AUTHORIZATION_SERVER_METADATA_PATH } from '@vecrea/au3te-ts-server/handler.service-configuration';
+import {
+  OPENID_CONFIGURATION_PATH,
+  AUTHORIZATION_SERVER_METADATA_PATH,
+} from '@vecrea/au3te-ts-server/handler.service-configuration';
 import { CREDENTIAL_METADATA_PATH } from '@vecrea/au3te-ts-server/handler.credential-metadata';
 import { SERVICE_JWKS_PATH } from '@vecrea/au3te-ts-server/handler.service-jwks';
 import { AUTHORIZATION_DECISION_PATH } from '@vecrea/au3te-ts-server/handler.authorization-decision';
@@ -25,7 +28,7 @@ import { CREDENTIAL_SINGLE_ISSUE_PATH } from '@vecrea/au3te-ts-server/handler.cr
 import { CREDENTIAL_ISSUER_JWKS_PATH } from '@vecrea/au3te-ts-server/handler.credential-issuer-jwks';
 import { FEDERATION_INITIATION_PATH } from '@vecrea/au3te-ts-server/handler.federation-initiation';
 import { FEDERATION_CALLBACK_PATH } from '@vecrea/au3te-ts-server/handler.federation-callback';
-
+import { STANDARD_INTROSPECTION_PATH } from '@vecrea/au3te-ts-server/handler.standard-introspection';
 /**
  * Manages the endpoint paths for various OAuth 2.0 and OpenID Connect operations.
  * This class centralizes the path configuration for all API endpoints used in the application.
@@ -37,13 +40,15 @@ export class EndpointPath {
   static readonly tokenPath = TOKEN_PATH;
   static readonly credentialPath = CREDENTIAL_SINGLE_ISSUE_PATH;
   static readonly openIDConfigurationPath = OPENID_CONFIGURATION_PATH;
-  static readonly authorizationServerMetadataPath = AUTHORIZATION_SERVER_METADATA_PATH;
+  static readonly authorizationServerMetadataPath =
+    AUTHORIZATION_SERVER_METADATA_PATH;
   static readonly credentialIssuerMetadataPath = CREDENTIAL_METADATA_PATH;
   static readonly credentialIssuerJwksPath = CREDENTIAL_ISSUER_JWKS_PATH;
   static readonly serviceJwksPath = SERVICE_JWKS_PATH;
   static readonly federationInitiationPath = FEDERATION_INITIATION_PATH;
   static readonly federationCallbackPath = FEDERATION_CALLBACK_PATH;
-  
+  static readonly standardIntrospectionPath = STANDARD_INTROSPECTION_PATH;
+
   private constructor() {
     throw new Error('This class is not instantiable');
   }

@@ -28,3 +28,4 @@ export * from './ServiceJwksController';
 export * from './TokenController';
 export * from './OpenIDConfigurationController';
 export * from './AuthorizationServerMetadataController';
+export * from './StandardIntrospectionController';

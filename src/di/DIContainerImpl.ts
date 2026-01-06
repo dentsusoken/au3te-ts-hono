@@ -103,6 +103,14 @@ import {
   FederationCallbackHandlerConfigurationImpl,
 } from '@vecrea/au3te-ts-server/handler.federation-callback';
 import { User } from '@vecrea/au3te-ts-common/schemas.common';
+import {
+  StandardIntrospectionHandlerConfiguration,
+  StandardIntrospectionHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.standard-introspection';
+import {
+  ResourceServerHandlerConfiguration,
+  ResourceServerHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-common/handler.resourceServer';
 
 /**
  * Default implementation of the DI container.
@@ -442,5 +450,28 @@ export class DIContainerImpl<
       federationManager: this.#federationManager,
       userHandler: this.userHandler(),
     });
+  }
+
+  standardIntrospectionHandler(): StandardIntrospectionHandlerConfiguration {
+    if (this.#overrides.standardIntrospectionHandler) {
+      return this.#overrides.standardIntrospectionHandler({
+        serverHandlerConfiguration: this.serverHandlerConfiguration(),
+        extractorConfiguration: this.extractorConfiguration(),
+        resourceServerHandlerConfiguration:
+          this.resourceServerHandlerConfiguration(),
+      });
+    }
+    return new StandardIntrospectionHandlerConfigurationImpl({
+      serverHandlerConfiguration: this.serverHandlerConfiguration(),
+      extractorConfiguration: this.extractorConfiguration(),
+      resourceServerHandlerConfiguration:
+        this.resourceServerHandlerConfiguration(),
+    });
+  }
+  resourceServerHandlerConfiguration(): ResourceServerHandlerConfiguration {
+    if (this.#overrides.resourceServerHandler) {
+      return this.#overrides.resourceServerHandler();
+    }
+    return new ResourceServerHandlerConfigurationImpl();
   }
 }

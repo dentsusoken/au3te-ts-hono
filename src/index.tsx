@@ -30,6 +30,7 @@ import {
   TokenController,
   OpenIDConfigurationController,
   AuthorizationServerMetadataController,
+  StandardIntrospectionController,
 } from './controllers';
 import { createGetDI } from './di';
 import { Env } from './env';
@@ -108,6 +109,10 @@ app.get(
 app.post(
   EndpointPath.federationCallbackPath,
   FederationCallbackController.handle,
+);
+app.post(
+  EndpointPath.standardIntrospectionPath,
+  StandardIntrospectionController.handle,
 );
 export { DurableObjectImpl } from './database';
 export default app;

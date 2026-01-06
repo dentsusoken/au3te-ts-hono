@@ -38,6 +38,7 @@ import {
   TokenController,
   OpenIDConfigurationController,
   AuthorizationServerMetadataController,
+  StandardIntrospectionController,
 } from './controllers';
 import { createGetDI } from './di';
 import { Env } from './env';
@@ -108,7 +109,10 @@ app.post(
   EndpointPath.federationCallbackPath,
   FederationCallbackController.handle,
 );
-
+app.post(
+  EndpointPath.standardIntrospectionPath,
+  StandardIntrospectionController.handle,
+);
 // Routes for CSS files
 const CSS_HEADERS = {
   'Content-Type': 'text/css',
