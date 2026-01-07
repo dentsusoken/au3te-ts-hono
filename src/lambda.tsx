@@ -49,6 +49,7 @@ import { setupLambdaMiddleware } from './middleware/setupLambda';
 import { createDynamoSession } from './session';
 import { TopPage } from './view/TopPage';
 import { User } from '@vecrea/au3te-ts-common/schemas.common';
+import { ClientRegistrationController } from './controllers/ClientRegistrationController';
 
 const app = new Hono<Env<DefaultSessionSchemas, User, never> & S3Env>();
 app.use(dynamoDBMiddleware());
@@ -112,6 +113,23 @@ app.post(
 app.post(
   EndpointPath.standardIntrospectionPath,
   StandardIntrospectionController.handle,
+);
+
+app.post(
+  EndpointPath.clientRegistrationPath.replace(':clientId', '*'),
+  ClientRegistrationController.handle,
+);
+app.get(
+  EndpointPath.clientRegistrationPath,
+  ClientRegistrationController.handle,
+);
+app.put(
+  EndpointPath.clientRegistrationPath,
+  ClientRegistrationController.handle,
+);
+app.delete(
+  EndpointPath.clientRegistrationPath,
+  ClientRegistrationController.handle,
 );
 // Routes for CSS files
 const CSS_HEADERS = {

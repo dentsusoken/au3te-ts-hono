@@ -46,6 +46,11 @@ import {
   StandardIntrospectionHandlerConfiguration,
   StandardIntrospectionHandlerConfigurationImplConstructorParams,
 } from '@vecrea/au3te-ts-server/handler.standard-introspection';
+import {
+  ClientRegistrationHandlerConfiguration,
+  ClientRegistrationHandlerConfigurationImplConstructorParams,
+  ApiMethod as ClientRegistrationApiMethod,
+} from '@vecrea/au3te-ts-server/handler.client-registration';
 import { Env } from '../env';
 import { Context } from 'hono';
 import {
@@ -181,6 +186,13 @@ export interface DIContainer<
    * @returns {ResourceServerHandlerConfiguration} The resource server handler configuration.
    */
   resourceServerHandlerConfiguration(): ResourceServerHandlerConfiguration;
+  /**
+   * Creates a client registration handler configuration.
+   * @returns {ClientRegistrationHandlerConfiguration} The client registration handler configuration.
+   */
+  clientRegistrationHandlerConfiguration(
+    method: ClientRegistrationApiMethod,
+  ): ClientRegistrationHandlerConfiguration;
 }
 
 /**
@@ -362,6 +374,14 @@ export interface StandardIntrospectionHandlerFactory<
 export interface ResourceServerHandlerFactory {
   (): ResourceServerHandlerConfiguration;
 }
+
+export interface ClientRegistrationHandlerFactory<
+  SS extends DefaultSessionSchemas = DefaultSessionSchemas,
+> {
+  (
+    params: ClientRegistrationHandlerConfigurationImplConstructorParams<SS>,
+  ): ClientRegistrationHandlerConfiguration;
+}
 /**
  * Override configuration for DI container.
  * Allows custom implementations to be injected for specific handlers.
@@ -387,5 +407,6 @@ export interface DIContainerOverrides<
   federationInitiationHandler?: FederationInitiationHandlerFactory;
   federationCallbackHandler?: FederationCallbackHandlerFactory<SS, U, T>;
   standardIntrospectionHandler?: StandardIntrospectionHandlerFactory;
-  resourceServerHandler?: ResourceServerHandlerFactory; 
+  resourceServerHandler?: ResourceServerHandlerFactory;
+  clientRegistrationHandler?: ClientRegistrationHandlerFactory<SS>;
 }

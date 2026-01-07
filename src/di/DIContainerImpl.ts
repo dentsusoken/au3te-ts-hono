@@ -111,6 +111,11 @@ import {
   ResourceServerHandlerConfiguration,
   ResourceServerHandlerConfigurationImpl,
 } from '@vecrea/au3te-ts-common/handler.resourceServer';
+import {
+  ApiMethod as ClientRegistrationApiMethod,
+  ClientRegistrationHandlerConfiguration,
+  ClientRegistrationHandlerConfigurationImpl,
+} from '@vecrea/au3te-ts-server/handler.client-registration';
 
 /**
  * Default implementation of the DI container.
@@ -473,5 +478,22 @@ export class DIContainerImpl<
       return this.#overrides.resourceServerHandler();
     }
     return new ResourceServerHandlerConfigurationImpl();
+  }
+
+  clientRegistrationHandlerConfiguration(
+    method: ClientRegistrationApiMethod,
+  ): ClientRegistrationHandlerConfiguration {
+    if (this.#overrides.clientRegistrationHandler) {
+      return this.#overrides.clientRegistrationHandler({
+        method,
+        serverHandlerConfiguration: this.serverHandlerConfiguration(),
+        extractorConfiguration: this.extractorConfiguration(),
+      });
+    }
+    return new ClientRegistrationHandlerConfigurationImpl({
+      method,
+      serverHandlerConfiguration: this.serverHandlerConfiguration(),
+      extractorConfiguration: this.extractorConfiguration(),
+    });
   }
 }

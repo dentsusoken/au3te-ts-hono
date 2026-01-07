@@ -47,6 +47,7 @@ import {
 import { TopPage } from './view/TopPage';
 import { createUnifiedIdFederationCallbackHandler } from './extensions/unified-id/handler/federation-callback/UnifiedIdFederationCallbackHandler';
 import { UnifiedIdUser } from './extensions/unified-id/schemas/User';
+import { ClientRegistrationController } from './controllers/ClientRegistrationController';
 
 const app = new Hono<
   Env<UnifiedIdSessionSchemas, UnifiedIdUser, UnifiedIdOptionsKeys>
@@ -114,5 +115,22 @@ app.post(
   EndpointPath.standardIntrospectionPath,
   StandardIntrospectionController.handle,
 );
+app.post(
+  EndpointPath.clientRegistrationPath.replace(':clientId', '*'),
+  ClientRegistrationController.handle,
+);
+app.get(
+  EndpointPath.clientRegistrationPath,
+  ClientRegistrationController.handle,
+);
+app.put(
+  EndpointPath.clientRegistrationPath,
+  ClientRegistrationController.handle,
+);
+app.delete(
+  EndpointPath.clientRegistrationPath,
+  ClientRegistrationController.handle,
+);
+
 export { DurableObjectImpl } from './database';
 export default app;

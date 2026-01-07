@@ -29,6 +29,7 @@ import { CREDENTIAL_ISSUER_JWKS_PATH } from '@vecrea/au3te-ts-server/handler.cre
 import { FEDERATION_INITIATION_PATH } from '@vecrea/au3te-ts-server/handler.federation-initiation';
 import { FEDERATION_CALLBACK_PATH } from '@vecrea/au3te-ts-server/handler.federation-callback';
 import { STANDARD_INTROSPECTION_PATH } from '@vecrea/au3te-ts-server/handler.standard-introspection';
+import { CLIENT_REGISTRATION_PATH } from '@vecrea/au3te-ts-server/handler.client-registration';
 /**
  * Manages the endpoint paths for various OAuth 2.0 and OpenID Connect operations.
  * This class centralizes the path configuration for all API endpoints used in the application.
@@ -48,6 +49,7 @@ export class EndpointPath {
   static readonly federationInitiationPath = FEDERATION_INITIATION_PATH;
   static readonly federationCallbackPath = FEDERATION_CALLBACK_PATH;
   static readonly standardIntrospectionPath = STANDARD_INTROSPECTION_PATH;
+  static readonly clientRegistrationPath = CLIENT_REGISTRATION_PATH;
 
   private constructor() {
     throw new Error('This class is not instantiable');
