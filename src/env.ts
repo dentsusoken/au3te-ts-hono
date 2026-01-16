@@ -15,7 +15,7 @@ import { User } from '@vecrea/au3te-ts-common/schemas.common';
  * @template T - User credential fields type extending keyof Omit<U, 'loginId' | 'password'>, defaults to never.
  */
 export type Env<
-  SS extends DefaultSessionSchemas,
+  SS extends DefaultSessionSchemas = DefaultSessionSchemas,
   U extends User = User,
   T extends keyof Omit<U, 'loginId' | 'password'> = never,
 > = DynamoDBEnv & {

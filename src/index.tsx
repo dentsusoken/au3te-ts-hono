@@ -15,6 +15,7 @@
  * License.
  */
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { jsxRenderer } from 'hono/jsx-renderer';
 import { EndpointPath } from './config/EndpointPath';
 import {
@@ -34,38 +35,45 @@ import {
 } from './controllers';
 import { createGetDI } from './di';
 import { Env } from './env';
-import { createUnifiedIdAuthorizationHandler } from './extensions/unified-id/handler/authorization';
-import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/handler/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
-import {
-  createUnifiedIdUserHandler,
-  UnifiedIdOptionsKeys,
-} from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
-import {
-  UnifiedIdSessionSchemas,
-  unifiedIdSessionSchemas,
-} from './extensions/unified-id/session';
+// import { createUnifiedIdAuthorizationHandler } from './extensions/unified-id/handler/authorization';
+// import { createUnifiedIdAuthorizationDecisionHandler } from './extensions/unified-id/handler/authorization-decision/UnifiedIdAuthorizationDecisionHandler';
+// import {
+//   createUnifiedIdUserHandler,
+//   UnifiedIdOptionsKeys,
+// } from './extensions/unified-id/handler/user/UnifiedIdUserHandlerConfigurationImpl';
+// import {
+//   UnifiedIdSessionSchemas,
+//   unifiedIdSessionSchemas,
+// } from './extensions/unified-id/session';
 import { TopPage } from './view/TopPage';
-import { createUnifiedIdFederationCallbackHandler } from './extensions/unified-id/handler/federation-callback/UnifiedIdFederationCallbackHandler';
-import { UnifiedIdUser } from './extensions/unified-id/schemas/User';
+// import { createUnifiedIdFederationCallbackHandler } from './extensions/unified-id/handler/federation-callback/UnifiedIdFederationCallbackHandler';
+// import { UnifiedIdUser } from './extensions/unified-id/schemas/User';
 import { ClientRegistrationController } from './controllers/ClientRegistrationController';
+import {
+  defaultSessionSchemas,
+  DefaultSessionSchemas,
+} from '@vecrea/au3te-ts-server/session';
+import { User } from '@vecrea/au3te-ts-common/schemas.common';
 
-const app = new Hono<
-  Env<UnifiedIdSessionSchemas, UnifiedIdUser, UnifiedIdOptionsKeys>
->();
-
+// const app = new Hono<
+//   Env<UnifiedIdSessionSchemas, UnifiedIdUser, UnifiedIdOptionsKeys>
+// >();
+const app = new Hono<Env>();
+app.use(cors({ origin: '*' }));
 app.use(async (c, next) => {
   c.set(
     'getDI',
-    createGetDI<UnifiedIdSessionSchemas, UnifiedIdUser, UnifiedIdOptionsKeys>(
-      unifiedIdSessionSchemas,
-      {
-        authorizationHandler: createUnifiedIdAuthorizationHandler,
-        authorizationDecisionHandler:
-          createUnifiedIdAuthorizationDecisionHandler,
-        userHandler: createUnifiedIdUserHandler,
-        federationCallbackHandler: createUnifiedIdFederationCallbackHandler,
-      },
-    ),
+    createGetDI<DefaultSessionSchemas, User, never>(defaultSessionSchemas),
+    // createGetDI<UnifiedIdSessionSchemas, UnifiedIdUser, UnifiedIdOptionsKeys>(
+    //   unifiedIdSessionSchemas,
+    //   {
+    //     authorizationHandler: createUnifiedIdAuthorizationHandler,
+    //     authorizationDecisionHandler:
+    //       createUnifiedIdAuthorizationDecisionHandler,
+    //     userHandler: createUnifiedIdUserHandler,
+    //     federationCallbackHandler: createUnifiedIdFederationCallbackHandler,
+    //   },
+    // ),
   );
   await next();
 });
