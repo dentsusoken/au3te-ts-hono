@@ -52,3 +52,6 @@ new_sqlite_classes = ["DurableObjectBase"]
 
 [observability]
 enabled = true
+
+[dev]
+port = 18787

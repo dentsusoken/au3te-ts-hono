@@ -4,13 +4,42 @@ A Hono-based implementation of the au3te-ts server for OAuth 2.0 and OpenID Conn
 
 ## Table of Contents
 
+- [Table of Contents](#table-of-contents)
 - [Setup](#setup)
+  - [Prerequisites](#prerequisites)
+    - [Authlete Client Registration](#authlete-client-registration)
+    - [mkcert Installation](#mkcert-installation)
+      - [macOS Installation](#macos-installation)
+      - [Root CA Setup](#root-ca-setup)
+      - [Check Root Certificate Location](#check-root-certificate-location)
+    - [Clone Repository](#clone-repository)
+    - [Install Dependencies](#install-dependencies)
+    - [Creating Server Certificate](#creating-server-certificate)
+      - [Preparation](#preparation)
+      - [Certificate Creation](#certificate-creation)
+  - [Cloudflare Setup](#cloudflare-setup)
+    - [Create .dev.vars](#create-devvars)
+    - [Setup KV Namespaces for Local Development](#setup-kv-namespaces-for-local-development)
+  - [KV Helper Scripts](#kv-helper-scripts)
+    - [Using update-wrangler-kv-ids.sh](#using-update-wrangler-kv-idssh)
+    - [Using kv-put.sh](#using-kv-putsh)
+    - [Using kv-get.sh](#using-kv-getsh)
 - [Local Development](#local-development)
+  - [Run Locally](#run-locally)
 - [Deployment](#deployment)
+  - [Deploy to Cloudflare Workers](#deploy-to-cloudflare-workers)
 - [AWS Setup](#aws-setup)
+  - [Prerequisites](#prerequisites-1)
+  - [Setup Steps](#setup-steps)
+    - [Environment Variables Configuration](#environment-variables-configuration)
+    - [VSCode Dev Container Startup](#vscode-dev-container-startup)
 - [LocalStack Deployment](#localstack-deployment)
 - [AWS Deployment](#aws-deployment)
+  - [Deploy Script Details](#deploy-script-details)
+    - [deployLocalStack.sh](#deploylocalstacksh)
+    - [deployAws.sh](#deployawssh)
 - [Federation Configuration](#federation-configuration)
+- [License](#license)
 
 ## Setup
 
@@ -28,6 +57,30 @@ Required configuration information:
 
 For setup instructions, see [here](https://www.authlete.com/ja/developers/tutorial/signup/)
 
+#### mkcert Installation
+
+mkcert is a tool for easily implementing HTTPS communication in local development environments.
+Here's how to install and configure mkcert.
+
+##### macOS Installation
+
+```bash
+brew install mkcert
+brew install nss # Required if using Firefox
+```
+
+##### Root CA Setup
+
+```bash
+mkcert -install
+```
+
+##### Check Root Certificate Location
+
+```bash
+mkcert -CAROOT
+```
+
 #### Clone Repository
 
 ```bash
@@ -39,6 +92,25 @@ cd au3te-ts-hono
 
 ```bash
 npm install
+```
+
+#### Creating Server Certificate
+
+To enable HTTPS communication with the previously set static IP address, we'll create a server certificate.
+
+##### Preparation
+
+```bash
+mkdir .mkcert
+cd .mkcert
+```
+
+Create and move to a dedicated folder for certificate storage.
+
+##### Certificate Creation
+
+```bash
+mkcert localhost
 ```
 
 ### Cloudflare Setup

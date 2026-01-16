@@ -37,3 +37,6 @@ lerna-debug.log*
 .aws-sam/
 build/
 volume/
+
+# mkcert
+.mkcert/
